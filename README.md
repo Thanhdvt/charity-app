@@ -49,8 +49,36 @@ The CharityApp is a platform that connects volunteers and charitable organizatio
 ### Installation
 1. Clone the repository to your machine.
    ```bash
-   git clone https://github.com/your-username/charity-app.git
+   git clone https://github.com/Thanhdvt/charity-app.git
    cd charity-app
+
+2. Cài đặt dependencies cho frontend và backend.
+# Cài đặt dependencies cho frontend
+cd frontend
+npm install
+# Cài đặt dependencies cho backend
+cd backend
+dotnet restore
+3. Chạy Ứng Dụng
+Chạy backend.
+bash
+Copy code
+# Di chuyển vào thư mục backend
+cd backend
+
+# Chạy ứng dụng ASP.NET Core 3
+dotnet run
+Chạy frontend.
+bash
+Copy code
+# Di chuyển vào thư mục frontend
+cd frontend
+
+# Chạy ứng dụng React Native Expo
+expo start
+Cấu Trúc Thư Mục
+backend: Mã nguồn cho phần backend (ASP.NET Core 3).
+frontend: Mã nguồn cho phần frontend (React Native Expo).
 
 ## Contact
 If you have any questions or suggestions, please contact us via email: thanhak2k2@gmail.com.
