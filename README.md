@@ -1,13 +1,5 @@
 # Charity App
 
-## Table of Contents
-1. [Introduction](#introduction)
-2. [Basic Features](#basic-features)
-3. [Technology Stack](#technology-stack)
-4. [Installation Guide](#installation-guide)
-5. [Directory Structure](#directory-structure)
-6. [Contribution and Feedback](#contribution-and-feedback)
-
 ## Introduction
 The CharityApp is a platform that connects volunteers and charitable organizations with those in need. Developed using React Native Expo for the frontend and ASP.NET Core 3 for the backend, this application emphasizes community solidarity, creating a strong bond between those who have the ability to help and those in need of support.
 
@@ -51,34 +43,34 @@ The CharityApp is a platform that connects volunteers and charitable organizatio
    ```bash
    git clone https://github.com/Thanhdvt/charity-app.git
    cd charity-app
-
+   ```
 2. Cài đặt dependencies cho frontend và backend.
-# Cài đặt dependencies cho frontend
-cd frontend
-npm install
-# Cài đặt dependencies cho backend
-cd backend
-dotnet restore
-3. Chạy Ứng Dụng
-Chạy backend.
-bash
-Copy code
-# Di chuyển vào thư mục backend
-cd backend
+#### Cài đặt dependencies cho frontend
+   ```bash
+   cd frontend
+   npm install
+   ```
+#### Cài đặt dependencies cho backend
+   ```bash
+   cd backend
+   dotnet restore
+   ```
 
-# Chạy ứng dụng ASP.NET Core 3
-dotnet run
-Chạy frontend.
-bash
-Copy code
-# Di chuyển vào thư mục frontend
-cd frontend
+3. Chạy Ứng Dụng
+#### Chạy ứng dụng ASP.NET Core 3
+   ``` bash
+   dotnet run
+   ```
 
 # Chạy ứng dụng React Native Expo
-expo start
-Cấu Trúc Thư Mục
-backend: Mã nguồn cho phần backend (ASP.NET Core 3).
-frontend: Mã nguồn cho phần frontend (React Native Expo).
+   ``` bash
+   expo start
+   ```
+
+### Cấu Trúc Thư Mục
+
+* `backend`: Mã nguồn cho phần backend (ASP.NET Core 3).
+* `frontend`: Mã nguồn cho phần frontend (React Native Expo).
 
 ## Contact
 If you have any questions or suggestions, please contact us via email: thanhak2k2@gmail.com.
