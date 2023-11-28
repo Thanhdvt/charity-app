@@ -38,39 +38,32 @@ The CharityApp is a platform that connects volunteers and charitable organizatio
 - Expo CLI
 - MySQL
 
-### Installation
+### Installation and Running
 1. Clone the repository to your machine.
    ```bash
    git clone https://github.com/Thanhdvt/charity-app.git
    cd charity-app
    ```
-2. Cài đặt dependencies cho frontend và backend.
-#### Cài đặt dependencies cho frontend
-   ```bash
-   cd frontend
-   npm install
-   ```
-#### Cài đặt dependencies cho backend
+
+2. Backend
    ```bash
    cd backend
    dotnet restore
-   ```
-
-3. Chạy Ứng Dụng
-#### Chạy ứng dụng ASP.NET Core 3
-   ``` bash
    dotnet run
    ```
 
-# Chạy ứng dụng React Native Expo
-   ``` bash
-   expo start
+3. Frontend
+   ```bash
+   cd frontend
+   npm install
+   npm start
    ```
 
-### Cấu Trúc Thư Mục
+### Directory Structure
 
-* `backend`: Mã nguồn cho phần backend (ASP.NET Core 3).
-* `frontend`: Mã nguồn cho phần frontend (React Native Expo).
+* `backend`: Contains the source code of the backend written in ASP.NET Core 3.
+* `frontend`: Contains the source code of the frontend written in React Native Expo.
+* `docs`: Documentation or guides related to the application.
 
 ## Contact
 If you have any questions or suggestions, please contact us via email: thanhak2k2@gmail.com.
