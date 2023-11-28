@@ -1,7 +1,7 @@
 # Charity App
 
 ## Introduction
-The CharityApp is a platform that connects volunteers and charitable organizations with those in need. Developed using React Native Expo for the frontend and ASP.NET Core 3 for the backend, this application emphasizes community solidarity, creating a strong bond between those who have the ability to help and those in need of support.
+The Charity App is a platform that connects volunteers and charitable organizations with those in need. Developed using React Native Expo for the frontend and ASP.NET Core 3 for the backend, this application emphasizes community solidarity, creating a strong bond between those who have the ability to help and those in need of support.
 
 ## Basic Features
 1. **Manage Charitable Organizations**
