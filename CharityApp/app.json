@@ -1,0 +1,33 @@
+{
+  "expo": {
+    "name": "CharityApp",
+    "slug": "CharityApp",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/logo-charity.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/images/logo-charity.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FFDAB9"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/logo-charity.png",
+        "backgroundColor": "#FFDAB9"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router"
+    ]
+  }
+}
