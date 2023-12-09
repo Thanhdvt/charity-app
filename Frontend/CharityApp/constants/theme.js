@@ -5,9 +5,11 @@ export const COLORS = {
     primary: '#FF6347',
     secondary: '#544C4C',
     white: '#ffffff',
+    grey: "#f5f5f5",
     black: '#000000',
+    secondaryBlack: "#222222",
     gray: 'rgba(36, 39, 96, 0.05)',
-    secondaryGray: 'rgba(84, 76, 76, 0.14)'
+    secondaryGray: 'rgba(84, 76, 76, 0.14)',
 }
 
 export const SIZES = {
