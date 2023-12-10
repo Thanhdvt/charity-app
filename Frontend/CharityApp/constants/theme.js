@@ -10,6 +10,14 @@ export const COLORS = {
     secondaryBlack: "#222222",
     gray: 'rgba(36, 39, 96, 0.05)',
     secondaryGray: 'rgba(84, 76, 76, 0.14)',
+    sliver: '#808080',
+    PRIMARY:'#d46dfc',
+    LIGHT_PRIMARY:'#f4d6ff',
+    BLACK:'#000',
+    GRAY:'#f0f0f0',
+    WHITE:'#fff',
+    YELLOW:'#fabd07',
+    DARK_GRAY:'#a1a09f'
 }
 
 export const SIZES = {

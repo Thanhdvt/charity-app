@@ -1,15 +1,16 @@
-import { View, Text, TouchableOpacity, StyleSheet, TextInput } from "react-native";
+import {View, Text, TouchableOpacity, StyleSheet, TextInput, Dimensions} from "react-native";
 import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import { COLORS, FONTS, SIZES } from "../../constants";
 import Icon from "react-native-vector-icons/Ionicons";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import JoinRequestListScreen from "./JoinRequest/JoinRequestListScreen";
 import VolunteerListScreen from "./Volunteer/VolunteerListScreen";
-import RecruitmentScreen from "./Recruitment/RecruitmentScreen";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const Tab = createMaterialTopTabNavigator();
+
+const {width} = Dimensions.get('screen');
 
 const VolunteerTabScreen = ({ navigation }) => {
   return (
@@ -34,7 +35,7 @@ const VolunteerTabScreen = ({ navigation }) => {
           <Ionicons name="arrow-back" size={24} color={COLORS.white} />
         </TouchableOpacity>
         <View style={{flexDirection: "row", backgroundColor: COLORS.white, paddingVertical: 3, paddingHorizontal: 15, borderRadius: 24,}}>
-            <View style={{justifyContent: "center", alignContent: "center", paddingHorizontal: 10, width: 200}}>
+            <View style={{justifyContent: "center", alignContent: "center", paddingHorizontal: 10, width: width/1.7}}>
                 <TextInput
                     style={{fontWeight: "400", fontSize: 16}}
                     placeholder="Tìm kiếm"
@@ -67,11 +68,6 @@ const VolunteerTabScreen = ({ navigation }) => {
           name="JoinRequest"
           component={JoinRequestListScreen}
           options={{ tabBarLabel: "Chờ duyệt" }}
-        />
-        <Tab.Screen
-          name="Recruitment"
-          component={RecruitmentScreen}
-          options={{ tabBarLabel: "Tuyển mới" }}
         />
       </Tab.Navigator>
     </SafeAreaView>

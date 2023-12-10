@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, Image, StyleSheet } from "react-native";
+import {Text, Image, StyleSheet, ScrollView} from "react-native";
 
 import { COLORS, images } from "../../../constants";
 // import { DrawerContent } from "../../Drawer/DrawerContent";
@@ -9,6 +9,9 @@ import Icon from "react-native-vector-icons/Ionicons";
 import { useTheme, Avatar } from "react-native-paper";
 import { View } from "react-native-animatable";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import OrganizationList from "../../../components/public/Landing/OrganizationList";
+import EventList from "../../../components/public/Landing/EventList";
+import Post from "../../../components/public/Landing/Post";
 
 const styles = StyleSheet.create({
   stretch: {
@@ -23,9 +26,11 @@ const HomeContent = ({ navigation }) => {
   const theme = useTheme();
 
   return (
-    <View>
-      <Text>Home</Text>
-    </View>
+      <ScrollView showsVerticalScrollIndicator={false} style={{marginBottom: 50}}>
+          <OrganizationList/>
+          <EventList/>
+          <Post/>
+      </ScrollView>
   );
 };
 
@@ -59,12 +64,13 @@ const HomeScreen = ({ navigation }) => {
 
           headerRight: () => (
             <View style={{ flexDirection: "row", marginRight: 10 }}>
-              <Icon.Button
+              <Icon
                 name="ios-search"
                 size={24}
-                color="#000"
+                color="#000000"
                 backgroundColor={colors.background}
-                onPress={() => {}}
+                onPress={() => navigation.navigate("SearchAll")}
+                style={{paddingVertical: 10, paddingHorizontal: 10}}
               />
               <TouchableOpacity style={{ paddingHorizontal: 10, marginTop: 0 }}>
                 <Image

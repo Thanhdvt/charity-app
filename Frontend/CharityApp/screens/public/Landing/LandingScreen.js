@@ -1,5 +1,5 @@
 import React from "react";
-import {Text, Image, StyleSheet, Modal, Animated, TouchableOpacity, ScrollView} from "react-native";
+import {Text, Image, StyleSheet, Modal, Animated, TouchableOpacity, ScrollView, Dimensions} from "react-native";
 import {useFocusEffect} from "@react-navigation/native";
 import {COLORS, icons, images} from "../../../constants";
 // import { DrawerContent } from "../../Drawer/DrawerContent";
@@ -8,7 +8,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 import {useTheme, Avatar} from "react-native-paper";
 import {View} from "react-native-animatable";
 import Button from "../../../components/common/Button"
-import Post from "../../../components/Profile/Post";
+import Post from "../../../components/public/Landing/Post";
 import OrganizationList from "../../../components/public/Landing/OrganizationList";
 import EventList from "../../../components/public/Landing/EventList";
 
@@ -141,13 +141,13 @@ const LandingScreen = ({navigation}) => {
                     ),
                     headerRight: () => (
                         <View style={{flexDirection: "row", marginRight: 10}}>
-                            <Icon.Button
+                            <Icon
                                 name="ios-search"
                                 size={24}
-                                color="#000"
+                                color="#000000"
                                 backgroundColor={colors.background}
-                                onPress={() => {
-                                }}
+                                onPress={() => navigation.navigate("SearchAll")}
+                                style={{paddingVertical: 10, paddingHorizontal: 10}}
                             />
                             <TouchableOpacity style={{paddingHorizontal: 10, marginTop: 0}}
                                               onPress={() => setVisible(true)}>

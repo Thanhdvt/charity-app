@@ -139,7 +139,6 @@ const VolunteerScreen = ({ navigation }) => {
         <View style={{ backgroundColor: COLORS.white }}>
           <View
             style={{
-              borderBottomColor: "gray",
               borderBottomWidth: 1,
               paddingHorizontal: 20,
               borderBottomColor: COLORS.secondaryGray,
@@ -168,7 +167,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: COLORS.white,
     paddingBottom: 20,
-    marginBottom: 10,
+    marginBottom: 5,
   },
   imageContainer: {
     width: 155,

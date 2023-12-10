@@ -1,15 +1,17 @@
 import { View, Text, Image , Pressable, TextInput, TouchableOpacity } from 'react-native'
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import { SafeAreaView } from "react-native-safe-area-context";
 import {COLORS, icons, images} from '../../../constants';
 import { Ionicons } from "@expo/vector-icons";
 import Checkbox from "expo-checkbox"
 import Button from '../../../components/common/Button';
 import { MaterialCommunityIcons, AntDesign, EvilIcons } from "@expo/vector-icons";
+import {AuthContext} from "../../../Context/AuthContext";
 
 const Login = ({ navigation }) => {
     const [isPasswordShown, setIsPasswordShown] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
+    const {login} = useContext(AuthContext);
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
@@ -128,6 +130,7 @@ const Login = ({ navigation }) => {
                         marginTop: 20,
                         marginBottom: 4,
                     }}
+                    onPress = {() => {login()}}
                 />
 
                 <View>

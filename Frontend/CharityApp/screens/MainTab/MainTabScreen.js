@@ -10,6 +10,7 @@ import { COLORS } from "../../constants/theme";
 import HomeScreen from "./Home/HomeCard";
 
 import MenuScreen from "./Menu/MenuCard";
+import MapScreen from "../Map/MapScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -44,9 +45,9 @@ const MainTabScreen = () => (
           ),
         }}
       />
-      {/* <Tab.Screen
+      <Tab.Screen
         name="Map"
-        component={HomeScreen}
+        component={MapScreen}
         options={{
           tabBarLabel: "Bản đồ",
           tabBarLabelStyle: { fontSize: 12, fontWeight: "400" },
@@ -67,7 +68,7 @@ const MainTabScreen = () => (
             <Icon name="ios-notifications" color={color} size={24} />
           ),
         }}
-      /> */}
+      />
       {/* <Tab.Screen
       name="Profile"
       component={HomeScreen}

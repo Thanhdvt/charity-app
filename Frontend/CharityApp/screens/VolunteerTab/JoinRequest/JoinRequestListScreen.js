@@ -5,10 +5,12 @@ import {
   Text,
   TouchableOpacity,
   FlatList,
-  StyleSheet,
+  StyleSheet, Dimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { COLORS, images } from "../../../constants";
+
+const {width} = Dimensions.get('screen');
 
 const JoinRequestListScreen = ({ navigation }) => {
   const [requestData, setRequestData] = useState([
@@ -141,7 +143,7 @@ const RequestItem = ({ id, name, image, onPress, onConfirm, onDelete }) => {
               {name}
             </Text>
           </View>
-          <View style={{ flexDirection: "row" }}>
+          <View style={{ flexDirection: "row", }}>
             <TouchableOpacity
               style={styles.confirmButton}
               onPress={() => onConfirm(id)}
@@ -168,14 +170,14 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
     paddingVertical: 8,
     borderRadius: 8,
-    width: 110,
+    width: width/3.1,
     alignItems: "center",
     marginRight: 8,
   },
   deleteButton: {
     backgroundColor: "#9C9C9C",
     paddingVertical: 8,
-    width: 110,
+    width: width/3.1,
     alignItems: "center",
     borderRadius: 8,
     marginLeft: 10

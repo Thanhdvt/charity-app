@@ -19,7 +19,7 @@ const IntroInfo = () => {
   return (
     <View
       style={{
-        marginBottom: 10,
+        marginBottom: 5,
         overflow: "hidden",
         backgroundColor: COLORS.white,
       }}

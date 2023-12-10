@@ -6,7 +6,7 @@ import {
   ScrollView,
   StyleSheet,
 } from "react-native";
-import React from "react";
+import React, {useContext} from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS, FONTS, images } from "../../../constants";
 import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
@@ -22,10 +22,12 @@ import {
 } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { createStackNavigator } from "@react-navigation/stack";
+import {AuthContext} from "../../../Context/AuthContext";
 
 const MenuStack = createStackNavigator();
 
 const MenuContent = ({ navigation }) => {
+  const {logout} = useContext(AuthContext);
   const navigateToProfile = () => {
     navigation.navigate("Profile");
   };
@@ -74,8 +76,8 @@ const MenuContent = ({ navigation }) => {
     console.log("Điều khoản và chính sách");
   };
 
-  const logout = () => {
-    console.log("Logout");
+  const exit = () => {
+    logout();
   };
 
   const accountItems = [
@@ -99,8 +101,13 @@ const MenuContent = ({ navigation }) => {
   const actionsItems = [
     {
       icon: "hand-heart-outline",
-      text: "Danh sách hoàn cảnh",
+      text: "Yêu cầu trợ giúp",
       action: navigatorToPlightList,
+    },
+    {
+      icon: "account-group-outline",
+      text: "Tình nguyện viên",
+      action: navigateToVolunteerTab,
     },
     {
       icon: "newspaper",
@@ -109,20 +116,15 @@ const MenuContent = ({ navigation }) => {
     },
     {
       icon: "chart-box-outline",
-      text: "Sao kê tài khoản",
+      text: "Thống kê phân tích",
       action: navigateToStatistic
-    },
-    {
-      icon: "account-group-outline",
-      text: "Tình nguyện viên",
-      action: navigateToVolunteerTab,
     },
   ];
 
   const OptionsItems = [
     {
-      icon: "post-outline",
-      text: "Danh sách bài đăng",
+      icon: "map-outline",
+      text: "Bản đồ",
       action: navigatorToPost,
     },
     {
@@ -146,7 +148,7 @@ const MenuContent = ({ navigation }) => {
     { 
       icon: "logout", 
       text: "Đăng xuất", 
-      action: logout 
+      action:exit
     },
   ];
 
