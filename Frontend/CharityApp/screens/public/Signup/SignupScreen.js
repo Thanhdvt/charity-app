@@ -5,10 +5,49 @@ import {COLORS, icons} from '../../../constants';
 import {AntDesign, EvilIcons, Ionicons} from "@expo/vector-icons";
 import Checkbox from "expo-checkbox"
 import Button from '../../../components/common/Button';
+import Modal from 'react-native-modal';
+import {register} from "../../../services/Signup";
+import CustomModal from "../../../components/Modal/MessageModal";
 
 const SignupScreen = ({ navigation }) => {
+    const [modalVisible, setModalVisible] = useState(false);
+    const [modalMessage, setModalMessage] = useState('');
     const [isPasswordShown, setIsPasswordShown] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
+    const [email, setEmail] = useState('');
+    const [phone, setPhone] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+
+    const validate = (email, phone, password, confirmPassword) => {
+        if (!email || !phone || !password || !confirmPassword) {
+            return { success: false, message: "Vui lòng nhập đầy đủ thông tin" };
+        }
+        if (password !== confirmPassword) {
+            return {
+                success: false,
+                message: "Mật khẩu và xác nhận mật khẩu không trùng khớp",
+            };
+        }
+        return { success: true, message: "Đăng ký thành công" };
+    };
+
+    const handleRegisterPress = () => {
+        const validation = validate(email, phone, password, confirmPassword);
+
+        if (!validation.success) {
+            setModalMessage(validation.message);
+            setModalVisible(true);
+            return;
+        }
+        register(email, phone, password);
+        navigation.navigate('Login');
+    };
+
+    const closeModal = () => {
+        setModalVisible(false);
+    };
+
     const handleTermsPress = () => {
         const termsUrl = 'https://thiennguyen.app/terms';
         Linking.openURL(termsUrl);
@@ -17,6 +56,7 @@ const SignupScreen = ({ navigation }) => {
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
             <View style={{ flex: 1, marginHorizontal: 22, justifyContent: "center" }}>
+                <CustomModal isVisible={modalVisible} onClose={closeModal} message={modalMessage} />
                 <View style={{ marginVertical: 22 }}>
                     <Text style={{
                         fontSize: 22,
@@ -54,6 +94,8 @@ const SignupScreen = ({ navigation }) => {
                                 width: "100%",
                                 paddingLeft: 12
                             }}
+                            value={email}
+                            onChangeText={text => setEmail(text)}
                         />
                     </View>
                 </View>
@@ -89,6 +131,8 @@ const SignupScreen = ({ navigation }) => {
                             style={{
                                 width: "80%"
                             }}
+                            value={phone}
+                            onChangeText={text => setPhone(text)}
                         />
                     </View>
                 </View>
@@ -114,6 +158,8 @@ const SignupScreen = ({ navigation }) => {
                                 width: "100%",
                                 paddingLeft: 3
                             }}
+                            value={password}
+                            onChangeText={text => setPassword(text)}
                         />
 
                         <TouchableOpacity
@@ -156,6 +202,8 @@ const SignupScreen = ({ navigation }) => {
                                 width: "100%",
                                 paddingLeft: 3
                             }}
+                            value={confirmPassword}
+                            onChangeText={text => setConfirmPassword(text)}
                         />
 
                         <TouchableOpacity
@@ -207,6 +255,7 @@ const SignupScreen = ({ navigation }) => {
                         marginTop: 20,
                         marginBottom: 4,
                     }}
+                    onPress = {() => handleRegisterPress()}
                 />
 
                 <View>

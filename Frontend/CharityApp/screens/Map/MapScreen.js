@@ -2,8 +2,8 @@ import { View, Text } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import GoogleMapViewFull from "../../components/Map/GoogleMapViewFull";
 import SearchBar from "../../components/Map/SearchBar";
-import {UserLocationContext} from "../../Context/UserLocationContext";
-import GlobalApi from "../../Services/GlobalApi";
+import {UserLocationContext} from "../../context/UserLocationContext";
+import GlobalApi from "../../services/GlobalApi";
 import BusinessList from "../../components/Map/BusinessList";
 export default function Search() {
     const [placeList,setPlaceList]=useState([]);

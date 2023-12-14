@@ -11,12 +11,16 @@ import {
     Image
 } from 'react-native';
 import {COLORS, images} from '../../../constants';
-import {useNavigation} from "@react-navigation/native";
+import {useFocusEffect, useNavigation} from "@react-navigation/native";
 import Button from "../../common/Button";
 import {AntDesign} from "@expo/vector-icons";
+import {useTheme} from "react-native-paper";
+import OrganizationList from "./OrganizationList";
+import Post from "./Post";
+import ModalPop from "../../Modal/PopModal";
 
 const {width} = Dimensions.get('screen');
-const EventList = () => {
+const EventList = ({setModalVisible}) => {
     const postInfo = [
         {
             postPersonName: "Hội chữ thập đỏ Việt Nam",
@@ -62,7 +66,12 @@ const EventList = () => {
 
     const navigation = useNavigation();
 
+    const handleEventPress = () => {
+        setModalVisible(true);
+    };
+
     const Card = ({event}) => {
+
         return (
             <TouchableOpacity
                 activeOpacity={0.8}
@@ -121,6 +130,7 @@ const EventList = () => {
                                 borderWidth: 1,
                                 borderRadius: 8
                             }}
+                            onPress={handleEventPress}
                         />
                     </View>
                 </View>

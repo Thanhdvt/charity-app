@@ -1,6 +1,6 @@
 import { View, Text } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
-import { UserLocationContext } from '../../Context/UserLocationContext';
+import { UserLocationContext } from '../../context/UserLocationContext';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { Dimensions } from 'react-native';
 import PlaceMarker from '../Map/PlaceMarker';

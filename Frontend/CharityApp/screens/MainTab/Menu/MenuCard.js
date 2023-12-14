@@ -22,7 +22,7 @@ import {
 } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { createStackNavigator } from "@react-navigation/stack";
-import {AuthContext} from "../../../Context/AuthContext";
+import {AuthContext} from "../../../context/AuthContext";
 
 const MenuStack = createStackNavigator();
 

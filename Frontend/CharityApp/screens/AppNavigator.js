@@ -20,7 +20,8 @@ import SearchAllScreen from "./public/Search/SearchAllScreen";
 import OrganizationSearchScreen from "./public/Search/OrganizationSearchScreen";
 import EventSearchScreen from "./public/Search/EventSearchScreen";
 import EventDetailScreen from "./public/Event/EventDetailScreen";
-import {AuthContext} from "../Context/AuthContext";
+import {AuthContext} from "../context/AuthContext";
+import PersonInfoScreen from "./PersonInfoForm/PersonInfoForm";
 
 const Stack = createNativeStackNavigator();
 
@@ -74,6 +75,7 @@ const AppNavigator = () => {
           <Stack.Screen name="EditProfile" component={EditProfileScreen} />
           <Stack.Screen name="Profile" component={ProfileScreen} />
           <Stack.Screen name="Comment" component={CommentScreen} />
+          <Stack.Screen name="PersonInfoForm" component={PersonInfoScreen} />
         </Stack.Navigator>
       )}
     </NavigationContainer>

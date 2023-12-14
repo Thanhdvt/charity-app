@@ -11,6 +11,7 @@ import Button from "../../../components/common/Button"
 import Post from "../../../components/public/Landing/Post";
 import OrganizationList from "../../../components/public/Landing/OrganizationList";
 import EventList from "../../../components/public/Landing/EventList";
+import ModalPop from "../../../components/Modal/PopModal";
 
 const LandingStack = createStackNavigator();
 
@@ -72,42 +73,6 @@ const LandingContent = ({navigation, visible, setVisible}) => {
                 />
             </ModalPop>
         </ScrollView>
-    );
-};
-
-const ModalPop = ({visible, children}) => {
-    const [showModal, setShowModal] = React.useState(visible);
-
-    const scaleValue = React.useRef(new Animated.Value(0)).current;
-    React.useEffect(() => {
-        toggleModal();
-    }, [visible]);
-    const toggleModal = () => {
-        if (visible) {
-            setShowModal(true);
-            Animated.spring(scaleValue, {
-                toValue: 1,
-                duration: 300,
-                useNativeDriver: true,
-            }).start();
-        } else {
-            setTimeout(() => setShowModal(false), 200);
-            Animated.timing(scaleValue, {
-                toValue: 0,
-                duration: 300,
-                useNativeDriver: true,
-            }).start();
-        }
-    };
-    return (
-        <Modal transparent visible={showModal}>
-            <View style={styles.modalBackGround}>
-                <Animated.View
-                    style={[styles.modalContainer, {transform: [{scale: scaleValue}]}]}>
-                    {children}
-                </Animated.View>
-            </View>
-        </Modal>
     );
 };
 

@@ -6,16 +6,49 @@ import { Ionicons } from "@expo/vector-icons";
 import Checkbox from "expo-checkbox"
 import Button from '../../../components/common/Button';
 import { MaterialCommunityIcons, AntDesign, EvilIcons } from "@expo/vector-icons";
-import {AuthContext} from "../../../Context/AuthContext";
+import {AuthContext} from "../../../context/AuthContext";
+import CustomModal from "../../../components/Modal/MessageModal";
 
 const Login = ({ navigation }) => {
+    const [modalVisible, setModalVisible] = useState(false);
+    const [modalMessage, setModalMessage] = useState('');
     const [isPasswordShown, setIsPasswordShown] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
+    const [email, setEmail] = useState(null);
+    const [password, setPassword] = useState(null);
     const {login} = useContext(AuthContext);
+
+    const validate = (email, password) => {
+        if (!email || !password) {
+            return { success: false, message: "Đăng nhập thất bại" };
+        }
+        return { success: true, message: "Đăng nhập thành công" };
+    };
+
+    const handleLoginError = (error) => {
+        setModalMessage(error);
+        setModalVisible(true);
+    };
+
+    const handleLoginPress = () => {
+        const validation = validate(email, password);
+
+        if (!validation.success) {
+            setModalMessage(validation.message);
+            setModalVisible(true);
+            return;
+        }
+        login(email, password, handleLoginError);
+    };
+
+    const closeModal = () => {
+        setModalVisible(false);
+    };
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
             <View style={{ flex: 1, marginHorizontal: 22, justifyContent: "center" }}>
+                <CustomModal isVisible={modalVisible} onClose={closeModal} message={modalMessage} />
                 <View style={{alignItems: 'center'}}>
                     <Image
                         source={images.welcome}
@@ -60,6 +93,8 @@ const Login = ({ navigation }) => {
                                 width: "100%",
                                 paddingLeft: 12
                             }}
+                            value={email}
+                            onChangeText={text => setEmail(text)}
                         />
                     </View>
                 </View>
@@ -85,6 +120,8 @@ const Login = ({ navigation }) => {
                                 width: "100%",
                                 paddingLeft: 3
                             }}
+                            value={password}
+                            onChangeText={text => setPassword(text)}
                         />
 
                         <TouchableOpacity
@@ -130,7 +167,7 @@ const Login = ({ navigation }) => {
                         marginTop: 20,
                         marginBottom: 4,
                     }}
-                    onPress = {() => {login()}}
+                    onPress = {() => handleLoginPress()}
                 />
 
                 <View>
