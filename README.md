@@ -56,8 +56,16 @@ The Charity App is a platform that connects volunteers and charitable organizati
    ```bash
    cd frontend
    npm install
-   npm start
+   npm start hoặc npx expo start -c (chạy và xóa cache)
    ```
+### Deploy
+1. Frontend
+```bash
+   b1:  npm install -g eas-cli
+   b2:  eas whoami (kiểm tra xem đăng nhập chưa) hoặc eas login( để đăng nhập )
+   b3: eas build:configure
+   b4: eas build -p android --profile preview
+```
 
 ### Directory Structure
 
