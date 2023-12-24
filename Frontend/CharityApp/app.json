@@ -1,13 +1,14 @@
 {
   "expo": {
     "name": "CharityApp",
-    "slug": "CharityApp",
+    "slug": "charity-app",
+    "description": "This is a charity app. It helps to connect volunteer or charity organization with people who need the assistance.",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/logo-charity.png",
+    "icon": "./assets/images/logo-charity.jpg",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/images/logo-charity.png",
+      "image": "./assets/images/logo-charity.jpg",
       "resizeMode": "contain",
       "backgroundColor": "#FFDAB9"
     },
@@ -18,14 +19,20 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "thanhndhust.charityapp",
+      "versionCode": 1,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/logo-charity.png",
+        "foregroundImage": "./assets/images/logo-charity.jpg",
         "backgroundColor": "#FFDAB9",
         "googleMapsApiKey": "AIzaSyDXMVizz6ZVZFij7oXbYwg6KQ7NRkHwp8A"
-      }
+      },
+      "permissions": [
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.FOREGROUND_SERVICE"
+      ]
     },
-    "web": {
-    },
+    "web": {},
     "plugins": [
       "expo-router",
       [
@@ -34,6 +41,14 @@
           "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
         }
       ]
-    ]
+    ],
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "5a0cb6d1-d402-4a0a-ace6-c371985a8c3e"
+      }
+    }
   }
 }
