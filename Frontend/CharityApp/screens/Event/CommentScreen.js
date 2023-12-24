@@ -1,22 +1,9 @@
-import React, { useState, useRef } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  FlatList,
-  StyleSheet,
-  Image,
-} from "react-native";
-import {
-  Ionicons,
-  MaterialCommunityIcons,
-  MaterialIcons,
-} from "@expo/vector-icons";
-import { COLORS, FONTS, SIZES, images } from "../../constants";
+import React, {useState} from "react";
+import {FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View,} from "react-native";
+import {Ionicons,} from "@expo/vector-icons";
+import {COLORS, images} from "../../constants";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import { useNavigation } from "@react-navigation/native";
-import { SafeAreaView } from "react-native";
+import {useNavigation} from "@react-navigation/native";
 
 const CommentScreen = () => {
 

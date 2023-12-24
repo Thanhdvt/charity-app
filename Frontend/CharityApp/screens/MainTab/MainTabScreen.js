@@ -11,6 +11,9 @@ import HomeScreen from "./Home/HomeCard";
 
 import MenuScreen from "./Menu/MenuCard";
 import MapScreen from "../Map/MapScreen";
+import ForHelpCreateScreen from "./ForHelpRequest/ForHelpCreateScreen";
+import {MaterialCommunityIcons} from "@expo/vector-icons";
+import NotificationScreen from "./Notification/NotificationScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -58,28 +61,28 @@ const MainTabScreen = () => (
         }}
       />
       <Tab.Screen
-        name="Notifications"
-        component={HomeScreen}
-        options={{
-          tabBarLabel: "Thông báo",
-          tabBarLabelStyle: { fontSize: 12, fontWeight: "400" },
-          tabBarColor: "#1f65ff",
-          tabBarIcon: ({ color }) => (
-            <Icon name="ios-notifications" color={color} size={24} />
-          ),
-        }}
-      />
-      {/* <Tab.Screen
-      name="Profile"
-      component={HomeScreen}
-      options={{
-        tabBarLabel: 'Cá nhân',
-        tabBarColor: '#694fad',
-        tabBarIcon: ({color}) => (
-          <Icon name="ios-person" color={color} size={24} />
-        ),
-      }}
-    /> */}
+          name="ForHelpCreate"
+          component={ForHelpCreateScreen}
+          options={{
+            tabBarLabel: 'Trợ giúp',
+            tabBarColor: '#694fad',
+            tabBarIcon: ({color}) => (
+              <MaterialCommunityIcons name="hand-heart" color={color} size={24} />
+            ),
+          }}
+        />
+        <Tab.Screen
+            name="Notifications"
+            component={NotificationScreen}
+            options={{
+                tabBarLabel: "Thông báo",
+                tabBarLabelStyle: { fontSize: 12, fontWeight: "400" },
+                tabBarColor: "#1f65ff",
+                tabBarIcon: ({ color }) => (
+                    <Icon name="ios-notifications" color={color} size={24} />
+                ),
+            }}
+        />
       <Tab.Screen
         name="Menu"
         component={MenuScreen}

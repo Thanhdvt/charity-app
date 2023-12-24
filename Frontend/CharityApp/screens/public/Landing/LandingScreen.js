@@ -1,11 +1,11 @@
 import React from "react";
-import {Text, Image, StyleSheet, Modal, Animated, TouchableOpacity, ScrollView, Dimensions} from "react-native";
+import {Image, ScrollView, StyleSheet, Text, TouchableOpacity} from "react-native";
 import {useFocusEffect} from "@react-navigation/native";
 import {COLORS, icons, images} from "../../../constants";
 // import { DrawerContent } from "../../Drawer/DrawerContent";
 import {createStackNavigator} from "@react-navigation/stack";
 import Icon from "react-native-vector-icons/Ionicons";
-import {useTheme, Avatar} from "react-native-paper";
+import {useTheme} from "react-native-paper";
 import {View} from "react-native-animatable";
 import Button from "../../../components/common/Button"
 import Post from "../../../components/public/Landing/Post";
@@ -118,12 +118,10 @@ const LandingScreen = ({navigation}) => {
                                               onPress={() => setVisible(true)}>
                                 <Image
                                     source={icons.account}
-                                    // resizeMode="contain"
                                     style={{
                                         width: 45,
                                         height: 45,
                                         borderRadius: 999,
-                                        // borderColor: COLORS.primary,
                                         borderWidth: 2,
                                     }}
                                 />

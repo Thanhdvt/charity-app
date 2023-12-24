@@ -11,17 +11,29 @@ import SignupScreen from "./public/Signup/SignupScreen";
 import MainTabScreen from "./MainTab/MainTabScreen";
 import ProfileScreen from "./Profile/ProfileScreen";
 import EditProfileScreen from "./Profile/EditProfileScreen";
-import CommentScreen from "./Comment/CommentScreen";
+import CommentScreen from "./Event/CommentScreen";
 import VolunteerTabScreen from "./VolunteerTab/VolunteerTabScreen";
 import VolunteerScreen from "./VolunteerTab/Volunteer/VolunteerScreen";
 import JoinRequestScreen from "./VolunteerTab/JoinRequest/JoinRequestScreen";
-import HomeScreen from "./MainTab/Home/HomeCard";
 import SearchAllScreen from "./public/Search/SearchAllScreen";
 import OrganizationSearchScreen from "./public/Search/OrganizationSearchScreen";
 import EventSearchScreen from "./public/Search/EventSearchScreen";
 import EventDetailScreen from "./public/Event/EventDetailScreen";
+import ForHelpCreateScreen from "./MainTab/ForHelpRequest/ForHelpCreateScreen";
+import JoinRegisterScreen from "./JoinRegister/JoinRegisterScreen";
+import EventScreen from "./Event/EventScreen";
+import NotificationScreen from "./MainTab/Notification/NotificationScreen";
+import MapScreen from "./Map/MapScreen";
+import PostScreen from "./Event/PostScreen";
+import StatsScreen from "./Event/StatisticScreen";
+import ImageScreen from "./Event/ImageScreen";
+import ForHelpDetailScreen from "./MainTab/ForHelpRequest/ForHelpDetailScreen";
+import AccountSettingScreen from "./Profile/AccountSettingScreen";
+import ContentManagerScreen from "./Manager/ContentManagerScreen";
 import {AuthContext} from "../context/AuthContext";
-import PersonInfoScreen from "./PersonInfoForm/PersonInfoForm";
+import EventDetailCensorScreen from "./Manager/EventDetailCensorScreen";
+import AccountManagerScreen from "./Manager/AccountManagerScreen";
+import AccountDetailCensorScreen from "./Manager/AccountDetailCensorScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -75,7 +87,20 @@ const AppNavigator = () => {
           <Stack.Screen name="EditProfile" component={EditProfileScreen} />
           <Stack.Screen name="Profile" component={ProfileScreen} />
           <Stack.Screen name="Comment" component={CommentScreen} />
-          <Stack.Screen name="PersonInfoForm" component={PersonInfoScreen} />
+          <Stack.Screen name="JoinRegister" component={JoinRegisterScreen} />
+          <Stack.Screen name="ForHelpCreate" component={ForHelpCreateScreen} />
+          <Stack.Screen name="Event" component={EventScreen} />
+          <Stack.Screen name="Notification" component={NotificationScreen}/>
+          <Stack.Screen name="Map" component={MapScreen}/>
+          <Stack.Screen name="Post" component={PostScreen}/>
+          <Stack.Screen name="Statistic" component={StatsScreen}/>
+          <Stack.Screen name="Image" component={ImageScreen}/>
+          <Stack.Screen name="ForHelpDetail" component={ForHelpDetailScreen}/>
+          <Stack.Screen name="AccountSetting" component={AccountSettingScreen}/>
+          <Stack.Screen name="ContentManager" component={ContentManagerScreen}/>
+          <Stack.Screen name="EventDetailCensor" component={EventDetailCensorScreen}/>
+          <Stack.Screen name="AccountManager" component={AccountManagerScreen}/>
+          <Stack.Screen name="AccountDetailCensor" component={AccountDetailCensorScreen}/>
         </Stack.Navigator>
       )}
     </NavigationContainer>

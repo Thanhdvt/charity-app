@@ -17,15 +17,11 @@ export const AuthProvider = ({children}) => {
             password
         }).then(res => {
             console.log(res.data);
-            console.log(res.status);
-            console.log(res.statusText);
 
-            let userInfo = res.data;
-            // setUserInfo(userInfo);
-            setUserToken(userInfo);
-
-            // AsyncStorage.setItem('userInfo', userInfo);
-            AsyncStorage.setItem('userToken', userInfo);
+            let userToken = res.data;
+            setUserToken(userToken);
+            AsyncStorage.setItem('userToken', userToken);
+            getUserInformation();
         }).catch(e => {
             console.log(`Login error` + e.message);
             errorCallback && errorCallback(`Đăng nhập thất bại: ${e.response.data}`);
@@ -33,6 +29,26 @@ export const AuthProvider = ({children}) => {
 
         setIsLoading(false);
     }
+
+    const getUserInformation = async () => {
+        try {
+            let token = await AsyncStorage.getItem('userToken');
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            };
+            const response = await axios.get(`${BASE_URL}/api/User/infor`, config);
+            let userInfo = response.data;
+            setUserInfo(userInfo);
+            console.log('userInfo', userInfo);
+            AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
+        } catch (error) {
+            console.error("Error fetching user information:", error);
+        }
+    };
+
+
     const logout = () => {
         setIsLoading(true);
         setUserToken(null);
@@ -44,7 +60,7 @@ export const AuthProvider = ({children}) => {
     const isLoggedIn = async () => {
         try {
             setIsLoading(true)
-            // let userInfo = await AsyncStorage.getItem('userInfo');
+            let userInfo = await AsyncStorage.getItem('userInfo');
             let userToken = await AsyncStorage.getItem('userToken');
             // userInfo = JSON.parse(userInfo);
 

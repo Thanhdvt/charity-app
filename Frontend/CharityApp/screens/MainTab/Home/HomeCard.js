@@ -1,21 +1,19 @@
 import React from "react";
-import {Text, Image, StyleSheet, ScrollView} from "react-native";
+import {Image, ScrollView, StyleSheet, Text, TouchableOpacity} from "react-native";
 
-import { COLORS, images } from "../../../constants";
+import {COLORS, images} from "../../../constants";
 // import { DrawerContent } from "../../Drawer/DrawerContent";
-import { createStackNavigator } from "@react-navigation/stack";
+import {createStackNavigator} from "@react-navigation/stack";
 import Icon from "react-native-vector-icons/Ionicons";
 
-import { useTheme, Avatar } from "react-native-paper";
-import { View } from "react-native-animatable";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import {useTheme} from "react-native-paper";
+import {View} from "react-native-animatable";
 import OrganizationList from "../../../components/public/Landing/OrganizationList";
 import EventList from "../../../components/public/Landing/EventList";
 import Post from "../../../components/public/Landing/Post";
 import Button from "../../../components/common/Button";
 import ModalPop from "../../../components/Modal/PopModal";
 import {useFocusEffect} from "@react-navigation/native";
-import LandingScreen from "../../public/Landing/LandingScreen";
 
 const HomeStack = createStackNavigator();
 
@@ -27,13 +25,8 @@ const HomeContent = ({ navigation, visible, setVisible }) => {
             return () => {
                 setVisible(false);
             };
-        }, [setVisible])
+        }, [])
     );
-
-    const closeModal = () => {
-        // Handle the modal visibility when an event is pressed
-        setVisible(false);
-    };
 
   return (
       <ScrollView showsVerticalScrollIndicator={false} style={{marginBottom: 50}}>
@@ -44,7 +37,7 @@ const HomeContent = ({ navigation, visible, setVisible }) => {
           <ModalPop visible={visible}>
               <View style={{alignItems: 'center'}}>
                   <View style={styles.header}>
-                      <TouchableOpacity onPress={() => closeModal}>
+                      <TouchableOpacity onPress={() => setVisible(false)}>
                           <Text style={{fontSize: 18, fontWeight: "bold", color: COLORS.primary}}>Lúc khác</Text>
                       </TouchableOpacity>
                   </View>
@@ -76,7 +69,7 @@ const HomeContent = ({ navigation, visible, setVisible }) => {
                   style={{
                       marginHorizontal: 20
                   }}
-                  onPress={() => navigation.navigate("PersonInfoForm")}
+                  onPress={() => navigation.navigate("JoinRegister")}
               />
           </ModalPop>
       </ScrollView>

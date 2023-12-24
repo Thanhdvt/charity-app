@@ -14,13 +14,14 @@ const SignupScreen = ({ navigation }) => {
     const [modalMessage, setModalMessage] = useState('');
     const [isPasswordShown, setIsPasswordShown] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
-    const validate = (email, phone, password, confirmPassword) => {
-        if (!email || !phone || !password || !confirmPassword) {
+    const validate = (name, email, phone, password, confirmPassword) => {
+        if (!name || !email || !phone || !password || !confirmPassword) {
             return { success: false, message: "Vui lòng nhập đầy đủ thông tin" };
         }
         if (password !== confirmPassword) {
@@ -33,14 +34,14 @@ const SignupScreen = ({ navigation }) => {
     };
 
     const handleRegisterPress = () => {
-        const validation = validate(email, phone, password, confirmPassword);
+        const validation = validate(name, email, phone, password, confirmPassword);
 
         if (!validation.success) {
             setModalMessage(validation.message);
             setModalVisible(true);
             return;
         }
-        register(email, phone, password);
+        register(name, email, phone, password);
         navigation.navigate('Login');
     };
 
@@ -71,6 +72,32 @@ const SignupScreen = ({ navigation }) => {
                         fontSize: 16,
                         color: COLORS.black
                     }}>Cùng nhau tạo tài khoản nào!</Text>
+                </View>
+
+                <View style={{ marginBottom: 12, marginVertical: 10 }}>
+                    <View style={{
+                        width: "100%",
+                        height: 48,
+                        borderColor: COLORS.black,
+                        borderWidth: 1,
+                        borderRadius: 8,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        paddingLeft: 22,
+                        flexDirection: "row"
+                    }}>
+                        <AntDesign name={"user"} size={22}/>
+                        <TextInput
+                            placeholder='Nhập tên của bạn'
+                            placeholderTextColor={COLORS.black}
+                            style={{
+                                width: "100%",
+                                paddingLeft: 12
+                            }}
+                            value={name}
+                            onChangeText={text => setName(text)}
+                        />
+                    </View>
                 </View>
 
                 <View style={{ marginBottom: 12, marginVertical: 10 }}>

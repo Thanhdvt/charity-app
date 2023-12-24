@@ -7,7 +7,7 @@ import {
   TextInput,
   Modal,
 } from "react-native";
-import React, { useState } from "react";
+import React, {useContext, useEffect, useState} from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as ImagePicker from "expo-image-picker";
 import { COLORS, FONTS } from "../../constants";
@@ -15,19 +15,24 @@ import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import { imagesDataURL } from "../../constants/data";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { StyleSheet } from "react-native";
+import {AuthContext} from "../../context/AuthContext";
+import {getOrganizationInfo} from "../../services/GetOrganizationInfo";
 
 const EditProfileScreen = ({ navigation }) => {
+  const {userInfo} = useContext(AuthContext);
   const [selectedImage, setSelectedImage] = useState(imagesDataURL[0]);
-  const [name, setName] = useState("Hội chữ thập đỏ Việt Nam");
-  const [phone, setPhone] = useState("02838391271");
-  const [email, setEmail] = useState("ctdpn@yahoo.com");
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [fax, setFax] = useState("02838391271");
+  const [website, setWebsite] = useState("ctdpn@yahoo.com");
   // const [password, setPassword] = useState("randompassword");
-  const [country, setCountry] = useState("Việt Nam");
+  const [address, setAddress] = useState("Việt Nam");
   const [description, setDescription] = useState(
     "Hội Chữ thập đỏ Việt Nam là tổ chức xã hội nhân đạo của quần chúng do Chủ tịch Hồ Chí Minh sáng lập và là Chủ tịch danh dự đầu tiên."
   );
 
-  const handleImageSelection = async () => {
+    const handleImageSelection = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
@@ -68,6 +73,30 @@ const EditProfileScreen = ({ navigation }) => {
 
     return `${formattedDay}/${formattedMonth}/${year}`;
   };
+
+    useEffect(() => {
+        if (userInfo) {
+            setName(userInfo.name || "");
+            setPhone(userInfo.phone || "");
+            setEmail(userInfo.email || "");
+
+        }
+        console.log(userInfo)
+    }, [userInfo]);
+
+    useEffect(() => {
+        const fetchApi = async () => {
+            try {
+                const organizationInfo = await getOrganizationInfo();
+
+                setDescription(organizationInfo[0].description);
+                // setSelectedStartDate(organizationInfo[0].establish_Date);
+            } catch (error) {
+                console.log('fetchApi' + error);
+            }
+        };
+        fetchApi();
+    }, []);
 
   function renderDatePicker() {
     return (
@@ -186,8 +215,8 @@ const EditProfileScreen = ({ navigation }) => {
             <View style={styles.containerTextInput}>
               <TextInput
                 style={{ fontSize: 16 }}
-                value={country}
-                onChangeText={(value) => setCountry(value)}
+                value={address}
+                onChangeText={(value) => setAddress(value)}
                 editable={true}
               />
             </View>
@@ -257,8 +286,8 @@ const EditProfileScreen = ({ navigation }) => {
             <View style={styles.containerTextInput}>
               <TextInput
                 style={{ fontSize: 16 }}
-                value={phone}
-                onChangeText={(value) => setPhone(value)}
+                value={fax}
+                onChangeText={(value) => setFax(value)}
                 editable={true}
                 keyboardType="numeric"
               />
@@ -275,8 +304,8 @@ const EditProfileScreen = ({ navigation }) => {
             <View style={styles.containerTextInput}>
               <TextInput
                 style={{ fontSize: 16 }}
-                value={email}
-                onChangeText={(value) => setEmail(value)}
+                value={website}
+                onChangeText={(value) => setWebsite(value)}
                 editable={true}
               />
             </View>

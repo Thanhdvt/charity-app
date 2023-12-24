@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     FlatList,
     ImageBackground,
@@ -18,51 +18,49 @@ import {useTheme} from "react-native-paper";
 import OrganizationList from "./OrganizationList";
 import Post from "./Post";
 import ModalPop from "../../Modal/PopModal";
+import {getEventList} from "../../../services/GetEventList";
 
 const {width} = Dimensions.get('screen');
 const EventList = ({setModalVisible}) => {
-    const postInfo = [
+
+    const [postInfo, setPostInfo] = useState([
         {
             postPersonName: "Hội chữ thập đỏ Việt Nam",
             postPersonImage: images.profile,
-            commentPersonImage: images.avatar,
-            postContent:
+            title:
                 "Hội Chữ thập đỏ Việt Nam là tổ chức xã hội nhân đạo của quần chúng, do Chủ tịch Hồ Chí Minh sáng lập ngày 23/11/1946 và Người làm Chủ tịch danh dự đầu tiên của Hội. 7 nguyên tắc hoạt động: Nhân đạo, Vô tư, Trung lập, Độc lập, Tự nguyện, Thống nhất, Toàn cầu",
-            postImage: images.onboarding_0,
-            likes: 765,
+            image: images.onboarding_0,
+            like_Count: 765,
             isLiked: false,
         },
         {
             postPersonName: "Hội chữ thập đỏ Việt Nam",
             postPersonImage: images.profile,
-            commentPersonImage: images.avatar,
-            postContent:
+            title:
                 "Hội Chữ thập đỏ Việt Nam là tổ chức xã hội nhân đạo của quần chúng, do Chủ tịch Hồ Chí Minh sáng lập ngày 23/11/1946 và Người làm Chủ tịch danh dự đầu tiên của Hội. 7 nguyên tắc hoạt động: Nhân đạo, Vô tư, Trung lập, Độc lập, Tự nguyện, Thống nhất, Toàn cầu",
-            postImage: images.onboarding_2,
-            likes: 345,
+            image: images.onboarding_2,
+            like_Count: 345,
             isLiked: false,
         },
         {
             postPersonName: "Hội chữ thập đỏ Việt Nam",
             postPersonImage: images.profile,
-            commentPersonImage: images.avatar,
-            postContent:
+            title:
                 "Hội Chữ thập đỏ Việt Nam là tổ chức xã hội nhân đạo của quần chúng, do Chủ tịch Hồ Chí Minh sáng lập ngày 23/11/1946 và Người làm Chủ tịch danh dự đầu tiên của Hội. 7 nguyên tắc hoạt động: Nhân đạo, Vô tư, Trung lập, Độc lập, Tự nguyện, Thống nhất, Toàn cầu",
-            postImage: images.onboarding_1,
-            likes: 734,
+            image: images.onboarding_1,
+            like_Count: 734,
             isLiked: false,
         },
         {
             postPersonName: "Hội chữ thập đỏ Việt Nam",
             postPersonImage: images.profile,
-            commentPersonImage: images.avatar,
-            postContent:
+            title:
                 "Hội Chữ thập đỏ Việt Nam là tổ chức xã hội nhân đạo của quần chúng, do Chủ tịch Hồ Chí Minh sáng lập ngày 23/11/1946 và Người làm Chủ tịch danh dự đầu tiên của Hội. 7 nguyên tắc hoạt động: Nhân đạo, Vô tư, Trung lập, Độc lập, Tự nguyện, Thống nhất, Toàn cầu",
-            postImage: images.cover,
-            likes: 875,
+            image: images.cover,
+            like_Count: 875,
             isLiked: false,
         },
-    ];
+    ]);
 
     const navigation = useNavigation();
 
@@ -70,17 +68,31 @@ const EventList = ({setModalVisible}) => {
         setModalVisible(true);
     };
 
-    const Card = ({event}) => {
+    useEffect(() => {
+        const fetchApi = async () => {
+            try {
+                const eventList = await getEventList();
+
+                // setPostInfo(eventList);
+            } catch (error) {
+                console.log('fetchApi' + error);
+            }
+        };
+        fetchApi();
+    }, []);
+
+    const Card = ({index}) => {
+        const event = postInfo[index];
 
         return (
             <TouchableOpacity
                 activeOpacity={0.8}
                 onPress={() => navigation.navigate("EventDetail")}>
                 <View style={{width: width/1.4, backgroundColor: COLORS.grey, marginRight: 20, borderRadius: 16}}>
-                    <ImageBackground style={styles.cardImage} source={event.postImage}>
+                    <ImageBackground style={styles.cardImage} source={event.image}>
                         <View style={{flexDirection: "row", alignItems: 'flex-start', alignSelf: "flex-end", padding: 10}}>
                             <AntDesign name="heart" size={20} color={"red"} />
-                            <Text style={{marginLeft: 5, color: COLORS.white}}>100</Text>
+                            <Text style={{marginLeft: 5, color: COLORS.white}}>{event.like_Count}</Text>
                         </View>
                         <View
                             style={{
@@ -109,7 +121,7 @@ const EventList = ({setModalVisible}) => {
                     </ImageBackground>
                     <View style={{paddingVertical: 15, paddingHorizontal: 15}}>
                         <Text style={{fontWeight: "bold", fontSize: 16, paddingBottom: 15, textAlign: "justify"}} numberOfLines={2} ellipsizeMode="tail">
-                            {event.postContent}
+                            {event.title}
                         </Text>
                         <View style={{justifyContent: "space-between", paddingBottom: 15, paddingLeft: 15}}>
                            <View style={{flexDirection: "row", alignItems: "center"}}>
@@ -153,7 +165,8 @@ const EventList = ({setModalVisible}) => {
                         horizontal
                         showsHorizontalScrollIndicator={false}
                         data={postInfo}
-                        renderItem={({item}) => <Card event={item}/>}
+                        keyExtractor={(item, index) => index.toString()}
+                        renderItem={({ item, index }) => <Card index={index} />}
                     />
                 </View>
             </ScrollView>

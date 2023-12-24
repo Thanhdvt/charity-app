@@ -5,7 +5,8 @@ import SearchBar from "../../components/Map/SearchBar";
 import {UserLocationContext} from "../../context/UserLocationContext";
 import GlobalApi from "../../services/GlobalApi";
 import BusinessList from "../../components/Map/BusinessList";
-export default function Search() {
+
+const MapScreen = () => {
     const [placeList,setPlaceList]=useState([]);
     // const {location,setLocation}=useContext(UserLocationContext);
 
@@ -31,3 +32,4 @@ export default function Search() {
         </View>
     )
 }
+export default MapScreen;

@@ -11,6 +11,8 @@ export const COLORS = {
     gray: 'rgba(36, 39, 96, 0.05)',
     secondaryGray: 'rgba(84, 76, 76, 0.14)',
     sliver: '#808080',
+    green: '#228B22',
+    secondaryGreen: '#90EE90',
     PRIMARY:'#d46dfc',
     LIGHT_PRIMARY:'#f4d6ff',
     BLACK:'#000',

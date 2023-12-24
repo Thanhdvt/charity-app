@@ -8,8 +8,8 @@ import * as Location from "expo-location";
 
 export default function GoogleMapViewFull({placeList}) {
     const [mapRegion, setMapRegion] = useState({
-        latitude: 37.78825,
-        longitude: -122.4324,
+        latitude: 21.005208714299744,
+        longitude: 105.84385906679833,
         latitudeDelta: 0.0922,
         longitudeDelta: 0.0421,
     })

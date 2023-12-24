@@ -4,7 +4,7 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
-  StyleSheet,
+  StyleSheet, Linking,
 } from "react-native";
 import React, {useContext} from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -37,43 +37,43 @@ const MenuContent = ({ navigation }) => {
   };
 
   const navigateToEditAccount = () => {
-    console.log("Edit account ");
-  };
-
-  const navigatorToPlightList = () => {
-    console.log("Danh sách hoàn cảnh khó khăn");
-  };
-
-  const navigatorToEventList = () => {
-    console.log("Danh sách sự kiện");
-  };
-
-  const navigateToNotifications = () => {
-    console.log("THông báo");
+    navigation.navigate("AccountSetting")
   };
 
   const navigateToVolunteerTab = () => {
     navigation.navigate("VolunteerTab");
   };
 
-  const navigateToRecruitment = () => {
-    console.log("Recruitment ");
+  const navigatorToEventList = () => {
+    navigation.navigate("Event");
+  };
+  const navigateToStatistic = () => {
+    navigation.navigate("Statistic")
+  };
+
+  const navigatorToMap = () => {
+    navigation.navigate("Map")
+  };
+
+  const navigateToNotifications = () => {
+    navigation.navigate("Notification")
   };
 
   const navigatorToMessage= () => {
-    console.log("Danh sách hoàn cảnh khó khăn");
+    console.log("Tin nhắn");
   };
 
-  const navigatorToPost = () => {
-    console.log("Sự kiện đã lưu");
-  };
+  const navigateToAccountManager = () => {
+    navigation.navigate("AccountManager")
+  }
 
-  const navigateToStatistic = () => {
-    console.log("Thống kê");
-  };
+  const navigateToContentManager = () => {
+    navigation.navigate("ContentManager")
+  }
 
   const navigateToTermsAndPolicies = () => {
-    console.log("Điều khoản và chính sách");
+    const termsUrl = 'https://thiennguyen.app/terms';
+    Linking.openURL(termsUrl);
   };
 
   const exit = () => {
@@ -100,11 +100,6 @@ const MenuContent = ({ navigation }) => {
 
   const actionsItems = [
     {
-      icon: "hand-heart-outline",
-      text: "Yêu cầu trợ giúp",
-      action: navigatorToPlightList,
-    },
-    {
       icon: "account-group-outline",
       text: "Tình nguyện viên",
       action: navigateToVolunteerTab,
@@ -125,7 +120,7 @@ const MenuContent = ({ navigation }) => {
     {
       icon: "map-outline",
       text: "Bản đồ",
-      action: navigatorToPost,
+      action: navigatorToMap,
     },
     {
       icon: "bell-outline",
@@ -135,11 +130,21 @@ const MenuContent = ({ navigation }) => {
     {
       icon: "message-text-outline",
       text: "Tin nhắn",
-      action: navigateToNotifications,
+      action: navigatorToMessage,
     },
   ];
 
   const supportItems = [
+    {
+      icon: "account-box-multiple-outline",
+      text: "Quản lý tài khoản",
+      action: navigateToAccountManager,
+    },
+    {
+      icon: "play-protected-content",
+      text: "Kiểm duyệt nội dung",
+      action: navigateToContentManager,
+    },
     {
       icon: "information-outline",
       text: "Điều khoản và chính sách",
@@ -183,7 +188,6 @@ const MenuContent = ({ navigation }) => {
   const menuSections = [
     { title: "Hồ sơ", items: accountItems },
     { title: "Hoạt động", items: actionsItems },
-    // { title: 'Sao kê', items: ReportItems },
     { title: "Tùy chọn", items: OptionsItems },
     { title: "Khác", items: supportItems },
   ];
@@ -194,13 +198,13 @@ const MenuContent = ({ navigation }) => {
       showsHorizontalScrollIndicator={false}
       showsVerticalScrollIndicator={false}
     >
-      <View style={{ marginHorizontal: 25, marginBottom: 60 }}>
+      <View style={{ marginHorizontal: 25, marginBottom: 80, marginTop: 10 }}>
         {menuSections.map((section, index) => (
           <View
             key={index}
             style={{
-              marginTop: 20,
-              marginBottom: 20,
+              marginTop: 15,
+              marginBottom: 15,
               borderRadius: 18,
               overflow: "hidden",
             }}
