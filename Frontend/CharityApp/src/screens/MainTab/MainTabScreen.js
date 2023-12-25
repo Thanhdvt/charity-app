@@ -1,17 +1,14 @@
 import React from "react";
-
 import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
 import {StatusBar} from "expo-status-bar";
-
 import Icon from "react-native-vector-icons/Ionicons";
-
 import HomeScreen from "./Home/HomeCard";
-
 import MenuScreen from "./Menu/MenuCard";
 import MapScreen from "../Map/MapScreen";
 import ForHelpCreateScreen from "./ForHelpRequest/ForHelpCreateScreen";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
 import NotificationScreen from "./Notification/NotificationScreen";
+
 
 const Tab = createBottomTabNavigator();
 

@@ -34,6 +34,7 @@ import {AuthContext} from "../context/AuthContext";
 import EventDetailCensorScreen from "./Manager/EventDetailCensorScreen";
 import AccountManagerScreen from "./Manager/AccountManagerScreen";
 import AccountDetailCensorScreen from "./Manager/AccountDetailCensorScreen";
+import GenericSetupScreen from "./GenericSetup/GenericSetupScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -101,6 +102,7 @@ const AppNavigator = () => {
           <Stack.Screen name="EventDetailCensor" component={EventDetailCensorScreen}/>
           <Stack.Screen name="AccountManager" component={AccountManagerScreen}/>
           <Stack.Screen name="AccountDetailCensor" component={AccountDetailCensorScreen}/>
+          <Stack.Screen name="GenericSetup" component={GenericSetupScreen}/>
         </Stack.Navigator>
       )}
     </NavigationContainer>

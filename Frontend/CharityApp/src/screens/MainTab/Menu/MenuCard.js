@@ -1,4 +1,4 @@
-import {Image, Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View,} from "react-native";
+import {Image, ScrollView, StyleSheet, Text, TouchableOpacity, View,} from "react-native";
 import React, {useContext} from "react";
 import {useSafeAreaInsets} from "react-native-safe-area-context";
 import {COLORS, FONTS, images} from "../../../constants";
@@ -54,9 +54,8 @@ const MenuContent = ({ navigation }) => {
     navigation.navigate("ContentManager")
   }
 
-  const navigateToTermsAndPolicies = () => {
-    const termsUrl = 'https://thiennguyen.app/terms';
-    Linking.openURL(termsUrl);
+  const navigateToGenericSetup = () => {
+    navigation.navigate("GenericSetup")
   };
 
   const exit = () => {
@@ -129,9 +128,9 @@ const MenuContent = ({ navigation }) => {
       action: navigateToContentManager,
     },
     {
-      icon: "information-outline",
-      text: "Điều khoản và chính sách",
-      action: navigateToTermsAndPolicies,
+      icon: "cog-outline",
+      text: "Cài đặt chung",
+      action: navigateToGenericSetup,
     },
     { 
       icon: "logout", 
