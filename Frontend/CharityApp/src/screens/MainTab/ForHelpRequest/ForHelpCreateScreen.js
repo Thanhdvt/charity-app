@@ -1,84 +1,24 @@
-import {
-    Image,
-    Modal,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    useWindowDimensions,
-    View,
-} from "react-native";
-import React, {useEffect, useState} from "react";
+import {Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View,} from "react-native";
+import React, {useContext, useEffect, useState} from "react";
 import {SafeAreaView, useSafeAreaInsets} from "react-native-safe-area-context";
 import {COLORS, FONTS} from "../../../constants";
 import {Ionicons} from "@expo/vector-icons";
 import {IconButton, useTheme,} from "react-native-paper";
 import {createStackNavigator} from "@react-navigation/stack";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import * as ImagePicker from "expo-image-picker";
 import {Dropdown} from 'react-native-element-dropdown';
 import Button from "../../../components/common/Button";
+import {AuthContext} from "../../../context/AuthContext";
+import FlashMessage, {hideMessage, showMessage} from "react-native-flash-message";
+import {createForHelpRequest} from "../../../services/ForHelpRequest/CreateForHelpRequest";
+import {getAllOrganization} from "../../../services/CharityOrganization/GetAllOrganization";
+import firebase from "firebase/compat/app";
+import * as FileSystem from 'expo-file-system';
+import * as DocumentPicker from 'expo-document-picker';
 
 const MenuStack = createStackNavigator();
 
 const ForHelpCreate = ({navigation}) => {
-    // const [images, setImages] = useState(imagesDataURL[0]);
-    const [images, setImages] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const { width } = useWindowDimensions();
-    const [name, setName] = useState("Hội chữ thập đỏ Việt Nam");
-    const [phone, setPhone] = useState("02838391271");
-    const [email, setEmail] = useState("ctdpn@yahoo.com");
-    // const [password, setPassword] = useState("randompassword");
-    const [country, setCountry] = useState("Việt Nam");
-    const [description, setDescription] = useState(
-        "Hội Chữ thập đỏ Việt Nam là tổ chức xã hội nhân đạo của quần chúng do Chủ tịch Hồ Chí Minh sáng lập và là Chủ tịch danh dự đầu tiên."
-    );
-
-    const [date, setDate] = useState(new Date("1946-11-23"));
-    const [showDatePicker, setShowDatePicker] = useState(false);
-    const [selectedStartDate, setSelectedStartDate] = useState("23/11/1946");
-
-    const showMode = () => {
-        setShowDatePicker(true);
-    };
-
-    const onChange = (event, selectedDate) => {
-        setShowDatePicker(false);
-
-        setDate(selectedDate);
-        const formattedDate = formatDate(selectedDate);
-        setSelectedStartDate(formattedDate);
-    };
-
-    const formatDate = (date) => {
-        const day = date.getDate();
-        const month = date.getMonth() + 1;
-        const year = date.getFullYear();
-
-        const formattedDay = day < 10 ? `0${day}` : day;
-        const formattedMonth = month < 10 ? `0${month}` : month;
-
-        return `${formattedDay}/${formattedMonth}/${year}`;
-    };
-
-    function renderDatePicker() {
-        return (
-            <Modal animationType="slide" transparent={true} visible={showDatePicker}>
-                <View
-                    style={{
-                        flex: 1,
-                        alignItems: "center",
-                        justifyContent: "center",
-                    }}
-                >
-                    <DateTimePicker value={date} mode="date" onChange={onChange}/>
-                </View>
-            </Modal>
-        );
-    }
-
     const data = [
         {label: 'Xóa đói', value: '1'},
         {label: 'Trẻ em', value: '2'},
@@ -88,39 +28,172 @@ const ForHelpCreate = ({navigation}) => {
         {label: 'Môi trường', value: '6'},
         {label: 'Giáo dục', value: '7'},
         {label: 'Khác', value: '8'},
-
     ];
-    const [value, setValue] = useState(null);
-    const [isFocus, setIsFocus] = useState(false);
+    const {userInfo} = useContext(AuthContext);
+    const [topic, setTopic] = useState(null);
+    const [organization_Id, setOrganization_Id] = useState(null);
+    const [description, setDescription] = useState("");
+    const [organizationList, setOrganizationList] = useState([]);
+    const [selectedFiles, setSelectedFiles] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+
+    const pickFiles = async () => {
+        try {
+            const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.All,
+                allowsMultipleSelection: true,
+                quality: 1,
+            });
+
+            if (!result.canceled && result.assets) {
+                const newFiles = result.assets.map(asset => asset.uri).filter(uri => !!uri);
+                setSelectedFiles([...selectedFiles, ...newFiles]);
+                console.log(selectedFiles)
+            }
+        } catch (error) {
+            console.error('Error picking files', error);
+        }
+    };
+
+    const removeFile = (index) => {
+        const newFiles = [...selectedFiles];
+        newFiles.splice(index, 1);
+        setSelectedFiles(newFiles);
+    };
 
     useEffect(() => {
         (async () => {
-            const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            const {status} = await ImagePicker.requestMediaLibraryPermissionsAsync();
             if (status !== 'granted') {
                 console.log('Permission to access media library denied');
             }
         })();
     }, []);
 
-    const pickImages = async () => {
-        const result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsMultipleSelection: true,
-            quality: 1,
-        });
+    useEffect(() => {
+        (async () => {
+            const res = await getAllOrganization();
+            setOrganizationList(res.data);
+        })();
+    }, []);
 
-        if (!result.cancelled && result.assets) {
-            const selectedImages = result.assets.map(asset => asset.uri).filter(uri => !!uri);
-            setImages([...images, ...selectedImages]);
-            console.log(images)
+    const validate = () => {
+        if (!topic || !description || !organization_Id) {
+            showMessage({
+                message: "Nhập đầy đủ các trường bắt buộc",
+                type: "danger",
+                duration: 3000,
+                onPress: () => {
+                    hideMessage();
+                },
+            });
+            return false;
+        }
+        return true;
+    }
+
+    const clearForm = () => {
+        setTopic(null);
+        setOrganization_Id(null);
+        setSelectedFiles([]);
+        setDescription("");
+    };
+
+    const handleOnClickSave = async () => {
+        if (validate()) {
+            const newForHelpRequest = {
+                description: description,
+                date: "2023-12-06T10:45:20.548Z",
+                status: 1,
+                user_id: userInfo.id,
+                organization_Id: organization_Id
+            };
+
+            await fetchData(newForHelpRequest);
+            await uploadImage();
+        }
+    }
+
+    // upload ảnh tới storage
+    const uploadImage = async () => {
+        try {
+            selectedFiles.map(async (selectedFile) => {
+                console.log('ok');
+                const {uri} = await FileSystem.getInfoAsync(selectedFile);
+
+                const blob = await new Promise((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.onload = () => {
+                        resolve(xhr.response);
+                    };
+                    xhr.onerror = (e) => {
+                        reject(new TypeError('Network request failed'));
+                    };
+                    xhr.responseType = 'blob';
+                    xhr.open('GET', uri, true);
+                    xhr.send(null);
+                });
+
+                const filename = selectedFile.substring(selectedFile.lastIndexOf('/') + 1);
+                const ref = firebase.storage().ref(`/files/${filename}`);
+                await ref.put(blob);
+
+                const imageURL = await ref.getDownloadURL();
+                await saveImageUrlToDatabase(imageURL);
+            })
+        } catch (e) {
+            console.log("err" + e);
+        }
+    }
+
+    // lưu ảnh vào database
+    const saveImageUrlToDatabase = async (imageURL) => {
+        try {
+            const random = Math.floor(Math.random() * 1000000000) + 1; // cần fix lại sau, hiện đang coi là id yêu cầu trợ giúp
+            const databaseRef = firebase.database().ref(`forhelprequest/${random}/file`);
+
+            await databaseRef.set(imageURL);
+        } catch (error) {
+            console.error("Error saving image URL to database", error);
         }
     };
 
-    const removeImage = (index) => {
-        const newImages = [...images];
-        newImages.splice(index, 1);
-        setImages(newImages);
-    };
+    // lưu thông tin
+    const fetchData = async (newForHelpRequest) => {
+        try {
+            const res = await createForHelpRequest(newForHelpRequest);
+            console.log(res.status)
+            if (res) {
+                showMessage({
+                    message: "Gửi thành công",
+                    type: "success",
+                    duration: 2000,
+                    onPress: () => {
+                        hideMessage();
+                    },
+                });
+                clearForm();
+            } else {
+                showMessage({
+                    message: "Đã xảy ra lỗi khi gửi yêu cầu",
+                    type: "danger",
+                    duration: 3000,
+                    onPress: () => {
+                        hideMessage();
+                    },
+                });
+            }
+        } catch (error) {
+            showMessage({
+                message: "Đã xảy ra lỗi khi gửi yêu cầu",
+                type: "danger",
+                duration: 3000,
+                onPress: () => {
+                    hideMessage();
+                },
+            });
+        }
+    }
 
     return (
         <SafeAreaView
@@ -130,6 +203,7 @@ const ForHelpCreate = ({navigation}) => {
                 paddingHorizontal: 20,
             }}
         >
+            <FlashMessage position="top" style={{marginHorizontal: 20}}/>
             <ScrollView
                 showsHorizontalScrollIndicator={false}
                 showsVerticalScrollIndicator={false}
@@ -154,12 +228,41 @@ const ForHelpCreate = ({navigation}) => {
                             labelField="label"
                             valueField="value"
                             placeholder="Chọn chủ đề"
-                            value={value}
-                            onFocus={() => setIsFocus(true)}
-                            onBlur={() => setIsFocus(false)}
+                            value={topic}
+                            // onFocus={() => setIsFocus(true)}
+                            // onBlur={() => setIsFocus(false)}
                             onChange={item => {
-                                setValue(item.value);
-                                setIsFocus(false);
+                                setTopic(item.value);
+                                // setIsFocus(false);
+                            }}
+                        />
+                    </View>
+
+                    <View
+                        style={{
+                            flexDirection: "column",
+                            marginBottom: 6,
+                        }}
+                    >
+                        <Text style={{...FONTS.h5}}>
+                            Tổ chức nhận yêu cầu <Text style={{color: "red"}}>*</Text>{" "}
+                        </Text>
+                        <Dropdown
+                            style={styles.dropdown}
+                            placeholderStyle={styles.placeholderStyle}
+                            selectedTextStyle={styles.selectedTextStyle}
+                            inputSearchStyle={styles.inputSearchStyle}
+                            data={organizationList}
+                            maxHeight={300}
+                            labelField="user_Id"
+                            valueField="id"
+                            placeholder="Chọn tổ chức"
+                            value={organization_Id}
+                            // onFocus={() => setIsFocus(true)}
+                            // onBlur={() => setIsFocus(false)}
+                            onChange={item => {
+                                setOrganization_Id(item.id);
+                                // setIsFocus(false);
                             }}
                         />
                     </View>
@@ -176,9 +279,9 @@ const ForHelpCreate = ({navigation}) => {
                         <View style={styles.containerTextInput}>
                             <TextInput
                                 style={{fontSize: 16}}
-                                value={name}
-                                onChangeText={(value) => setName(value)}
-                                editable={true}
+                                value={userInfo.name}
+                                // onChangeText={(value) => setName(value)}
+                                editable={false}
                             />
                         </View>
                     </View>
@@ -195,26 +298,11 @@ const ForHelpCreate = ({navigation}) => {
                         <View style={styles.containerTextInput}>
                             <TextInput
                                 style={{fontSize: 16}}
-                                value={country}
-                                onChangeText={(value) => setCountry(value)}
-                                editable={true}
+                                value={userInfo.address}
+                                // onChangeText={(value) => setCountry(value)}
+                                editable={false}
                             />
                         </View>
-                    </View>
-
-                    <View
-                        style={{
-                            flexDirection: "column",
-                            marginBottom: 6,
-                        }}
-                    >
-                        <Text style={{...FONTS.h5}}>Ngày sinh</Text>
-                        <TouchableOpacity
-                            onPress={showMode}
-                            style={styles.containerTextInput}
-                        >
-                            <Text>{selectedStartDate}</Text>
-                        </TouchableOpacity>
                     </View>
 
                     <View
@@ -229,9 +317,9 @@ const ForHelpCreate = ({navigation}) => {
                         <View style={styles.containerTextInput}>
                             <TextInput
                                 style={{fontSize: 16}}
-                                value={email}
-                                onChangeText={(value) => setEmail(value)}
-                                editable={true}
+                                value={userInfo.email}
+                                // onChangeText={(value) => setEmail(value)}
+                                editable={false}
                             />
                         </View>
                     </View>
@@ -248,9 +336,9 @@ const ForHelpCreate = ({navigation}) => {
                         <View style={styles.containerTextInput}>
                             <TextInput
                                 style={{fontSize: 16}}
-                                value={phone}
-                                onChangeText={(value) => setPhone(value)}
-                                editable={true}
+                                value={userInfo.phone}
+                                // onChangeText={(value) => setPhone(value)}
+                                editable={false}
                                 keyboardType="numeric"
                             />
                         </View>
@@ -275,10 +363,10 @@ const ForHelpCreate = ({navigation}) => {
                         </View>
                     </View>
 
-                    <View style={{ flexDirection: 'column', marginBottom: 16 }}>
-                        <Text style={{...FONTS.h5}}>Ảnh minh họa</Text>
-                        <View style={{ flexDirection: 'row' }}>
-                            <Button title="Chọn ảnh" onPress={pickImages}  style={{
+                    <View style={{flexDirection: 'column', marginBottom: 16}}>
+                        <Text style={{...FONTS.h5}}>Ảnh/ Video</Text>
+                        <View style={{flexDirection: 'row'}}>
+                            <Button title="Chọn file" onPress={() => pickFiles()} style={{
                                 overflow: 'hidden',
                                 borderRadius: 8,
                                 borderStyle: 'dashed',
@@ -290,14 +378,19 @@ const ForHelpCreate = ({navigation}) => {
                                 width: 100, height: 100,
                             }}/>
                             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                                {images.map((uri, index) => (
-                                    <View key={index} style={{ margin: 5 }}>
-                                        <Image source={{ uri }} style={{ width: 100, height: 100, borderRadius: 8 }} />
+                                {selectedFiles.map((uri, index) => (
+                                    <View key={index} style={{margin: 5}}>
+                                        <Image source={{uri}} style={{width: 100, height: 100, borderRadius: 8}}/>
                                         <IconButton
                                             icon="close"
                                             size={15}
-                                            style={{position: 'absolute', top: 5, right: 5, backgroundColor: 'rgba(255, 255, 255, 0.7)'}}
-                                            onPress={() => removeImage(index)}
+                                            style={{
+                                                position: 'absolute',
+                                                top: 5,
+                                                right: 5,
+                                                backgroundColor: 'rgba(255, 255, 255, 0.7)'
+                                            }}
+                                            onPress={() => removeFile(index)}
                                         />
                                     </View>
                                 ))}
@@ -311,9 +404,9 @@ const ForHelpCreate = ({navigation}) => {
                             marginBottom: 16,
                         }}
                     >
-                        <Text style={{...FONTS.h5,  color: COLORS.secondary,textAlign: "justify",}}>
-                            Xin lưu ý <Text style={{color: "red"}}>*</Text>: để chúng tôi có thể hỗ trợ bạn tốt nhất,
-                            thông tin liên quan đến tài khoản, thiết bị ứng dụng sẽ được gửi kèm theo phản hồi này</Text>
+                        <Text style={{...FONTS.h5, color: COLORS.secondary, textAlign: "justify",}}>
+                            Xin lưu ý <Text style={{color: "red"}}>*</Text>: Để chúng tôi có thể hỗ trợ bạn tốt nhất,
+                            thông tin liên quan đến tài khoản sẽ được gửi kèm theo phản hồi này!</Text>
                     </View>
                 </View>
 
@@ -326,6 +419,7 @@ const ForHelpCreate = ({navigation}) => {
                         alignItems: "center",
                         justifyContent: "center",
                     }}
+                    onPress={() => handleOnClickSave()}
                 >
                     <Text
                         style={{
@@ -336,8 +430,6 @@ const ForHelpCreate = ({navigation}) => {
                         Gửi
                     </Text>
                 </TouchableOpacity>
-
-                {renderDatePicker()}
             </ScrollView>
         </SafeAreaView>
     );
@@ -378,7 +470,7 @@ const ForHelpCreateScreen = ({navigation}) => {
                             }}
                         >
                             <TouchableOpacity onPress={() => navigation.goBack()}>
-                                <Ionicons name="arrow-back" size={24} color={COLORS.black} />
+                                <Ionicons name="arrow-back" size={24} color={COLORS.black}/>
                             </TouchableOpacity>
                             <Text
                                 style={{

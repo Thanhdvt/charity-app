@@ -1,18 +1,42 @@
-import React from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {Dimensions, Image, StyleSheet, TouchableOpacity, View} from "react-native";
 import {useNavigation} from "@react-navigation/native";
 import Button from "../common/Button";
 import {COLORS, images} from "../../constants";
+import firebase from "firebase/compat";
+import {AuthContext} from "../../context/AuthContext";
 
 const {width} = Dimensions.get('screen');
 const PostCreat = () => {
+    const {userInfo, charityOrganization} = useContext(AuthContext);
     const navigation = useNavigation();
+    const [selectedImage, setSelectedImage] = useState();
+
+    useEffect(() => {
+        const fetchUserProfileImage = async () => {
+            try {
+                const snapshot = await firebase.database()
+                    .ref(`users/${userInfo.id}/image`)
+                    .once('value');
+
+                const imageUrl = snapshot.val();
+
+                if (imageUrl) {
+                    setSelectedImage(imageUrl);
+                }
+            } catch (error) {
+                console.error('Lỗi khi lấy ảnh từ Realtime Database', error);
+            }
+        };
+
+        fetchUserProfileImage();
+    }, [userInfo.id]);
 
     return (
         <View style={styles.inputContainer}>
             <TouchableOpacity style={{ paddingHorizontal: 10, marginTop: 0 }}>
                 <Image
-                    source={images.profile}
+                    source={ selectedImage ? {uri: selectedImage} : images.avatar_default }
                     style={{
                         width: 40,
                         height: 40,

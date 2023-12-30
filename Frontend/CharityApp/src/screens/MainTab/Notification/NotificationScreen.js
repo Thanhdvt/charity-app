@@ -1,13 +1,12 @@
 import React from "react";
 import {Image, ScrollView, StyleSheet, Text, TouchableOpacity} from "react-native";
-
 import {COLORS} from "../../../constants";
 import {createStackNavigator} from "@react-navigation/stack";
 import Icon from "react-native-vector-icons/Ionicons";
-
 import {useTheme} from "react-native-paper";
 import {View} from "react-native-animatable";
 import {MaterialIcons} from "@expo/vector-icons";
+import {StatusBar} from "expo-status-bar";
 
 const NotificationStack = createStackNavigator();
 
@@ -67,12 +66,14 @@ const NotificationContent = ({ navigation }) => {
                     {renderEventItem({ item })}
                 </View>
             ))}
+            <StatusBar style={"auto"}/>
         </ScrollView>
     );
 };
 
 const NotificationScreen = ({ navigation }) => {
     const { colors } = useTheme();
+
     return (
         <NotificationStack.Navigator
             screenOptions={{

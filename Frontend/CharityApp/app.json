@@ -2,6 +2,14 @@
   "expo": {
     "name": "Thiện nguyện",
     "slug": "charity-app",
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them with your friends."
+        }
+      ]
+    ],
     "description": "This is a charity app. It helps to connect volunteer or charity organization with people who need the assistance.",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -19,7 +27,8 @@
       "supportsTablet": true
     },
     "android": {
-      "package": "thanhndhust.charityapp",
+      "googleServicesFile": "./google-services.json",
+      "package": "com.thanhnd.charityapp",
       "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/logo-charity.jpg",
@@ -33,15 +42,6 @@
       ]
     },
     "web": {},
-    "plugins": [
-      "expo-router",
-      [
-        "expo-location",
-        {
-          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
-        }
-      ]
-    ],
     "extra": {
       "router": {
         "origin": false

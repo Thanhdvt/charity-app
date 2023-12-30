@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "403380094991",
+    "firebase_url": "https://charity-app-9a8ed-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "charity-app-9a8ed",
+    "storage_bucket": "charity-app-9a8ed.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:403380094991:android:790b1e98b194d29b5f3b7a",
+        "android_client_info": {
+          "package_name": "com.thanhnd.charityapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBrdRqu8p4c4c2MX2S0PUgX5edwx_iWQFY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -14,7 +14,7 @@ import {COLORS, images} from '../../../constants';
 import {useNavigation} from "@react-navigation/native";
 import Button from "../../common/Button";
 import {AntDesign} from "@expo/vector-icons";
-import {getEventList} from "../../../services/GetEventList";
+import {getAllEvent} from "../../../services/Event/GetAllEvent";
 
 const {width} = Dimensions.get('screen');
 const EventList = ({setModalVisible}) => {
@@ -67,7 +67,7 @@ const EventList = ({setModalVisible}) => {
     useEffect(() => {
         const fetchApi = async () => {
             try {
-                const eventList = await getEventList();
+                const eventList = await getAllEvent();
 
                 // setPostInfo(eventList);
             } catch (error) {

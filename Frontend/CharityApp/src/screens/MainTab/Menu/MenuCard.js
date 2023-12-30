@@ -209,6 +209,7 @@ const MenuContent = ({ navigation }) => {
 };
 
 const MenuScreen = () => {
+  const {userInfo} = useContext(AuthContext);
   const { colors } = useTheme();
 
   const insets = useSafeAreaInsets();
@@ -242,8 +243,8 @@ const MenuScreen = () => {
                     alignItems: "flex-end",
                   }}
                 >
-                  <Title style={styles.title}>Hội chữ thập đỏ Việt Nam</Title>
-                  <Caption style={styles.caption}>@chuthapdo</Caption>
+                  <Title style={styles.title}>{userInfo.name}</Title>
+                  <Caption style={styles.caption}>{userInfo.email}</Caption>
                 </View>
                 <TouchableOpacity
                   style={{ paddingHorizontal: 20, marginTop: 5 }}

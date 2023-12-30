@@ -1,12 +1,12 @@
-import * as request from "../utils/httpRequest";
+import * as request from "../../utils/httpRequest";
 
-export const getEventList = async () => {
+export const getAllEvent = async () => {
     try {
         const res = await request.get(
             '/api/Event',
         );
         //console.log(res.data)
-        console.log("EventList ", res);
+        // console.log("EventList ", res);
         return res;
     } catch (error) {
         console.log('EventList ' + error);

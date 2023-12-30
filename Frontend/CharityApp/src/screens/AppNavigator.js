@@ -43,17 +43,18 @@ const Drawer = createDrawerNavigator();
 
 const AppNavigator = () => {
   const {isLoading, userToken} = useContext(AuthContext);
-  if(isLoading) {
-    return (
-        <View style={{flex:1, justifyContent: "center", alignItems: "center"}}>
-          <ActivityIndicator size={'large'}/>
-        </View>
-    );
-  }
+  // if(isLoading) {
+  //   return (
+  //       <View style={{flex:1, justifyContent: "center", alignItems: "center"}}>
+  //         <ActivityIndicator size={'large'}/>
+  //       </View>
+  //   );
+  // }
+  // console.log(userToken)
 
   return (
     <NavigationContainer>
-      { userToken !== null ? (
+      { userToken === null ? (
         // <Drawer.Navigator drawerContent={props => <DrawerContent {...props} />} screenOptions={{ headerShown: false,}}>
         // 	<Drawer.Screen name="MainTab" component={MainTabScreen} />
         // </Drawer.Navigator>

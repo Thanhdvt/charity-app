@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useContext} from "react";
 import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
 import {StatusBar} from "expo-status-bar";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -27,7 +27,6 @@ const screenOptions = {
   },
   tabBarActiveTintColor: "#FF6347",
 };
-
 const MainTabScreen = () => (
   <>
     <StatusBar style="dark" backgroundColor="white" />

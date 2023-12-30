@@ -1,18 +1,18 @@
-import {Image, Linking, Pressable, Text, TextInput, TouchableOpacity, View} from 'react-native'
+import {Image, Linking, Pressable, Text, TextInput, TouchableOpacity, View, StyleSheet} from 'react-native'
 import React, {useState} from 'react'
 import {SafeAreaView} from "react-native-safe-area-context";
 import {COLORS, icons} from '../../../constants';
 import {AntDesign, EvilIcons, Ionicons} from "@expo/vector-icons";
 import Checkbox from "expo-checkbox"
 import Button from '../../../components/common/Button';
-import {register} from "../../../services/Signup";
+import {register} from "../../../services/User/CreateUser";
 import CustomModal from "../../../components/Modal/MessageModal";
+import Feather from "react-native-vector-icons/Feather";
 
 const SignupScreen = ({ navigation }) => {
     const [modalVisible, setModalVisible] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
     const [isPasswordShown, setIsPasswordShown] = useState(false);
-    const [isChecked, setIsChecked] = useState(false);
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
@@ -55,9 +55,9 @@ const SignupScreen = ({ navigation }) => {
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
-            <View style={{ flex: 1, marginHorizontal: 22, justifyContent: "center" }}>
+            <View style={{ flex: 1, marginHorizontal: 22, justifyContent: "center", marginVertical: 10 }}>
                 <CustomModal isVisible={modalVisible} onClose={closeModal} message={modalMessage} />
-                <View style={{ marginVertical: 22 }}>
+                <View style={{ marginBottom: 50 }}>
                     <Text style={{
                         fontSize: 22,
                         fontWeight: 'bold',
@@ -74,21 +74,11 @@ const SignupScreen = ({ navigation }) => {
                 </View>
 
                 <View style={{ marginBottom: 12, marginVertical: 10 }}>
-                    <View style={{
-                        width: "100%",
-                        height: 48,
-                        borderColor: COLORS.black,
-                        borderWidth: 1,
-                        borderRadius: 8,
-                        alignItems: "center",
-                        justifyContent: "center",
-                        paddingLeft: 22,
-                        flexDirection: "row"
-                    }}>
-                        <AntDesign name={"user"} size={22}/>
+                    <View style={styles.containerText}>
+                        <AntDesign name={"user"} size={24} color={COLORS.sliver}/>
                         <TextInput
                             placeholder='Nhập tên của bạn'
-                            placeholderTextColor={COLORS.black}
+                            placeholderTextColor={COLORS.sliver}
                             style={{
                                 width: "100%",
                                 paddingLeft: 12
@@ -100,21 +90,11 @@ const SignupScreen = ({ navigation }) => {
                 </View>
 
                 <View style={{ marginBottom: 12, marginVertical: 10 }}>
-                    <View style={{
-                        width: "100%",
-                        height: 48,
-                        borderColor: COLORS.black,
-                        borderWidth: 1,
-                        borderRadius: 8,
-                        alignItems: "center",
-                        justifyContent: "center",
-                        paddingLeft: 22,
-                        flexDirection: "row"
-                    }}>
-                        <AntDesign name={"mail"} size={22}/>
+                    <View style={styles.containerText}>
+                        <AntDesign name={"mail"} size={24} color={COLORS.sliver}/>
                         <TextInput
                             placeholder='Nhập email của bạn'
-                            placeholderTextColor={COLORS.black}
+                            placeholderTextColor={COLORS.sliver}
                             keyboardType='email-address'
                             style={{
                                 width: "100%",
@@ -127,35 +107,15 @@ const SignupScreen = ({ navigation }) => {
                 </View>
 
                 <View style={{ marginBottom: 12, marginVertical: 10 }}>
-                    <View style={{
-                        width: "100%",
-                        height: 48,
-                        borderColor: COLORS.black,
-                        borderWidth: 1,
-                        borderRadius: 8,
-                        alignItems: "center",
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                        paddingLeft: 22
-                    }}>
-                        <TextInput
-                            placeholder='+91'
-                            placeholderTextColor={COLORS.black}
-                            keyboardType='numeric'
-                            style={{
-                                width: "12%",
-                                borderRightWidth: 1,
-                                borderLeftColor: COLORS.grey,
-                                height: "100%"
-                            }}
-                        />
-
+                    <View style={styles.containerText}>
+                        <Feather name="phone" size={22} color={COLORS.sliver}/>
                         <TextInput
                             placeholder='Nhập số điện thoại'
-                            placeholderTextColor={COLORS.black}
+                            placeholderTextColor={COLORS.sliver}
                             keyboardType='numeric'
                             style={{
-                                width: "80%"
+                                width: "100%",
+                                paddingLeft: 12
                             }}
                             value={phone}
                             onChangeText={text => setPhone(text)}
@@ -164,25 +124,15 @@ const SignupScreen = ({ navigation }) => {
                 </View>
 
                 <View style={{ marginBottom: 12, marginVertical: 10 }}>
-                    <View style={{
-                        width: "100%",
-                        height: 48,
-                        borderColor: COLORS.black,
-                        borderWidth: 1,
-                        borderRadius: 8,
-                        alignItems: "center",
-                        justifyContent: "center",
-                        paddingLeft: 22,
-                        flexDirection: "row"
-                    }}>
-                        <EvilIcons name={"lock"} size={40}/>
+                    <View style={styles.containerText}>
+                        <AntDesign name="lock" size={28} color={COLORS.sliver} />
                         <TextInput
                             placeholder='Nhập mật khẩu'
-                            placeholderTextColor={COLORS.black}
+                            placeholderTextColor={COLORS.sliver}
                             secureTextEntry={isPasswordShown}
                             style={{
                                 width: "100%",
-                                paddingLeft: 3
+                                paddingLeft: 8
                             }}
                             value={password}
                             onChangeText={text => setPassword(text)}
@@ -197,9 +147,9 @@ const SignupScreen = ({ navigation }) => {
                         >
                             {
                                 isPasswordShown === true ? (
-                                    <Ionicons name="eye-off" size={24} color={COLORS.black} />
+                                    <Ionicons name="eye-off" size={24} color={COLORS.sliver} />
                                 ) : (
-                                    <Ionicons name="eye" size={24} color={COLORS.black} />
+                                    <Ionicons name="eye" size={24} color={COLORS.sliver} />
                                 )
                             }
 
@@ -211,7 +161,7 @@ const SignupScreen = ({ navigation }) => {
                     <View style={{
                         width: "100%",
                         height: 48,
-                        borderColor: COLORS.black,
+                        borderColor: COLORS.sliver,
                         borderWidth: 1,
                         borderRadius: 8,
                         alignItems: "center",
@@ -219,14 +169,14 @@ const SignupScreen = ({ navigation }) => {
                         paddingLeft: 22,
                         flexDirection: "row"
                     }}>
-                        <EvilIcons name={"lock"} size={40}/>
+                        <AntDesign name="lock" size={28} color={COLORS.sliver} />
                         <TextInput
                             placeholder='Nhập lại mật khẩu'
-                            placeholderTextColor={COLORS.black}
+                            placeholderTextColor={COLORS.sliver}
                             secureTextEntry={isPasswordShown}
                             style={{
                                 width: "100%",
-                                paddingLeft: 3
+                                paddingLeft: 8
                             }}
                             value={confirmPassword}
                             onChangeText={text => setConfirmPassword(text)}
@@ -241,9 +191,9 @@ const SignupScreen = ({ navigation }) => {
                         >
                             {
                                 isPasswordShown === true ? (
-                                    <Ionicons name="eye-off" size={24} color={COLORS.black} />
+                                    <Ionicons name="eye-off" size={24} color={COLORS.sliver} />
                                 ) : (
-                                    <Ionicons name="eye" size={24} color={COLORS.black} />
+                                    <Ionicons name="eye" size={24} color={COLORS.sliver} />
                                 )
                             }
 
@@ -253,24 +203,17 @@ const SignupScreen = ({ navigation }) => {
 
                 <View style={{
                     flexDirection: 'row',
-                    marginVertical: 6
+                    marginVertical: 6,
                 }}>
-                    <Checkbox
-                        style={{ marginRight: 8 }}
-                        value={isChecked}
-                        onValueChange={setIsChecked}
-                        color={isChecked ? COLORS.primary : undefined}
-                    />
-
-                    <View style={{flexDirection: 'row',}}>
+                    <View style={{ paddingRight: 10}}>
                         <Text style={{paddingTop: 3}}>
-                            Tôi đồng ý với{' '}
+                            Bằng việc nhấn đăng ký bạn đã xác nhận đồng ý với{' '}
+                            <Pressable onPress={() => handleTermsPress()}>
+                                <Text style={{ color: COLORS.primary, fontWeight: 'bold' }}>
+                                    điều khoản sử dụng
+                                </Text>
+                            </Pressable>
                         </Text>
-                        <TouchableOpacity onPress={handleTermsPress}>
-                            <Text style={{ color: COLORS.primary, fontWeight: 'bold', lineHeight: 24 }}>
-                                điều khoản sử dụng
-                            </Text>
-                        </TouchableOpacity>
                     </View>
                 </View>
 
@@ -285,85 +228,6 @@ const SignupScreen = ({ navigation }) => {
                 />
 
                 <View>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 20 }}>
-                        <View
-                            style={{
-                                flex: 1,
-                                height: 1,
-                                backgroundColor: COLORS.grey,
-                                marginHorizontal: 10
-                            }}
-                        />
-                        <Text style={{ fontSize: 14 }}>Hoặc tiếp tục với</Text>
-                        <View
-                            style={{
-                                flex: 1,
-                                height: 1,
-                                backgroundColor: COLORS.grey,
-                                marginHorizontal: 10
-                            }}
-                        />
-                    </View>
-
-                    <View style={{
-                        flexDirection: 'row',
-                        justifyContent: 'center'
-                    }}>
-                        <TouchableOpacity
-                            onPress={() => console.log("Pressed")}
-                            style={{
-                                flex: 1,
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                flexDirection: 'row',
-                                height: 52,
-                                borderWidth: 1,
-                                borderColor: COLORS.grey,
-                                marginRight: 4,
-                                borderRadius: 10
-                            }}
-                        >
-                            <Image
-                                source={icons.icon_1}
-                                style={{
-                                    height: 36,
-                                    width: 36,
-                                    marginRight: 8
-                                }}
-                                resizeMode='contain'
-                            />
-
-                            <Text>Facebook</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            onPress={() => console.log("Pressed")}
-                            style={{
-                                flex: 1,
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                flexDirection: 'row',
-                                height: 52,
-                                borderWidth: 1,
-                                borderColor: COLORS.grey,
-                                marginRight: 4,
-                                borderRadius: 10
-                            }}
-                        >
-                            <Image
-                                source={icons.icon_2}
-                                style={{
-                                    height: 36,
-                                    width: 36,
-                                    marginRight: 8
-                                }}
-                                resizeMode='contain'
-                            />
-
-                            <Text>Google</Text>
-                        </TouchableOpacity>
-                    </View>
-
                     <View style={{
                         flexDirection: "row",
                         justifyContent: "center",
@@ -386,5 +250,19 @@ const SignupScreen = ({ navigation }) => {
         </SafeAreaView>
     )
 }
+
+const styles = StyleSheet.create({
+    containerText: {
+        width: "100%",
+        height: 48,
+        borderColor: COLORS.sliver,
+        borderWidth: 1,
+        borderRadius: 8,
+        alignItems: "center",
+        justifyContent: "center",
+        flexDirection: "row",
+        paddingLeft: 22
+    }
+})
 
 export default SignupScreen

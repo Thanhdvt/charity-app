@@ -1,8 +1,7 @@
 import axios from "axios";
-import {BASE_URL} from "../../config";
 
 export const register = (name, email, phone, password) => {
-    axios.post(`${BASE_URL}/api/User`, {
+    axios.post(`http://10.0.2.2:153/api/User`, {
         name,
         userName: email,
         password,

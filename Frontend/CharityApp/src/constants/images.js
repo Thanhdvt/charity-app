@@ -1,3 +1,4 @@
+const avatar_default = require("../../assets/images/avatar_default.jpg")
 const avatar_1 = require("../../assets/images/avatar_1.jpg");
 const avatar_2 = require("../../assets/images/avatar_2.jpg");
 const avatar_3 = require("../../assets/images/avatar_3.jpg");
@@ -17,6 +18,7 @@ const landing_1 = require("../../assets/images/landing_1.jpg")
 const welcome = require("../../assets/images/welcome.jpg")
 
 export default {
+    avatar_default,
     avatar_1,
     avatar_2,
     avatar_3,

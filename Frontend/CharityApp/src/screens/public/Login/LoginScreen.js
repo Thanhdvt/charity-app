@@ -12,8 +12,8 @@ const Login = ({ navigation }) => {
     const [modalMessage, setModalMessage] = useState('');
     const [isPasswordShown, setIsPasswordShown] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
-    const [email, setEmail] = useState(null);
-    const [password, setPassword] = useState(null);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const {login} = useContext(AuthContext);
 
     const validate = (email, password) => {
@@ -73,7 +73,7 @@ const Login = ({ navigation }) => {
                     <View style={{
                         width: "100%",
                         height: 48,
-                        borderColor: COLORS.black,
+                        borderColor: COLORS.sliver,
                         borderWidth: 1,
                         borderRadius: 8,
                         alignItems: "center",
@@ -82,10 +82,10 @@ const Login = ({ navigation }) => {
                         marginVertical: 10,
                         flexDirection: "row"
                     }}>
-                        <AntDesign name={"mail"} size={22}/>
+                        <AntDesign name={"mail"} size={26} color={COLORS.sliver}/>
                         <TextInput
                             placeholder='Nhập địa chỉ email'
-                            placeholderTextColor={COLORS.black}
+                            placeholderTextColor={COLORS.sliver}
                             keyboardType='email-address'
                             style={{
                                 width: "100%",
@@ -101,7 +101,7 @@ const Login = ({ navigation }) => {
                     <View style={{
                         width: "100%",
                         height: 48,
-                        borderColor: COLORS.black,
+                        borderColor: COLORS.sliver,
                         borderWidth: 1,
                         borderRadius: 8,
                         alignItems: "center",
@@ -109,14 +109,14 @@ const Login = ({ navigation }) => {
                         paddingLeft: 22,
                         flexDirection: "row"
                     }}>
-                        <EvilIcons name={"lock"} size={40}/>
+                        <AntDesign name="lock" size={30} color={COLORS.sliver} />
                         <TextInput
                             placeholder='Nhập mật khẩu'
-                            placeholderTextColor={COLORS.black}
+                            placeholderTextColor={COLORS.sliver}
                             secureTextEntry={isPasswordShown}
                             style={{
                                 width: "100%",
-                                paddingLeft: 3
+                                paddingLeft: 12
                             }}
                             value={password}
                             onChangeText={text => setPassword(text)}
@@ -131,9 +131,9 @@ const Login = ({ navigation }) => {
                         >
                             {
                                 isPasswordShown === true ? (
-                                    <Ionicons name="eye-off" size={24} color={COLORS.black} />
+                                    <Ionicons name="eye-off" size={24} color={COLORS.sliver} />
                                 ) : (
-                                    <Ionicons name="eye" size={24} color={COLORS.black} />
+                                    <Ionicons name="eye" size={24} color={COLORS.sliver} />
                                 )
                             }
 
