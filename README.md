@@ -49,7 +49,7 @@ The Charity App is a platform that connects volunteers and charitable organizati
    ```bash
    cd backend
    dotnet restore
-   dotnet run
+   dotnet run --urls "http://192.168.x.x:5000" (ở đây là .2.13)
    ```
 
 3. Frontend
