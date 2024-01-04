@@ -129,7 +129,7 @@ const SignupScreen = ({ navigation }) => {
                         <TextInput
                             placeholder='Nhập mật khẩu'
                             placeholderTextColor={COLORS.sliver}
-                            secureTextEntry={isPasswordShown}
+                            secureTextEntry={!isPasswordShown}
                             style={{
                                 width: "100%",
                                 paddingLeft: 8
@@ -139,14 +139,14 @@ const SignupScreen = ({ navigation }) => {
                         />
 
                         <TouchableOpacity
-                            onPress={() => setIsPasswordShown(!isPasswordShown)}
+                            onPress={() => setIsPasswordShown(isPasswordShown)}
                             style={{
                                 position: "absolute",
                                 right: 12
                             }}
                         >
                             {
-                                isPasswordShown === true ? (
+                                isPasswordShown !== true ? (
                                     <Ionicons name="eye-off" size={24} color={COLORS.sliver} />
                                 ) : (
                                     <Ionicons name="eye" size={24} color={COLORS.sliver} />
@@ -173,7 +173,7 @@ const SignupScreen = ({ navigation }) => {
                         <TextInput
                             placeholder='Nhập lại mật khẩu'
                             placeholderTextColor={COLORS.sliver}
-                            secureTextEntry={isPasswordShown}
+                            secureTextEntry={!isPasswordShown}
                             style={{
                                 width: "100%",
                                 paddingLeft: 8
@@ -191,9 +191,9 @@ const SignupScreen = ({ navigation }) => {
                         >
                             {
                                 isPasswordShown === true ? (
-                                    <Ionicons name="eye-off" size={24} color={COLORS.sliver} />
-                                ) : (
                                     <Ionicons name="eye" size={24} color={COLORS.sliver} />
+                                ) : (
+                                    <Ionicons name="eye-off" size={24} color={COLORS.sliver} />
                                 )
                             }
 
@@ -202,17 +202,17 @@ const SignupScreen = ({ navigation }) => {
                 </View>
 
                 <View style={{
-                    flexDirection: 'row',
                     marginVertical: 6,
                 }}>
                     <View style={{ paddingRight: 10}}>
-                        <Text style={{paddingTop: 3}}>
-                            Bằng việc nhấn đăng ký bạn đã xác nhận đồng ý với{' '}
+                        <Text style={{marginTop: 3}}>
+                            <Text>Bằng việc nhấn đăng ký bạn đã xác nhận đồng ý với{' '}</Text>
                             <Pressable onPress={() => handleTermsPress()}>
-                                <Text style={{ color: COLORS.primary, fontWeight: 'bold' }}>
-                                    điều khoản sử dụng
-                                </Text>
+
                             </Pressable>
+                            <Text style={{ color: COLORS.primary, fontWeight: "500"}}>
+                                điều khoản sử dụng
+                            </Text>
                         </Text>
                     </View>
                 </View>

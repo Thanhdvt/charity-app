@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {
     Dimensions,
     FlatList,
@@ -15,11 +15,17 @@ import {useNavigation} from "@react-navigation/native";
 import Button from "../../common/Button";
 import {AntDesign} from "@expo/vector-icons";
 import {getAllEvent} from "../../../services/Event/GetAllEvent";
+import {getAllOrganization} from "../../../services/CharityOrganization/GetAllOrganization";
+import {getUserById} from "../../../services/User/{id}/GetUserById";
+import {getOrganizationById} from "../../../services/CharityOrganization/{id}/GetOrganizationById";
+import {AuthContext} from "../../../context/AuthContext";
+import ModalPop from "../../Modal/PopModal";
+import {hideMessage, showMessage} from "react-native-flash-message";
 
 const {width} = Dimensions.get('screen');
-const EventList = ({setModalVisible}) => {
+const EventList = () => {
 
-    const [postInfo, setPostInfo] = useState([
+    const post=
         {
             postPersonName: "Hội chữ thập đỏ Việt Nam",
             postPersonImage: images.profile,
@@ -28,67 +34,114 @@ const EventList = ({setModalVisible}) => {
             image: images.onboarding_0,
             like_Count: 765,
             isLiked: false,
-        },
-        {
-            postPersonName: "Hội chữ thập đỏ Việt Nam",
-            postPersonImage: images.profile,
-            title:
-                "Hội Chữ thập đỏ Việt Nam là tổ chức xã hội nhân đạo của quần chúng, do Chủ tịch Hồ Chí Minh sáng lập ngày 23/11/1946 và Người làm Chủ tịch danh dự đầu tiên của Hội. 7 nguyên tắc hoạt động: Nhân đạo, Vô tư, Trung lập, Độc lập, Tự nguyện, Thống nhất, Toàn cầu",
-            image: images.onboarding_2,
-            like_Count: 345,
-            isLiked: false,
-        },
-        {
-            postPersonName: "Hội chữ thập đỏ Việt Nam",
-            postPersonImage: images.profile,
-            title:
-                "Hội Chữ thập đỏ Việt Nam là tổ chức xã hội nhân đạo của quần chúng, do Chủ tịch Hồ Chí Minh sáng lập ngày 23/11/1946 và Người làm Chủ tịch danh dự đầu tiên của Hội. 7 nguyên tắc hoạt động: Nhân đạo, Vô tư, Trung lập, Độc lập, Tự nguyện, Thống nhất, Toàn cầu",
-            image: images.onboarding_1,
-            like_Count: 734,
-            isLiked: false,
-        },
-        {
-            postPersonName: "Hội chữ thập đỏ Việt Nam",
-            postPersonImage: images.profile,
-            title:
-                "Hội Chữ thập đỏ Việt Nam là tổ chức xã hội nhân đạo của quần chúng, do Chủ tịch Hồ Chí Minh sáng lập ngày 23/11/1946 và Người làm Chủ tịch danh dự đầu tiên của Hội. 7 nguyên tắc hoạt động: Nhân đạo, Vô tư, Trung lập, Độc lập, Tự nguyện, Thống nhất, Toàn cầu",
-            image: images.cover,
-            like_Count: 875,
-            isLiked: false,
-        },
-    ]);
+        }
 
+    const {userToken} = useContext(AuthContext);
     const navigation = useNavigation();
+    const [eventList, setEventList] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [visible, setVisible] = useState(false);
 
-    const handleEventPress = () => {
-        setModalVisible(true);
+    const handleButtonClick = () => {
+        setVisible(true);
     };
 
-    useEffect(() => {
-        const fetchApi = async () => {
-            try {
-                const eventList = await getAllEvent();
+    const handleButtonLogin = () => {
+        setVisible(false);
+        navigation.navigate("Login");
+    }
 
-                // setPostInfo(eventList);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const res = await getAllEvent();
+                const updatedList = await Promise.all(
+                    res.data.map(async (item) => {
+                        try {
+                            const organization = await getOrganizationById(item.organization_Id);
+                            if (organization) {
+                                const userResponse = await getUserById(organization.data.user_Id)
+                                const { image, name, email } = userResponse.data;
+                                return { ...item, image, name, email };
+                            }
+                        } catch (error) {
+                            console.error('Error fetching user data', error);
+                            return item;
+                        }
+                    })
+                );
+                setEventList(updatedList);
             } catch (error) {
-                console.log('fetchApi' + error);
+                console.error('Error fetching data', error);
+                setEventList([]);
+            } finally {
+                setIsLoading(false);
             }
         };
-        fetchApi();
+        fetchData();
     }, []);
 
-    const Card = ({index}) => {
-        const event = postInfo[index];
+    const showModal = () => {
+        return (
+            <ModalPop visible={visible}>
+                <View style={{alignItems: 'center'}}>
+                    <View style={{
+                        width: '100%',
+                        height: 20,
+                        alignItems: "flex-end",
+                        justifyContent: 'center',
+                    }}>
+                        <TouchableOpacity onPress={() => setVisible(false)}>
+                            <Text style={{fontSize: 18, fontWeight: "bold", color: COLORS.primary}}>Lúc khác</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+                <View style={{alignItems: 'center'}}>
+                    <Image
+                        source={images.landing_1}
+                        style={{height: 250, width: 250}}
+                    />
+                </View>
 
+                <Text style={{marginTop: 15, fontSize: 18, fontWeight: "500", textAlign: 'center'}}>
+                    Chào mừng bạn đến với nền tảng thiện nguyện minh bạch
+                </Text>
+
+                <Text style={{
+                    marginVertical: 20,
+                    fontSize: 14,
+                    textAlign: 'center',
+                    color: COLORS.secondary,
+                    paddingHorizontal: 25
+                }}>
+                    Chúng tôi sẽ giúp bạn có trải nghiệm thiện nguyện thật khác biệt
+                </Text>
+
+                <Button
+                    title="Đăng nhập hoặc tạo tài khoản"
+                    filled
+                    style={{
+                        marginHorizontal: 20
+                    }}
+                    onPress={() => handleButtonLogin()}
+                />
+            </ModalPop>
+        )
+    }
+
+
+    const Card = ({index}) => {
+        const event = eventList[index];
+        // console.log(event)
         return (
             <TouchableOpacity
                 activeOpacity={0.8}
-                onPress={() => navigation.navigate("EventDetail")}>
+                onPress={() => navigation.navigate('EventDetail', { eventId: event.id, organizationId: event.organization_Id })}>
                 <View style={{width: width/1.4, backgroundColor: COLORS.grey, marginRight: 20, borderRadius: 16}}>
-                    <ImageBackground style={styles.cardImage} source={event.image}>
+                    <ImageBackground style={styles.cardImage} source={post.image}>
                         <View style={{flexDirection: "row", alignItems: 'flex-start', alignSelf: "flex-end", padding: 10}}>
                             <AntDesign name="heart" size={20} color={"red"} />
-                            <Text style={{marginLeft: 5, color: COLORS.white}}>{event.like_Count}</Text>
+                            <Text style={{marginLeft: 5, color: COLORS.white}}>{event?.like_Count}</Text>
                         </View>
                         <View
                             style={{
@@ -98,7 +151,7 @@ const EventList = ({setModalVisible}) => {
                                 alignItems: 'flex-end',
                             }}>
                             <View style={{flexDirection: 'row', justifyContent: "center", alignItems: "center", padding: 10}}>
-                                <Image source={event.postPersonImage} style={{
+                                <Image source={ isLoading ? images.avatar_default : {uri: event?.image}} style={{
                                     height: 40,
                                     width: 40,
                                     borderRadius: 50,
@@ -106,18 +159,18 @@ const EventList = ({setModalVisible}) => {
                                 }}/>
                                <View>
                                    <Text style={{marginLeft: 5, color: COLORS.white, fontWeight: "500", fontSize: 18}} numberOfLines={1} ellipsizeMode="tail">
-                                       {event.postPersonName}
+                                       {event?.name}
                                    </Text>
                                    <Text style={{marginLeft: 5, color: COLORS.white }}>
-                                       @chuthapdo
+                                       {event?.email}
                                    </Text>
                                </View>
                             </View>
                         </View>
                     </ImageBackground>
                     <View style={{paddingVertical: 15, paddingHorizontal: 15}}>
-                        <Text style={{fontWeight: "bold", fontSize: 16, paddingBottom: 15, textAlign: "justify"}} numberOfLines={2} ellipsizeMode="tail">
-                            {event.title}
+                        <Text style={{fontWeight: "bold", fontSize: 16, paddingBottom: 15, textAlign: "justify"}} numberOfLines={1} ellipsizeMode="tail">
+                            {event?.title}
                         </Text>
                         <View style={{justifyContent: "space-between", paddingBottom: 15, paddingLeft: 15}}>
                            <View style={{flexDirection: "row", alignItems: "center"}}>
@@ -138,7 +191,7 @@ const EventList = ({setModalVisible}) => {
                                 borderWidth: 1,
                                 borderRadius: 8
                             }}
-                            onPress={handleEventPress}
+                            onPress={ () => (userToken ? navigation.navigate("JoinRegister") : handleButtonClick)}
                         />
                     </View>
                 </View>
@@ -148,6 +201,7 @@ const EventList = ({setModalVisible}) => {
 
     return (
         <View style={{flex: 1, backgroundColor: COLORS.white, marginBottom: 5, paddingTop: 15, paddingBottom: 25}}>
+            {showModal()}
             <ScrollView showsVerticalScrollIndicator={false}>
                 <View style={styles.sectionTitle}>
                     <Text style={{fontSize: 18, fontWeight: "500"}}>Sự kiện nổi bật</Text>
@@ -160,7 +214,7 @@ const EventList = ({setModalVisible}) => {
                         contentContainerStyle={{paddingLeft: 20}}
                         horizontal
                         showsHorizontalScrollIndicator={false}
-                        data={postInfo}
+                        data={eventList}
                         keyExtractor={(item, index) => index.toString()}
                         renderItem={({ item, index }) => <Card index={index} />}
                     />

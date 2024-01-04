@@ -113,7 +113,7 @@ const Login = ({ navigation }) => {
                         <TextInput
                             placeholder='Nhập mật khẩu'
                             placeholderTextColor={COLORS.sliver}
-                            secureTextEntry={isPasswordShown}
+                            secureTextEntry={!isPasswordShown}
                             style={{
                                 width: "100%",
                                 paddingLeft: 12
@@ -131,9 +131,9 @@ const Login = ({ navigation }) => {
                         >
                             {
                                 isPasswordShown === true ? (
-                                    <Ionicons name="eye-off" size={24} color={COLORS.sliver} />
-                                ) : (
                                     <Ionicons name="eye" size={24} color={COLORS.sliver} />
+                                ) : (
+                                    <Ionicons name="eye-off" size={24} color={COLORS.sliver} />
                                 )
                             }
 

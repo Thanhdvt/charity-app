@@ -2,7 +2,7 @@ import {Image, Text, View} from "react-native";
 import {COLORS} from "../../constants";
 import React from "react";
 
-const Waiting = () => {
+const Skeleton  = () => {
     return (
         <>
             <View
@@ -16,7 +16,7 @@ const Waiting = () => {
                     }}
                 >
                     <View style={{ flexDirection: "row", alignItems: "center" }}>
-                        <Image style={{ width: 40, height: 40, borderRadius: 100, backgroundColor: "#d4d4d4" }}/>
+                        <View style={{ width: 40, height: 40, borderRadius: 100, backgroundColor: "#d4d4d4" }}/>
                         <View style={{ paddingLeft: 5, marginBottom: 5 }}>
                             <View style={{ width:100, height: 10, backgroundColor: "#d4d4d4", marginBottom: 5 }}></View>
                             <View style={{ width: 80, height: 10, backgroundColor: "#d4d4d4", marginBottom: 5 }}></View>
@@ -31,11 +31,11 @@ const Waiting = () => {
                         alignItems: "center",
                     }}
                 >
-                    <Image style={{ width: "100%", height: 200, backgroundColor: "#d4d4d4" }}/>
+                    <View style={{ width: "100%", height: 200, backgroundColor: "#d4d4d4" }}/>
                 </View>
             </View>
         </>
     )
 }
 
-export default Waiting
+export default Skeleton

@@ -1,11 +1,12 @@
 import {Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View,} from "react-native";
-import React, {useState} from "react";
+import React, {useContext, useState} from "react";
 import {SafeAreaView} from "react-native-safe-area-context";
 import * as ImagePicker from "expo-image-picker";
 import {COLORS, FONTS} from "../../constants";
 import {Ionicons, MaterialIcons} from "@expo/vector-icons";
 import {imagesDataURL} from "../../constants/data";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import {AuthContext} from "../../context/AuthContext";
 
 const JoinRegisterScreen = ({ navigation }) => {
     const [selectedImage, setSelectedImage] = useState(imagesDataURL[0]);
@@ -29,14 +30,13 @@ const JoinRegisterScreen = ({ navigation }) => {
             aspect: [4, 4],
             quality: 1,
         });
-
         console.log(result);
-
         if (!result.canceled) {
             setSelectedImage(result.assets[0].uri);
         }
     };
 
+    const {userInfo} = useContext(AuthContext);
     const [date, setDate] = useState(new Date("1946-11-23"));
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [selectedStartDate, setSelectedStartDate] = useState("23/11/1946");
@@ -92,7 +92,7 @@ const JoinRegisterScreen = ({ navigation }) => {
                 style={{
                     flexDirection: "row",
                     alignItems: "center",
-                    marginVertical: 10,
+                    marginVertical: 0,
                     height: 60,
                 }}
             >
@@ -122,7 +122,7 @@ const JoinRegisterScreen = ({ navigation }) => {
                 >
                     <TouchableOpacity onPress={handleImageSelection}>
                         <Image
-                            source={{ uri: selectedImage }}
+                            source={{ uri: userInfo.image }}
                             style={{
                                 height: 170,
                                 width: 170,
@@ -157,17 +157,57 @@ const JoinRegisterScreen = ({ navigation }) => {
                         }}
                     >
                         <Text style={{ ...FONTS.h5 }}>
-                            Tên tài khoản <Text style={{ color: "red" }}>*</Text>{" "}
+                            Họ và tên <Text style={{ color: "red" }}>*</Text>{" "}
                         </Text>
                         <View style={styles.containerTextInput}>
                             <TextInput
                                 style={{ fontSize: 16 }}
-                                value={name}
-                                onChangeText={(value) => setName(value)}
-                                editable={true}
+                                value={userInfo.name}
+                                // onChangeText={(value) => setName(value)}
+                                editable={false}
                             />
                         </View>
                     </View>
+
+                    <View
+                        style={{
+                            flexDirection: "column",
+                            marginBottom: 6,
+                        }}
+                    >
+                        <Text style={{ ...FONTS.h5 }}>
+                            Email <Text style={{ color: "red" }}>*</Text>
+                        </Text>
+                        <View style={styles.containerTextInput}>
+                            <TextInput
+                                style={{ fontSize: 16 }}
+                                value={email}
+                                // onChangeText={(value) => setEmail(value)}
+                                editable={false}
+                            />
+                        </View>
+                    </View>
+
+                    <View
+                        style={{
+                            flexDirection: "column",
+                            marginBottom: 6,
+                        }}
+                    >
+                        <Text style={{ ...FONTS.h5 }}>
+                            Số điện thoại <Text style={{ color: "red" }}>*</Text>
+                        </Text>
+                        <View style={styles.containerTextInput}>
+                            <TextInput
+                                style={{ fontSize: 16 }}
+                                value={phone}
+                                onChangeText={(value) => setPhone(value)}
+                                editable={true}
+                                keyboardType="numeric"
+                            />
+                        </View>
+                    </View>
+
 
                     <View
                         style={{
@@ -201,45 +241,6 @@ const JoinRegisterScreen = ({ navigation }) => {
                         >
                             <Text>{selectedStartDate}</Text>
                         </TouchableOpacity>
-                    </View>
-
-                    <View
-                        style={{
-                            flexDirection: "column",
-                            marginBottom: 6,
-                        }}
-                    >
-                        <Text style={{ ...FONTS.h5 }}>
-                            Email <Text style={{ color: "red" }}>*</Text>
-                        </Text>
-                        <View style={styles.containerTextInput}>
-                            <TextInput
-                                style={{ fontSize: 16 }}
-                                value={email}
-                                onChangeText={(value) => setEmail(value)}
-                                editable={true}
-                            />
-                        </View>
-                    </View>
-
-                    <View
-                        style={{
-                            flexDirection: "column",
-                            marginBottom: 6,
-                        }}
-                    >
-                        <Text style={{ ...FONTS.h5 }}>
-                            Số điện thoại <Text style={{ color: "red" }}>*</Text>
-                        </Text>
-                        <View style={styles.containerTextInput}>
-                            <TextInput
-                                style={{ fontSize: 16 }}
-                                value={phone}
-                                onChangeText={(value) => setPhone(value)}
-                                editable={true}
-                                keyboardType="numeric"
-                            />
-                        </View>
                     </View>
 
                     <View

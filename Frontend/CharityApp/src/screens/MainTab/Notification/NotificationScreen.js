@@ -1,5 +1,5 @@
-import React from "react";
-import {Image, ScrollView, StyleSheet, Text, TouchableOpacity} from "react-native";
+import React, {useEffect} from "react";
+import {Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity} from "react-native";
 import {COLORS} from "../../../constants";
 import {createStackNavigator} from "@react-navigation/stack";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -7,6 +7,7 @@ import {useTheme} from "react-native-paper";
 import {View} from "react-native-animatable";
 import {MaterialIcons} from "@expo/vector-icons";
 import {StatusBar} from "expo-status-bar";
+import messaging from "@react-native-firebase/messaging";
 
 const NotificationStack = createStackNavigator();
 
@@ -38,6 +39,59 @@ const NotificationContent = ({ navigation }) => {
             status: 'Đang diễn ra',
         },
     ];
+
+    const requestUserPermission = async () => {
+        const authStatus = await messaging().requestPermission();
+        const enabled =
+            authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+            authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+        if (enabled) {
+            console.log('Authorization status:', authStatus);
+        }
+    }
+
+    useEffect(() => {
+        if(requestUserPermission()) {
+            // return fcm token for the device
+            messaging().getToken().then(token => {
+                console.log(token)
+            })
+        } else {
+            console.log("Failed token status", authStatus);
+        }
+
+        // Check whether an initial notification is available
+        messaging()
+            .getInitialNotification()
+            .then(async  (remoteMessage) => {
+                if (remoteMessage) {
+                    console.log(
+                        'Notification caused app to open from quit state:',
+                        remoteMessage.notification,
+                    );
+                }
+            });
+
+        // Assume a message-notification contains a "type" property in the data payload of the screen to open
+        messaging().onNotificationOpenedApp(async (remoteMessage) => {
+            console.log(
+                'Notification caused app to open from background state:',
+                remoteMessage.notification,
+            );
+        });
+
+        // Register background handler
+        messaging().setBackgroundMessageHandler(async (remoteMessage) => {
+            console.log('Message handled in the background!', remoteMessage);
+        });
+
+        messaging().onMessage(async remoteMessage => {
+            Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
+        });
+
+    }, []);
+
 
     const renderEventItem = ({ item }) => (
         <TouchableOpacity

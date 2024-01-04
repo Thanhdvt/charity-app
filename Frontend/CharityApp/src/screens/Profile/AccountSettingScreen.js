@@ -9,18 +9,30 @@ import FlashMessage, {hideMessage, showMessage} from "react-native-flash-message
 import {updateUserById} from "../../services/User/{id}/UpdateUserById";
 
 const AccountSettingScreen = ({ navigation }) => {
-    const {userInfo} = useContext(AuthContext)
+    const {userInfo, login, userToken} = useContext(AuthContext)
     const [isLoading, setIsLoading] = useState(false);
-    const [isOldPasswordShow, setIsOldPasswordShow] = useState(true);
-    const [isNewPasswordShow, setIsNewPasswordShow] = useState(true);
-    const [isConfirmPasswordShow, setIsConfirmPasswordShow] = useState(true);
+    const [isOldPasswordShow, setIsOldPasswordShow] = useState(false);
+    const [isNewPasswordShow, setIsNewPasswordShow] = useState(false);
+    const [isConfirmPasswordShow, setIsConfirmPasswordShow] = useState(false);
     const [phone, setPhone] = useState(userInfo.phone);
     const [oldPassword, setOldPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
-    const validate = () => {
-        if( !phone || !oldPassword || !newPassword || !confirmPassword) {
+    const validate = async () => {
+        const verify = await login( userInfo.userName, oldPassword);
+        console.log(verify)
+        if(!verify) {
+            showMessage({
+                message: "Mật khẩu cũ không chính xác",
+                type: "danger",
+                duration: 3000,
+                onPress: () => {
+                    hideMessage();
+                },
+            });
+            return false;
+        } else if (!phone || !oldPassword || !newPassword || !confirmPassword) {
             showMessage({
                 message: "Nhập đầy đủ các trường bắt buộc",
                 type: "danger",
@@ -30,18 +42,7 @@ const AccountSettingScreen = ({ navigation }) => {
                 },
             });
             return false;
-        // } else if(oldPassword !== userInfo.password) {
-        //     console.log(userInfo.password + " " + oldPassword)
-        //     showMessage({
-        //         message: "Mật khẩu hiện tại không chính xác",
-        //         type: "danger",
-        //         duration: 3000,
-        //         onPress: () => {
-        //             hideMessage();
-        //         },
-        //     });
-        //     return false;
-        } else if(oldPassword === newPassword) {
+        } else if (oldPassword === newPassword) {
             showMessage({
                 message: "Mật khẩu mới phải khác mật khẩu cũ",
                 type: "danger",
@@ -51,7 +52,7 @@ const AccountSettingScreen = ({ navigation }) => {
                 },
             });
             return false;
-        } else if(confirmPassword !== newPassword) {
+        } else if (confirmPassword !== newPassword) {
             showMessage({
                 message: "Mật khẩu mới và xác nhận mật khẩu không trùng khớp",
                 type: "danger",
@@ -68,7 +69,7 @@ const AccountSettingScreen = ({ navigation }) => {
     // thực hiện khi ấn Cập nhật
     const handleOnClickSave = async () => {
         setIsLoading(true);
-        if (validate()) {
+        if (await validate()) {
             const newUser = {
                 name: userInfo.name,
                 userName: userInfo.userName,
@@ -88,8 +89,7 @@ const AccountSettingScreen = ({ navigation }) => {
     // lưu thông tin
     const fetchData = async (newUser) => {
         try {
-            const res = await updateUserById(userInfo.id, newUser);
-
+            const res = await updateUserById(userInfo.id, newUser, userToken);
             if(res) {
                 showMessage({
                     message: "Gửi thành công",
@@ -99,6 +99,9 @@ const AccountSettingScreen = ({ navigation }) => {
                         hideMessage();
                     },
                 });
+                setOldPassword('');
+                setNewPassword('');
+                setConfirmPassword('');
             } else {
                 showMessage({
                     message: "Đã xảy ra lỗi khi gửi yêu cầu",
@@ -151,7 +154,7 @@ const AccountSettingScreen = ({ navigation }) => {
                         Cài đặt tài khoản
                     </Text>
                 </View>
-                <View style={{ flex: 1, justifyContent: "center", paddingVertical: 40 }}>
+                <View style={{ flex: 1, justifyContent: "center", paddingVertical: 20}}>
                     <View style={{ marginBottom: 10, marginVertical: 10 }}>
                         <View style={{marginBottom: 5}}>
                             <Text style={{ ...FONTS.h5 }}>
@@ -207,7 +210,7 @@ const AccountSettingScreen = ({ navigation }) => {
                             <AntDesign name="lock" size={30} color={COLORS.sliver} />
                             <TextInput
                                 placeholderTextColor={COLORS.sliver}
-                                secureTextEntry={isOldPasswordShow}
+                                secureTextEntry={!isOldPasswordShow}
                                 style={{
                                     width: "100%",
                                     paddingLeft: 12,
@@ -226,12 +229,11 @@ const AccountSettingScreen = ({ navigation }) => {
                             >
                                 {
                                     isOldPasswordShow === true ? (
-                                        <Ionicons name="eye-off" size={24} color={COLORS.sliver} />
-                                    ) : (
                                         <Ionicons name="eye" size={24} color={COLORS.sliver} />
+                                    ) : (
+                                        <Ionicons name="eye-off" size={24} color={COLORS.sliver} />
                                     )
                                 }
-
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -246,7 +248,7 @@ const AccountSettingScreen = ({ navigation }) => {
                             <AntDesign name="lock" size={30} color={COLORS.sliver} />
                             <TextInput
                                 placeholderTextColor={COLORS.sliver}
-                                secureTextEntry={isNewPasswordShow}
+                                secureTextEntry={!isNewPasswordShow}
                                 style={{
                                     width: "100%",
                                     paddingHorizontal: 12,
@@ -266,12 +268,11 @@ const AccountSettingScreen = ({ navigation }) => {
                             >
                                 {
                                     isNewPasswordShow === true ? (
-                                        <Ionicons name="eye-off" size={24} color={COLORS.sliver} />
-                                    ) : (
                                         <Ionicons name="eye" size={24} color={COLORS.sliver} />
+                                    ) : (
+                                        <Ionicons name="eye-off" size={24} color={COLORS.sliver} />
                                     )
                                 }
-
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -286,7 +287,7 @@ const AccountSettingScreen = ({ navigation }) => {
                             <AntDesign name="lock" size={30} color={COLORS.sliver} />
                             <TextInput
                                 placeholderTextColor={COLORS.sliver}
-                                secureTextEntry={isConfirmPasswordShow}
+                                secureTextEntry={!isConfirmPasswordShow}
                                 style={{
                                     width: "100%",
                                     paddingLeft: 12,
@@ -305,12 +306,11 @@ const AccountSettingScreen = ({ navigation }) => {
                             >
                                 {
                                     isConfirmPasswordShow === true ? (
-                                        <Ionicons name="eye-off" size={24} color={COLORS.sliver} />
-                                    ) : (
                                         <Ionicons name="eye" size={24} color={COLORS.sliver} />
+                                    ) : (
+                                        <Ionicons name="eye-off" size={24} color={COLORS.sliver} />
                                     )
                                 }
-
                             </TouchableOpacity>
                         </View>
                     </View>

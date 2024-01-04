@@ -9,12 +9,11 @@ import {useNavigation} from "@react-navigation/native";
 import {AuthContext} from "../../context/AuthContext";
 import {createEvent} from "../../services/Event/CreateEvent";
 import FlashMessage, {hideMessage, showMessage} from "react-native-flash-message";
+import getAvatar from "../../../firebase/getAvatar";
 
 const {height} = Dimensions.get('screen');
 
 const PostScreen = () => {
-    const navigation = useNavigation();
-    const {userInfo, charityOrganization} = useContext(AuthContext)
     const [event, setEvent] = useState(
         {
             "title": "",
@@ -27,8 +26,6 @@ const PostScreen = () => {
             "review": "",
             "type": 0
         });
-    const [content, setContent] = useState("");
-    const [selectedImages, setSelectedImages] = useState([]);
     const [organization, setOrganization] = useState(
         {
             id: "1",
@@ -36,23 +33,49 @@ const PostScreen = () => {
             image: images.profile
         })
 
-    const pickImages = async () => {
-        const result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsMultipleSelection: true,
-            quality: 1,
-        });
+    const navigation = useNavigation();
+    const {userInfo, charityOrganization} = useContext(AuthContext);
+    const [content, setContent] = useState("");
+    const [avatar, setAvatar] = useState();
+    const [selectedFiles, setSelectedFiles] = useState([]);
 
-        if (!result.canceled && result.assets) {
-            const selectedImages = result.assets.map((asset) => asset.uri).filter((uri) => !!uri);
-            setSelectedImages(selectedImages);
+    useEffect(() => {
+        const fetchUserProfileImage = async () => {
+            try {
+                const imageUrl = await getAvatar(userInfo.id);
+
+                if (imageUrl) {
+                    setAvatar(imageUrl);
+                }
+            } catch (error) {
+                console.error('Lỗi khi lấy ảnh từ Realtime Database', error);
+            }
+        };
+        fetchUserProfileImage();
+    }, [userInfo.id]);
+
+    const pickFiles = async () => {
+        try {
+            const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.All,
+                allowsMultipleSelection: true,
+                quality: 1,
+            });
+
+            if (!result.canceled && result.assets) {
+                const newFiles = result.assets.map(asset => asset.uri).filter(uri => !!uri);
+                setSelectedFiles([...selectedFiles, ...newFiles]);
+                console.log(selectedFiles)
+            }
+        } catch (error) {
+            console.error('Error picking files', error);
         }
     };
 
-    const removeImage = (index) => {
-        const newImages = [...selectedImages];
-        newImages.splice(index, 1);
-        setSelectedImages(newImages);
+    const removeFile = (index) => {
+        const newFiles = [...selectedFiles];
+        newFiles.splice(index, 1);
+        setSelectedFiles(newFiles);
     };
 
     const validate = () => {
@@ -78,7 +101,7 @@ const PostScreen = () => {
     const handleOnClickSave = async () => {
         if (validate()) {
             const newPost = {
-                title: "string",
+                title: content.slice(0, 100),
                 content: content,
                 image: "string",
                 organization_Id: charityOrganization.id,
@@ -125,10 +148,10 @@ const PostScreen = () => {
         }
     }
 
-    const renderImages = () => {
+    const renderFiles = () => {
         return (
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                {selectedImages.map((uri, index) => (
+                {selectedFiles.map((uri, index) => (
                     <View key={index} style={{margin: 5}}>
                         <Image source={{uri}} style={{width: 100, height: 100, borderRadius: 8}}/>
                         <IconButton
@@ -140,7 +163,7 @@ const PostScreen = () => {
                                 right: 5,
                                 backgroundColor: 'rgba(255, 255, 255, 0.7)'
                             }}
-                            onPress={() => removeImage(index)}
+                            onPress={() => removeFile(index)}
                         />
                     </View>
                 ))}
@@ -206,7 +229,7 @@ const PostScreen = () => {
                     }}
                 >
                     <Image
-                        source={images.profile}
+                        source={ avatar ? {uri: avatar} : images.avatar_default }
                         style={{width: 50, height: 50, borderRadius: 25, marginRight: 12}}
                     />
                     <View>
@@ -224,8 +247,8 @@ const PostScreen = () => {
                         onChangeText={(text) => setContent(text)}
                         style={{borderWidth: 0, borderColor: 'gray', marginBottom: 16, padding: 8, fontSize: 20}}
                     />
-                    {selectedImages.length > 0 && renderImages()}
-                    <TouchableOpacity onPress={pickImages} style={{marginTop: 10}}>
+                    {selectedFiles.length > 0 && renderFiles()}
+                    <TouchableOpacity onPress={pickFiles} style={{marginTop: 10}}>
                         <View style={{flexDirection: "row", justifyContent: "center", alignItems: "center"}}>
                             <MaterialCommunityIcons name="image-plus" size={36} style={{color: COLORS.primary}}/>
                             <Text style={{fontSize: 20, paddingLeft: 10, fontWeight: "500", color: COLORS.primary}}>

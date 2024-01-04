@@ -10,6 +10,7 @@ import {AuthContext} from "../../../context/AuthContext";
 const MenuStack = createStackNavigator();
 
 const MenuContent = ({ navigation }) => {
+  const {userInfo} = useContext(AuthContext)
   const {logout} = useContext(AuthContext);
   const navigateToProfile = () => {
     navigation.navigate("Profile");
@@ -32,6 +33,14 @@ const MenuContent = ({ navigation }) => {
   };
   const navigateToStatistic = () => {
     navigation.navigate("Statistic")
+  };
+
+  const navigateToJoinRegisterList = () => {
+    navigation.navigate("JoinRegisterList");
+  };
+
+  const navigatorToForHelpList= () => {
+    navigation.navigate("ForHelpList");
   };
 
   const navigatorToMap = () => {
@@ -80,23 +89,57 @@ const MenuContent = ({ navigation }) => {
     },
   ];
 
-  const actionsItems = [
-    {
-      icon: "account-group-outline",
-      text: "Tình nguyện viên",
-      action: navigateToVolunteerTab,
-    },
-    {
-      icon: "newspaper",
-      text: "Bảng tin sự kiện",
-      action: navigatorToEventList,
-    },
-    {
-      icon: "chart-box-outline",
-      text: "Thống kê phân tích",
-      action: navigateToStatistic
-    },
-  ];
+  let actionsItems = []
+  if(userInfo.role === 0) {
+
+    actionsItems = [
+      {
+        icon: "account-box-multiple-outline",
+        text: "Quản lý tài khoản",
+        action: navigateToAccountManager,
+      },
+      {
+        icon: "play-protected-content",
+        text: "Kiểm duyệt nội dung",
+        action: navigateToContentManager,
+      },
+    ];
+  }
+  if(userInfo.role === 1) {
+    actionsItems = [
+      {
+        icon: "account-group-outline",
+        text: "Hội nhóm",
+        action: navigateToVolunteerTab,
+      },
+      {
+        icon: "newspaper",
+        text: "Bảng tin sự kiện",
+        action: navigatorToEventList,
+      },
+      {
+        icon: "chart-box-outline",
+        text: "Thống kê phân tích",
+        action: navigateToStatistic
+      },
+
+    ];
+  }
+
+  if(userInfo.role === 2) {
+    actionsItems = [
+      {
+        icon: "book-account-outline",
+        text: "Đăng ký tham gia",
+        action: navigateToJoinRegisterList,
+      },
+      {
+        icon: "home-assistant",
+        text: "Yêu cầu trợ giúp",
+        action: navigatorToForHelpList,
+      },
+    ];
+  }
 
   const OptionsItems = [
     {
@@ -118,23 +161,13 @@ const MenuContent = ({ navigation }) => {
 
   const supportItems = [
     {
-      icon: "account-box-multiple-outline",
-      text: "Quản lý tài khoản",
-      action: navigateToAccountManager,
-    },
-    {
-      icon: "play-protected-content",
-      text: "Kiểm duyệt nội dung",
-      action: navigateToContentManager,
-    },
-    {
       icon: "cog-outline",
       text: "Cài đặt chung",
       action: navigateToGenericSetup,
     },
-    { 
-      icon: "logout", 
-      text: "Đăng xuất", 
+    {
+      icon: "logout",
+      text: "Đăng xuất",
       action:exit
     },
   ];
@@ -167,12 +200,32 @@ const MenuContent = ({ navigation }) => {
     </View>
   );
 
-  const menuSections = [
-    { title: "Hồ sơ", items: accountItems },
-    { title: "Hoạt động", items: actionsItems },
-    { title: "Tùy chọn", items: OptionsItems },
-    { title: "Khác", items: supportItems },
-  ];
+  let menuSections = [];
+
+  if(userInfo.role === 0) {
+    menuSections = [
+      { title: "Hồ sơ", items: accountItems },
+      { title: "Hoạt động", items: actionsItems },
+      { title: "Tùy chọn", items: OptionsItems },
+      { title: "Khác", items: supportItems },
+    ];
+  }
+  if(userInfo.role === 1) {
+    menuSections = [
+      { title: "Hồ sơ", items: accountItems },
+      { title: "Hoạt động", items: actionsItems },
+      { title: "Tùy chọn", items: OptionsItems },
+      { title: "Khác", items: supportItems },
+    ];
+  }
+  if(userInfo.role === 2) {
+    menuSections = [
+      { title: "Hồ sơ", items: accountItems },
+      { title: "Hoạt động", items: actionsItems },
+      { title: "Tùy chọn", items: OptionsItems },
+      { title: "Khác", items: supportItems },
+    ];
+  }
 
   return (
     <ScrollView

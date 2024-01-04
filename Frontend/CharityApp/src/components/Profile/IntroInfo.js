@@ -1,12 +1,13 @@
 import {Ionicons, MaterialCommunityIcons, MaterialIcons,} from "@expo/vector-icons";
 import React, {useContext, useEffect, useState} from "react";
-import {Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Image, Linking, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {EmailIcon, OrangeTick, TikTokIcon} from "../common/Icon";
 import {COLORS, FONTS, images, SIZES} from "../../constants";
 import {useNavigation} from "@react-navigation/native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import {AuthContext} from "../../context/AuthContext";
-import getUserProfileImage from "../../../firebase/getUserProfileImage";
+import getAvatar from "../../../firebase/getAvatar";
+import FlashMessage, {hideMessage, showMessage} from "react-native-flash-message";
 
 const IntroInfo = () => {
     const {userInfo, charityOrganization} = useContext(AuthContext);
@@ -20,7 +21,7 @@ const IntroInfo = () => {
     useEffect(() => {
         const fetchUserProfileImage = async () => {
             try {
-                const imageUrl = await getUserProfileImage(userInfo.id);
+                const imageUrl = await getAvatar(userInfo.id);
                 if (imageUrl) {
                     setSelectedImage(imageUrl);
                 }
@@ -32,6 +33,16 @@ const IntroInfo = () => {
         fetchUserProfileImage();
     }, [userInfo.id]);
 
+    const handleClickIcon = () => {
+        showMessage({
+            message: "Tài khoản chưa thiết lập thông tin này",
+            type: "warning",
+            duration: 3000,
+            onPress: () => {
+                hideMessage();
+            },
+        });
+    }
 
     return (
         <View
@@ -41,6 +52,7 @@ const IntroInfo = () => {
                 backgroundColor: COLORS.white,
             }}
         >
+            <FlashMessage position="top" style={{marginHorizontal: 20, borderRadius: 12}}/>
             <View style={{width: "100%"}}>
                 <Image
                     source={images.cover}
@@ -123,6 +135,7 @@ const IntroInfo = () => {
                             alignItems: "center",
                             marginHorizontal: 6
                         }}
+                        onPress={() => {userInfo.phone ?  Linking.openURL(`tel:${userInfo.phone}`) : handleClickIcon()}}
                     >
                         <Icon name="phone" size={24} color={"white"}/>
                     </TouchableOpacity>
@@ -136,6 +149,7 @@ const IntroInfo = () => {
                             backgroundColor: "white",
                             marginHorizontal: 6
                         }}
+                        onPress={ () => {userInfo.email ? Linking.openURL(`mailto:${userInfo.email}`) : handleClickIcon()}}
                     >
                         <EmailIcon/>
                     </TouchableOpacity>
@@ -151,6 +165,7 @@ const IntroInfo = () => {
                             alignItems: "center",
                             marginHorizontal: 6
                         }}
+                        onPress={ () => { charityOrganization?.website ?  Linking.openURL(charityOrganization.website) : handleClickIcon()}}
                     >
                         <Icon name="facebook-f" size={24} color={"white"}/>
                     </TouchableOpacity>
@@ -165,22 +180,27 @@ const IntroInfo = () => {
                             alignItems: "center",
                             marginHorizontal: 6
                         }}
+                        onPress={ () => { charityOrganization?.website ?  Linking.openURL(charityOrganization.website) : handleClickIcon()}}
                     >
                         <TikTokIcon/>
                     </TouchableOpacity>
                 </View>
 
-                <View style={{paddingHorizontal: 35, paddingTop: 20}}>
-                    <Text
-                        style={{
-                            color: COLORS.secondary,
-                            ...FONTS.body4,
-                            textAlign: "justify",
-                        }}
-                    >
-                        {charityOrganization?.description}
-                    </Text>
-                </View>
+                {
+                    charityOrganization?.description && (
+                        <View style={{paddingHorizontal: 35, paddingTop: 20}}>
+                            <Text
+                                style={{
+                                    color: COLORS.secondary,
+                                    ...FONTS.body4,
+                                    textAlign: "justify",
+                                }}
+                            >
+                                {charityOrganization?.description}
+                            </Text>
+                        </View>
+                    )
+                }
 
                 <View
                     style={{

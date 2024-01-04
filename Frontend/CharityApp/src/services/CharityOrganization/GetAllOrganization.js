@@ -6,7 +6,7 @@ export const getAllOrganization = async () => {
         const res = await request.get(
             '/api/CharityOrganization',
         );
-        //console.log(res.data)
+        // console.log(res.data)
         // console.log("organizationInfo ", res);
         return res;
     } catch (error) {

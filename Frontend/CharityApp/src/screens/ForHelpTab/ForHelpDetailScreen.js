@@ -1,6 +1,6 @@
 import {Dimensions, FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View,} from "react-native";
 import {SafeAreaView} from "react-native-safe-area-context";
-import {COLORS, images} from "../../../constants";
+import {COLORS, images} from "../../constants";
 import {Entypo, Ionicons, MaterialCommunityIcons, MaterialIcons,} from "@expo/vector-icons";
 import {useNavigation} from "@react-navigation/native";
 import {LinearGradient} from "expo-linear-gradient";

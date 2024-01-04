@@ -7,14 +7,14 @@ import {COLORS, images} from "../../constants";
 import {useNavigation} from "@react-navigation/native";
 import {AuthContext} from "../../context/AuthContext";
 import {getEventByOrganizationId} from "../../services/Event/{organizationId}/GetEventByOrganizationId";
-import Waiting from "../common/Waiting";
+import Waiting from "../common/Skeleton";
 
 const Post = () => {
   const postInfo = [
     {
       postPersonName: "Hội chữ thập đỏ Việt Nam",
       postPersonImage: images.profile,
-      commentPersonImage: images.avatar,
+      commentPersonImage: images.avatar_default,
       postContent:
         "Hội Chữ thập đỏ Việt Nam là tổ chức xã hội nhân đạo của quần chúng, do Chủ tịch Hồ Chí Minh sáng lập ngày 23/11/1946 và Người làm Chủ tịch danh dự đầu tiên của Hội. 7 nguyên tắc hoạt động: Nhân đạo, Vô tư, Trung lập, Độc lập, Tự nguyện, Thống nhất, Toàn cầu",
       postImage: images.onboarding_0,
@@ -24,7 +24,7 @@ const Post = () => {
     {
       postPersonName: "Hội chữ thập đỏ Việt Nam",
       postPersonImage: images.profile,
-      commentPersonImage: images.avatar,
+      commentPersonImage: images.avatar_default,
       postContent:
         "Hội Chữ thập đỏ Việt Nam là tổ chức xã hội nhân đạo của quần chúng, do Chủ tịch Hồ Chí Minh sáng lập ngày 23/11/1946 và Người làm Chủ tịch danh dự đầu tiên của Hội. 7 nguyên tắc hoạt động: Nhân đạo, Vô tư, Trung lập, Độc lập, Tự nguyện, Thống nhất, Toàn cầu",
       postImage: images.onboarding_2,
@@ -34,7 +34,7 @@ const Post = () => {
     {
       postPersonName: "Hội chữ thập đỏ Việt Nam",
       postPersonImage: images.profile,
-      commentPersonImage: images.avatar,
+      commentPersonImage: images.avatar_default,
       postContent:
         "Hội Chữ thập đỏ Việt Nam là tổ chức xã hội nhân đạo của quần chúng, do Chủ tịch Hồ Chí Minh sáng lập ngày 23/11/1946 và Người làm Chủ tịch danh dự đầu tiên của Hội. 7 nguyên tắc hoạt động: Nhân đạo, Vô tư, Trung lập, Độc lập, Tự nguyện, Thống nhất, Toàn cầu",
       postImage: images.onboarding_1,
@@ -44,7 +44,7 @@ const Post = () => {
     {
       postPersonName: "Hội chữ thập đỏ Việt Nam",
       postPersonImage: images.profile,
-      commentPersonImage: images.avatar,
+      commentPersonImage: images.avatar_default,
       postContent:
         "Hội Chữ thập đỏ Việt Nam là tổ chức xã hội nhân đạo của quần chúng, do Chủ tịch Hồ Chí Minh sáng lập ngày 23/11/1946 và Người làm Chủ tịch danh dự đầu tiên của Hội. 7 nguyên tắc hoạt động: Nhân đạo, Vô tư, Trung lập, Độc lập, Tự nguyện, Thống nhất, Toàn cầu",
       postImage: images.cover,

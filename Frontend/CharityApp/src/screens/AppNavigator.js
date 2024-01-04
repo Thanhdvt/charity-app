@@ -1,4 +1,4 @@
-import {ActivityIndicator, StyleSheet, View} from "react-native";
+import {StyleSheet} from "react-native";
 import React, {useContext} from "react";
 import {NavigationContainer} from "@react-navigation/native";
 import {createNativeStackNavigator} from "@react-navigation/native-stack";
@@ -27,7 +27,7 @@ import MapScreen from "./Map/MapScreen";
 import PostScreen from "./Event/PostScreen";
 import StatsScreen from "./Event/StatisticScreen";
 import ImageScreen from "./Event/ImageScreen";
-import ForHelpDetailScreen from "./MainTab/ForHelpRequest/ForHelpDetailScreen";
+import ForHelpDetailScreen from "./ForHelpTab/ForHelpDetailScreen";
 import AccountSettingScreen from "./Profile/AccountSettingScreen";
 import ContentManagerScreen from "./Manager/ContentManagerScreen";
 import {AuthContext} from "../context/AuthContext";
@@ -35,6 +35,10 @@ import EventDetailCensorScreen from "./Manager/EventDetailCensorScreen";
 import AccountManagerScreen from "./Manager/AccountManagerScreen";
 import AccountDetailCensorScreen from "./Manager/AccountDetailCensorScreen";
 import GenericSetupScreen from "./GenericSetup/GenericSetupScreen";
+import ForHelpListScreen from "./ForHelpTab/ForHelpListScreen";
+import JoinRegisterListScreen from "./JoinRegister/JoinRegisterListScreen";
+import JoinRegisterDetailScreen from "./JoinRegister/JoinRegisterDetailScreen";
+import OrganizationScreen from "./public/Organization/OrganizationScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -71,6 +75,8 @@ const AppNavigator = () => {
           <Stack.Screen name="EventSearch" component={EventSearchScreen}/>
           <Stack.Screen name="EventDetail" component={EventDetailScreen}/>
           <Stack.Screen name="Profile" component={ProfileScreen} />
+          <Stack.Screen name="Organization" component={OrganizationScreen}/>
+          <Stack.Screen name="Image" component={ImageScreen}/>
           <Stack.Screen name="Comment" component={CommentScreen} />
         </Stack.Navigator>
       ) : (
@@ -104,6 +110,10 @@ const AppNavigator = () => {
           <Stack.Screen name="AccountManager" component={AccountManagerScreen}/>
           <Stack.Screen name="AccountDetailCensor" component={AccountDetailCensorScreen}/>
           <Stack.Screen name="GenericSetup" component={GenericSetupScreen}/>
+          <Stack.Screen name="ForHelpList" component={ForHelpListScreen}/>
+          <Stack.Screen name="JoinRegisterList" component={JoinRegisterListScreen}/>
+          <Stack.Screen name="JoinRegisterDetail" component={JoinRegisterDetailScreen}/>
+          <Stack.Screen name="Organization" component={OrganizationScreen}/>
         </Stack.Navigator>
       )}
     </NavigationContainer>

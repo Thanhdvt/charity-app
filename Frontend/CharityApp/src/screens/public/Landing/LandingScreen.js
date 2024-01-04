@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import {Image, ScrollView, StyleSheet, Text, TouchableOpacity} from "react-native";
 import {useFocusEffect} from "@react-navigation/native";
 import {COLORS, icons, images} from "../../../constants";
@@ -11,67 +11,67 @@ import Post from "../../../components/public/Landing/Post";
 import OrganizationList from "../../../components/public/Landing/OrganizationList";
 import EventList from "../../../components/public/Landing/EventList";
 import ModalPop from "../../../components/Modal/PopModal";
+import FlashMessage, {hideMessage, showMessage} from "react-native-flash-message";
 
 const LandingStack = createStackNavigator();
 
 const LandingContent = ({navigation, visible, setVisible}) => {
     const theme = useTheme();
 
-    useFocusEffect(
-        React.useCallback(() => {
-            setVisible(true);
-            return () => {
-                setVisible(false);
-            };
-        }, [])
-    );
-
+    // useFocusEffect(
+    //     React.useCallback(() => {
+    //         setVisible(true);
+    //         return () => {
+    //             setVisible(false);
+    //         };
+    //     }, [])
+    // );
     return (
-        <ScrollView showsVerticalScrollIndicator={false}>
-
-            <OrganizationList/>
-            <EventList/>
-            <Post/>
-
-            <ModalPop visible={visible}>
-                <View style={{alignItems: 'center'}}>
-                    <View style={styles.header}>
-                        <TouchableOpacity onPress={() => setVisible(false)}>
-                            <Text style={{fontSize: 18, fontWeight: "bold", color: COLORS.primary}}>Lúc khác</Text>
-                        </TouchableOpacity>
+            <ScrollView showsVerticalScrollIndicator={false}>
+                <ModalPop visible={visible}>
+                    <View style={{alignItems: 'center'}}>
+                        <View style={styles.header}>
+                            <TouchableOpacity onPress={() => setVisible(false)}>
+                                <Text style={{fontSize: 18, fontWeight: "bold", color: COLORS.primary}}>Lúc khác</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
-                </View>
-                <View style={{alignItems: 'center'}}>
-                    <Image
-                        source={images.landing_1}
-                        style={{height: 250, width: 250}}
+                    <View style={{alignItems: 'center'}}>
+                        <Image
+                            source={images.landing_1}
+                            style={{height: 250, width: 250}}
+                        />
+                    </View>
+
+                    <Text style={{marginTop: 15, fontSize: 18, fontWeight: "500", textAlign: 'center'}}>
+                        Chào mừng bạn đến với nền tảng thiện nguyện minh bạch
+                    </Text>
+
+                    <Text style={{
+                        marginVertical: 20,
+                        fontSize: 14,
+                        textAlign: 'center',
+                        color: COLORS.secondary,
+                        paddingHorizontal: 25
+                    }}>
+                        Chúng tôi sẽ giúp bạn có trải nghiệm thiện nguyện thật khác biệt
+                    </Text>
+
+                    <Button
+                        title="Đăng nhập hoặc tạo tài khoản"
+                        filled
+                        style={{
+                            marginHorizontal: 20
+                        }}
+                        onPress={() => navigation.navigate("Login")}
                     />
-                </View>
+                </ModalPop>
 
-                <Text style={{marginTop: 15, fontSize: 18, fontWeight: "500", textAlign: 'center'}}>
-                    Chào mừng bạn đến với nền tảng thiện nguyện minh bạch
-                </Text>
+                <OrganizationList/>
+                <EventList/>
+                <Post/>
 
-                <Text style={{
-                    marginVertical: 20,
-                    fontSize: 14,
-                    textAlign: 'center',
-                    color: COLORS.secondary,
-                    paddingHorizontal: 25
-                }}>
-                    Chúng tôi sẽ giúp bạn có trải nghiệm thiện nguyện thật khác biệt
-                </Text>
-
-                <Button
-                    title="Đăng nhập hoặc tạo tài khoản"
-                    filled
-                    style={{
-                        marginHorizontal: 20
-                    }}
-                    onPress={() => navigation.navigate("Login")}
-                />
-            </ModalPop>
-        </ScrollView>
+            </ScrollView>
     );
 };
 

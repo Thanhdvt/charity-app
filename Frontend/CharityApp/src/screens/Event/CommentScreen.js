@@ -1,12 +1,13 @@
-import React, {useState} from "react";
-import {FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View,} from "react-native";
+import React, {useContext, useState} from "react";
+import {FlatList, Image, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View,} from "react-native";
 import {Ionicons,} from "@expo/vector-icons";
 import {COLORS, images} from "../../../src/constants";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import {useNavigation} from "@react-navigation/native";
+import {AuthContext} from "../../context/AuthContext";
 
 const CommentScreen = () => {
-
+  const {userToken} = useContext(AuthContext);
   const navigation = useNavigation();
   const navigateGoBack = () => {
     navigation.goBack();
@@ -99,75 +100,83 @@ const CommentScreen = () => {
   };
 
   return (
-      <View style={styles.container}>
-        <View style={styles.headerContainer}>
-          <TouchableOpacity onPress={navigateGoBack}>
-            <Ionicons name="arrow-back" size={24} color={COLORS.black} />
-          </TouchableOpacity>
-          <Text style={styles.header}>{comments.length} Bình luận</Text>
-        </View>
+      <SafeAreaView style={styles.container}>
+          <View style={styles.headerContainer}>
+            <TouchableOpacity onPress={navigateGoBack}>
+              <Ionicons name="arrow-back" size={24} color={COLORS.black} />
+            </TouchableOpacity>
+            <Text style={styles.header}>{comments.length} Bình luận</Text>
+          </View>
 
-        <FlatList
-          showsVerticalScrollIndicator={false}
-          data={comments}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => (
-            <View style={styles.commentContainer}>
-              <View>
-                <View style={styles.userInfo}>
-                  <Image source={item.user.avatar} style={styles.avatar} />
-                  <Text style={styles.userName}>{item.user.name}</Text>
-                </View>
-                <Text style={styles.commentText}>{item.text}</Text>
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <View style={{ width: "60%", overflow: "hidden" }}>
-                    <Text>{calculateElapsedTime(item.createdAt)}</Text>
+          <FlatList
+              showsVerticalScrollIndicator={false}
+              data={comments}
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={({ item }) => (
+                  <View style={styles.commentContainer}>
+                    <View>
+                      <View style={styles.userInfo}>
+                        <Image source={item.user.avatar} style={styles.avatar} />
+                        <Text style={styles.userName}>{item.user.name}</Text>
+                      </View>
+                      <Text style={styles.commentText}>{item.text}</Text>
+                      <View style={{ flexDirection: "row", alignItems: "center" }}>
+                        <View style={{ width: "60%", overflow: "hidden" }}>
+                          <Text>{calculateElapsedTime(item.createdAt)}</Text>
+                        </View>
+                        <View style={{ width: "40%", overflow: "hidden" }}>
+                          <Text style={{ fontWeight: "500" }}>
+                            {item.likes} lượt thích
+                          </Text>
+                        </View>
+                      </View>
+                    </View>
+                    {
+                        userToken && (
+                            <View style={styles.likeContainer}>
+                              <TouchableOpacity onPress={() => toggleLike(item.id)}>
+                                <FontAwesome
+                                    name={item.isLiked ? "heart" : "heart-o"}
+                                    size={24}
+                                    color={item.isLiked ? "red" : "#000"}
+                                />
+                              </TouchableOpacity>
+                            </View>
+                        )
+                    }
                   </View>
-                  <View style={{ width: "40%", overflow: "hidden" }}>
-                    <Text style={{ fontWeight: "500" }}>
-                      {item.likes} lượt thích
-                    </Text>
-                  </View>
-                </View>
-              </View>
-              <View style={styles.likeContainer}>
-                <TouchableOpacity onPress={() => toggleLike(item.id)}>
-                  <FontAwesome
-                    name={item.isLiked ? "heart" : "heart-o"}
-                    size={24}
-                    color={item.isLiked ? "red" : "#000"}
-                  />
-                </TouchableOpacity>
-              </View>
-            </View>
-          )}
-        />
-
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Add a comment"
-            value={newComment}
-            onChangeText={(text) => setNewComment(text)}
+              )}
           />
-          <TouchableOpacity style={styles.sendButton} onPress={addComment}>
-            <FontAwesome name="send" size={24} color="#fff" />
-          </TouchableOpacity>
-        </View>
-      </View>
+
+          {
+              userToken && (
+                  <View style={styles.inputContainer}>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Add a comment"
+                        value={newComment}
+                        onChangeText={(text) => setNewComment(text)}
+                    />
+                    <TouchableOpacity style={styles.sendButton} onPress={addComment}>
+                      <FontAwesome name="send" size={24} color="#fff" />
+                    </TouchableOpacity>
+                  </View>
+              )
+          }
+      </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    paddingHorizontal: 20,
     backgroundColor: "#fff",
+    paddingVertical: 10,
   },
   headerContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginVertical: 10,
     height: 60
   },
   header: {

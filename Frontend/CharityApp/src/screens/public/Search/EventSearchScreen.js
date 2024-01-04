@@ -6,11 +6,22 @@ import {createMaterialTopTabNavigator} from "@react-navigation/material-top-tabs
 import {SafeAreaView} from "react-native-safe-area-context";
 import {StatusBar} from "expo-status-bar";
 import EventTab from "../../../components/public/Search/EventTab";
+import React, {useEffect, useState} from "react";
+import {Loading} from "../../../components/common/Loading";
 
 const Tab = createMaterialTopTabNavigator();
 const {width} = Dimensions.get('screen');
 
 const EventSearchScreen = ({ navigation }) => {
+    const [isLoading, setIsLoading] = useState(true);
+    const [searchValue, setSearchValue] = useState('');
+
+    useEffect(() => {
+        setTimeout(() => {
+            setIsLoading(false);
+        }, 1000);
+    }, []);
+
     return (
         <SafeAreaView
             style={{
@@ -18,6 +29,7 @@ const EventSearchScreen = ({ navigation }) => {
                 backgroundColor: COLORS.white,
             }}
         >
+            {isLoading ? <Loading/> : null}
             <StatusBar style="dark" backgroundColor="white" />
             <View
                 style={{
@@ -37,6 +49,7 @@ const EventSearchScreen = ({ navigation }) => {
                         <TextInput
                             style={{fontWeight: "500", fontSize: 16}}
                             placeholder="Tìm kiếm"
+                            onChangeText={(text) => setSearchValue(text)}
                         />
                     </View>
                     <Icon
@@ -46,7 +59,7 @@ const EventSearchScreen = ({ navigation }) => {
                     />
                 </View>
             </View>
-            <EventTab/>
+            <EventTab searchValue={searchValue}/>
         </SafeAreaView>
     );
 };

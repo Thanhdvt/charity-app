@@ -14,7 +14,9 @@ import {createForHelpRequest} from "../../../services/ForHelpRequest/CreateForHe
 import {getAllOrganization} from "../../../services/CharityOrganization/GetAllOrganization";
 import firebase from "firebase/compat/app";
 import * as FileSystem from 'expo-file-system';
-import * as DocumentPicker from 'expo-document-picker';
+import registerNNPushToken from 'native-notify';
+import {sendPushNotification} from "../../../../firebase/sendPushNotification";
+import {getUserById} from "../../../services/User/{id}/GetUserById";
 
 const MenuStack = createStackNavigator();
 
@@ -55,6 +57,17 @@ const ForHelpCreate = ({navigation}) => {
         }
     };
 
+    // const  expoPushToken = "ExponentPushToken[xhyOSsIm-6Pp5UBGnJg_dS]"
+    const  expoPushToken = "ExponentPushToken[7mhEAvLS-b5MhVKE-U_bWt]"
+
+    const message = {
+        to: expoPushToken,
+        sound: 'default',
+        title: 'Original Title',
+        body: 'And here is the body!',
+        data: { someData: 'goes here' },
+    };
+
     const removeFile = (index) => {
         const newFiles = [...selectedFiles];
         newFiles.splice(index, 1);
@@ -73,7 +86,19 @@ const ForHelpCreate = ({navigation}) => {
     useEffect(() => {
         (async () => {
             const res = await getAllOrganization();
-            setOrganizationList(res.data);
+            const updatedList = await Promise.all(
+                res.data.map(async (item) => {
+                    try {
+                        const userResponse = await getUserById(item.user_Id);
+                        const { image, name } = userResponse.data;
+                        return { ...item, image, name };
+                    } catch (error) {
+                        console.error('Error fetching user data', error);
+                        return item;
+                    }
+                })
+            );
+            setOrganizationList(updatedList);
         })();
     }, []);
 
@@ -109,13 +134,14 @@ const ForHelpCreate = ({navigation}) => {
                 organization_Id: organization_Id
             };
 
-            await fetchData(newForHelpRequest);
-            await uploadImage();
+            let forHelpRequestId = await fetchData(newForHelpRequest);
+            await uploadImage(forHelpRequestId);
+            await sendPushNotification(message);
         }
     }
 
     // upload ảnh tới storage
-    const uploadImage = async () => {
+    const uploadImage = async (forHelpRequestId) => {
         try {
             selectedFiles.map(async (selectedFile) => {
                 console.log('ok');
@@ -135,11 +161,11 @@ const ForHelpCreate = ({navigation}) => {
                 });
 
                 const filename = selectedFile.substring(selectedFile.lastIndexOf('/') + 1);
-                const ref = firebase.storage().ref(`/files/${filename}`);
+                const ref = firebase.storage().ref(`files/${filename}`);
                 await ref.put(blob);
 
                 const imageURL = await ref.getDownloadURL();
-                await saveImageUrlToDatabase(imageURL);
+                await saveImageUrlToDatabase(imageURL, forHelpRequestId);
             })
         } catch (e) {
             console.log("err" + e);
@@ -147,12 +173,10 @@ const ForHelpCreate = ({navigation}) => {
     }
 
     // lưu ảnh vào database
-    const saveImageUrlToDatabase = async (imageURL) => {
+    const saveImageUrlToDatabase = async (imageURL, forHelpRequestId) => {
         try {
-            const random = Math.floor(Math.random() * 1000000000) + 1; // cần fix lại sau, hiện đang coi là id yêu cầu trợ giúp
-            const databaseRef = firebase.database().ref(`forhelprequest/${random}/file`);
-
-            await databaseRef.set(imageURL);
+            const databaseRef = firebase.database().ref(`${userInfo.id}/forhelprequest/${forHelpRequestId}`);
+            await databaseRef.push().set(imageURL);
         } catch (error) {
             console.error("Error saving image URL to database", error);
         }
@@ -162,7 +186,7 @@ const ForHelpCreate = ({navigation}) => {
     const fetchData = async (newForHelpRequest) => {
         try {
             const res = await createForHelpRequest(newForHelpRequest);
-            console.log(res.status)
+            const random = Math.floor(Math.random() * 1000000000) + 1; // cần fix lại sau, hiện đang coi là id yêu cầu trợ giúp
             if (res) {
                 showMessage({
                     message: "Gửi thành công",
@@ -173,6 +197,7 @@ const ForHelpCreate = ({navigation}) => {
                     },
                 });
                 clearForm();
+                return random;
             } else {
                 showMessage({
                     message: "Đã xảy ra lỗi khi gửi yêu cầu",
@@ -254,7 +279,7 @@ const ForHelpCreate = ({navigation}) => {
                             inputSearchStyle={styles.inputSearchStyle}
                             data={organizationList}
                             maxHeight={300}
-                            labelField="user_Id"
+                            labelField="name"
                             valueField="id"
                             placeholder="Chọn tổ chức"
                             value={organization_Id}

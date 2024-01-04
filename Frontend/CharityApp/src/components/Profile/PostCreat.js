@@ -5,6 +5,7 @@ import Button from "../common/Button";
 import {COLORS, images} from "../../constants";
 import firebase from "firebase/compat";
 import {AuthContext} from "../../context/AuthContext";
+import getAvatar from "../../../firebase/getAvatar";
 
 const {width} = Dimensions.get('screen');
 const PostCreat = () => {
@@ -15,11 +16,7 @@ const PostCreat = () => {
     useEffect(() => {
         const fetchUserProfileImage = async () => {
             try {
-                const snapshot = await firebase.database()
-                    .ref(`users/${userInfo.id}/image`)
-                    .once('value');
-
-                const imageUrl = snapshot.val();
+                const imageUrl = await getAvatar(userInfo.id);
 
                 if (imageUrl) {
                     setSelectedImage(imageUrl);

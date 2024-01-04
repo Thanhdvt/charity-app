@@ -1,14 +1,20 @@
 import {Dimensions, FlatList, Image, ScrollView, Share, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
-import React, {useState} from 'react'
+import React, {useContext, useEffect, useState} from 'react'
 import {SafeAreaView} from 'react-native-safe-area-context'
 import {COLORS, images, SIZES} from '../../../constants'
 import {StatusBar} from 'expo-status-bar'
-import {Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
+import {AntDesign, Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
 import Button from "../../../components/common/Button";
-import AntDesign from "react-native-vector-icons/AntDesign";
 import {OrangeTick} from "../../../components/common/Icon";
+import {getEventById} from "../../../services/Event/{id}/GetEventById";
+import {getOrganizationById} from "../../../services/CharityOrganization/{id}/GetOrganizationById";
+import {getUserById} from "../../../services/User/{id}/GetUserById";
+import {Loading} from "../../../components/common/Loading";
+import moment from "moment";
+import {AuthContext} from "../../../context/AuthContext";
+import FlashMessage, {hideMessage, showMessage} from "react-native-flash-message";
 
-const EventDetailScreen = ({ navigation }) => {
+const EventDetailScreen = ({ navigation, route}) => {
     const data = {
         postPersonName: "Quỹ Thiện Nguyện Sinh Viên",
         postPersonImage: {uri: "https://static.thiennguyen.app/public/user/profile/2022/7/12/58b2a0b8-f0a7-4c1d-ac7a-35ec33f66461.jpg"},
@@ -38,15 +44,15 @@ const EventDetailScreen = ({ navigation }) => {
             { id: '16', name: 'Trương Thị Mỹ Lan', image: {uri: 'https://i.pinimg.com/1200x/6f/1e/65/6f1e652d717da2b043b7202cf274676d.jpg'} },
         ],
     }
+
+    const {userToken} = useContext(AuthContext);
+    const [event, setEvent] = useState(null);
+    const [organizationUser, setOrganizationUser] = useState(null);
     const [showFullDescription, setShowFullDescription] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+
     const toggleDescription = () => {
         setShowFullDescription(!showFullDescription);
-    };
-
-    const [like, setLike] = useState(data.isLiked);
-
-    const navigateToCommentScreen = () => {
-        navigation.navigate("Comment");
     };
 
     const handleShare = async () => {
@@ -59,6 +65,17 @@ const EventDetailScreen = ({ navigation }) => {
         });
     };
 
+    const showNotice = () => {
+        showMessage({
+            message: "Đăng nhập để Tham gia",
+            type: "warning",
+            duration: 3000,
+            onPress: () => {
+                hideMessage();
+            },
+        });
+    }
+
     const MAX_AVATAR_WIDTH = 50;
     const SCREEN_WIDTH = Dimensions.get('window').width;
     const MAX_AVATAR_COUNT = Math.floor(SCREEN_WIDTH / MAX_AVATAR_WIDTH);
@@ -67,17 +84,46 @@ const EventDetailScreen = ({ navigation }) => {
         <Image style={styles.avatar} source={item.image} />
     );
 
+    const eventId = route.params.eventId;
+    const organizationId = route.params.organizationId;
+
+    useEffect(() => {
+        setIsLoading(true);
+        const fetchData = async () => {
+            try {
+                const res = await getEventById(eventId);
+                const res_1 = await getOrganizationById(organizationId);
+                if(res_1) {
+                    const userResponse = await getUserById(res_1.data.user_Id);
+                    setOrganizationUser(userResponse.data);
+                }
+                setEvent(res.data);
+            } catch (error) {
+                console.error('Error fetching data', error);
+                setEvent(null);
+                setOrganizationUser(null);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+
     return (
         <SafeAreaView
             style={{
                 flex: 1,
-                backgroundColor: COLORS.white
             }}>
+            {isLoading ? <Loading/> : null}
             <StatusBar hidden={true} />
             <View
                 style={{
-                    flex: 1
+                    flex: 1,
+                    backgroundColor: COLORS.white
                 }}>
+                <FlashMessage position="top" style={{borderRadius: 12, marginVertical: 20, marginHorizontal: 20}}/>
                 <ScrollView showsVerticalScrollIndicator={false} style={{marginBottom: 60}}>
                     <View style={{ marginBottom: 10}}>
                         <TouchableOpacity
@@ -113,16 +159,22 @@ const EventDetailScreen = ({ navigation }) => {
                             color: COLORS.black,
                             fontWeight: "bold",
                             marginVertical: 6
-                        }}>{data.title}</Text>
-                        <View style={{flexDirection: "row", alignItems: "center"}}>
-                            <Ionicons name="md-location-outline" size={28} color={COLORS.sliver} />
-                            <Text style={{
-                                fontSize: 14,
-                                color: COLORS.sliver,
-                                marginTop: 5,
-                                marginRight: 20,
-                                marginLeft: 6
-                            }}>{data.location}</Text>
+                        }}>{event?.title}</Text>
+                        <View style={{flexDirection: "row", justifyContent: "space-between"}}>
+                            <View style={{flexDirection: "row", alignItems: "center"}}>
+                                <Ionicons name="calendar-outline" size={28} color={COLORS.sliver} />
+                                <Text style={{
+                                    fontSize: 14,
+                                    color: COLORS.sliver,
+                                    marginTop: 5,
+                                    marginRight: 20,
+                                    marginLeft: 6
+                                }}>{moment(event?.created_Date).format("DD/MM/YYYY HH:mm")}</Text>
+                            </View>
+                            <View style={{flexDirection: "row", alignItems: 'flex-start', alignSelf: "flex-end"}}>
+                                <AntDesign name="heart" size={20} color={"red"} />
+                                <Text style={{marginLeft: 5, color: COLORS.black}}>{event?.like_Count}</Text>
+                            </View>
                         </View>
                     </View>
 
@@ -130,7 +182,7 @@ const EventDetailScreen = ({ navigation }) => {
                         <Text>Tạo bởi</Text>
                         <View style={{flexDirection: 'row', paddingTop: 5, alignItems: "center"}}>
                             <Image
-                                source={data.postPersonImage}
+                                source={ isLoading ? images.avatar_default : {uri: organizationUser?.image}}
                                 resizeMode="contain"
                                 style={{
                                     height: 60,
@@ -142,12 +194,12 @@ const EventDetailScreen = ({ navigation }) => {
                             <View>
                                 <View style={{flexDirection: "row", alignItems: "center"}}>
                                     <Text style={{marginLeft: 5, color: COLORS.black, fontWeight: "500", fontSize: 16, paddingRight: 5}} numberOfLines={1} ellipsizeMode="tail">
-                                        {data.postPersonName}
+                                        {organizationUser?.name}
                                     </Text>
                                     <OrangeTick/>
                                 </View>
                                 <Text style={{marginLeft: 5, color: COLORS.black }}>
-                                    @thiennguyensinhvien
+                                    {organizationUser?.email}
                                 </Text>
                             </View>
                         </View>
@@ -182,7 +234,7 @@ const EventDetailScreen = ({ navigation }) => {
                             marginVertical: 6
                         }}>Câu chuyện</Text>
 
-                        {data.description.length > 100 && (
+                        {event?.content.length > 100 ? (
                             <TouchableOpacity onPress={toggleDescription}>
                                 <Text style={{
                                     color: COLORS.sliver,
@@ -194,12 +246,21 @@ const EventDetailScreen = ({ navigation }) => {
                                         fontSize: 14,
                                         color: COLORS.secondary,
                                     }}>
-                                        {showFullDescription ? data.description : `${data.description.slice(0, 250)}...`}
+                                        {showFullDescription ? event?.content : `${event?.content.slice(0, 250)}...`}
 
                                     </Text>
                                     {showFullDescription ? '   Thu gọn' : '   Xem thêm'}
                                 </Text>
                             </TouchableOpacity>
+                        ) : (
+                            <Text
+                                style={{
+                                    fontSize: 14,
+                                    color: COLORS.secondary,
+                                }}
+                            >
+                                {event?.content}
+                            </Text>
                         )}
                     </View>
 
@@ -229,40 +290,6 @@ const EventDetailScreen = ({ navigation }) => {
                     backgroundColor: COLORS.white,
                     zIndex: 999
                 }}>
-                    <View
-                        style={{
-                            flexDirection: "row",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            paddingVertical: 15,
-                        }}
-                    >
-                        <View style={{ flexDirection: "row", alignItems: "center" }}>
-                            <TouchableOpacity onPress={() => setLike(!like)}>
-                                <AntDesign
-                                    name={like ? "heart" : "hearto"}
-                                    style={{
-                                        paddingRight: 20,
-                                        fontSize: 25,
-                                        color: like ? "red" : "black",
-                                    }}
-                                />
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={navigateToCommentScreen}>
-                                <Ionicons
-                                    name="md-chatbubble-ellipses-outline"
-                                    style={{ fontSize: 28, paddingRight: 20 }}
-                                />
-                            </TouchableOpacity>
-                            <TouchableOpacity>
-                                <Ionicons
-                                    name="md-share-social-outline"
-                                    style={{ fontSize: 28 }}
-                                    onPress={handleShare}
-                                />
-                            </TouchableOpacity>
-                        </View>
-                    </View>
                     <Button
                         title="Tham gia"
                         filled
@@ -273,7 +300,26 @@ const EventDetailScreen = ({ navigation }) => {
                             paddingHorizontal: 40,
                             borderRadius: 8
                         }}
+                        onPress = {() =>  (userToken ? navigation.navigate("JoinRegister") : showNotice())}
                     />
+                    <View
+                        style={{
+                            flexDirection: "row",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            paddingVertical: 15,
+                        }}
+                    >
+                        <View style={{ flexDirection: "row", alignItems: "center" }}>
+                            <TouchableOpacity>
+                                <Ionicons
+                                    name="md-share-social-outline"
+                                    style={{ fontSize: 28 }}
+                                    onPress={handleShare}
+                                />
+                            </TouchableOpacity>
+                        </View>
+                    </View>
                 </View>
             </View>
         </SafeAreaView>

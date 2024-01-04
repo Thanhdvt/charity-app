@@ -18,6 +18,7 @@ const MapScreen = () => {
             console.log(placeList)
         })
     }
+
     return (
         <View>
             <View style={{position:'absolute',zIndex:20}}>

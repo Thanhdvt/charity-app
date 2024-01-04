@@ -1,65 +1,50 @@
-import React from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {Dimensions, FlatList, Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import {COLORS, images} from "../../constants"
+import {COLORS} from "../../constants"
 import {Ionicons} from "@expo/vector-icons";
 import {useNavigation} from "@react-navigation/native";
+import {AuthContext} from "../../context/AuthContext";
+import getAllBackground from "../../../firebase/getAllBackground";
+import getAllAvatar from "../../../firebase/getAllAvatar";
 
 const {width} = Dimensions.get("screen");
 
-const ImageScreen = () => {
-    const imageData = [
-        {id: '1', source: images.onboarding_0},
-        {id: '2', source: images.onboarding},
-        {id: '3', source: images.onboarding_1},
-        {id: '4', source: images.onboarding_2},
-        {id: '5', source: images.onboarding_0},
-        {id: '6', source: images.onboarding},
-        {id: '7', source: images.onboarding_1},
-        {id: '8', source: images.onboarding_2},
-        {id: '9', source: images.onboarding_0},
-        {id: '10', source: images.onboarding},
-        {id: '11', source: images.onboarding_1},
-        {id: '12', source: images.onboarding_2},
-        {id: '13', source: images.onboarding_0},
-        {id: '14', source: images.onboarding},
-        {id: '15', source: images.onboarding_1},
-        {id: '16', source: images.onboarding_0},
-        {id: '17', source: images.onboarding},
-        {id: '18', source: images.onboarding_1},
-        {id: '19', source: images.onboarding_2},
-        {id: '20', source: images.onboarding_0},
-        {id: '21', source: images.onboarding},
-        {id: '22', source: images.onboarding_1},
-        {id: '23', source: images.onboarding_2},
-        {id: '24', source: images.onboarding_0},
-        {id: '25', source: images.onboarding},
-        {id: '26', source: images.onboarding_1},
-        {id: '27', source: images.onboarding_2},
-        {id: '28', source: images.onboarding_0},
-        {id: '29', source: images.onboarding},
-        {id: '30', source: images.onboarding_1},
-        {id: '31', source: images.onboarding_0},
-        {id: '32', source: images.onboarding},
-        {id: '33', source: images.onboarding_1},
-        {id: '34', source: images.onboarding_2},
-        {id: '35', source: images.onboarding_0},
-        {id: '36', source: images.onboarding},
-        {id: '37', source: images.onboarding_1},
-        {id: '38', source: images.onboarding_2},
-        {id: '39', source: images.onboarding_0},
-        {id: '40', source: images.onboarding},
-        {id: '41', source: images.onboarding_1},
-        {id: '42', source: images.onboarding_2},
-        {id: '43', source: images.onboarding_0},
-        {id: '44', source: images.onboarding},
-        {id: '45', source: images.onboarding_1},
-    ];
-
-    const renderItem = ({item}) => (
-        <Image source={item.source} style={styles.image}/>
-    );
-
+const ImageScreen = ({route}) => {
+    const { userInfo } = useContext(AuthContext);
+    const [imageList, setImageList] = useState([]);
     const navigation = useNavigation();
+
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                let id;
+                if(route.params?.userId) {
+                    id = route.params.userId;
+                } else {
+                    id = userInfo.id;
+                }
+
+                console.log(id);
+                const background = await getAllBackground(id);
+                const avatar = await getAllAvatar(id);
+
+                let combinedImageList = [];
+                if (avatar && background) {
+                    combinedImageList = [...Object.values(avatar), ...Object.values(background)];
+                } else if(avatar) {
+                    combinedImageList = [...Object.values(avatar)];
+                } else if(background) {
+                    combinedImageList = [...Object.values(background)];
+                }
+                setImageList(combinedImageList.filter(image => image)); // Remove undefined entries
+            } catch (error) {
+                console.error('Lỗi khi lấy ảnh từ Realtime Database', error);
+            }
+        };
+
+        fetchData();
+    }, []);
 
     return (
         <SafeAreaView
@@ -91,9 +76,9 @@ const ImageScreen = () => {
             </View>
             <View style={styles.container}>
                 <FlatList
-                    data={imageData}
-                    renderItem={renderItem}
-                    keyExtractor={(item) => item.id}
+                    data={imageList}
+                    renderItem={({item}) => (<Image source={{uri: item}} style={styles.image}/>)}
+                    keyExtractor={(item, index) => index.toString()}
                     numColumns={4}
                 />
             </View>

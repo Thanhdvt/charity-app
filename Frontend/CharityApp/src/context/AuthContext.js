@@ -1,6 +1,7 @@
 import React, {createContext, useEffect, useState} from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import {registerForPushNotificationsAsync} from "../../firebase/registerForPushNotificationsAsync";
 
 export const AuthContext = createContext(undefined);
 
@@ -9,53 +10,47 @@ export const AuthProvider = ({children}) => {
     const [charityOrganization, setCharityOrganization] = useState(null);
     const [userToken, setUserToken] = useState(null);
     const [userInfo, setUserInfo] = useState(null);
-    const login = (userName, password, errorCallback) => {
 
+    const login = async (userName, password, errorCallback) => {
         setIsLoading(true);
-        axios.post(`http://10.0.2.2:153/api/login`, {
-            userName,
-            password
-        }).then(res => {
+        try {
+            const res = await axios.post(`http://192.168.2.13:5000/api/login`, {
+                userName,
+                password
+            });
+
             if (res && res.data) {
-                let userInfo = res.data.user;
-                let charityOrganization = res.data.charityOrganization;
-                let userToken = res.data.token;
-                setUserToken(userToken);
-                setUserInfo(userInfo);
-                setCharityOrganization(charityOrganization);
-                userInfo = JSON.stringify(userInfo);
-                charityOrganization = JSON.stringify(charityOrganization);
-                AsyncStorage.setItem('userToken', userToken)
-                    .then(() => AsyncStorage.setItem('userInfo', userInfo))
-                    .then(() => AsyncStorage.setItem('charityOrganization', charityOrganization));
+                let userToken_1 = res.data.token;
+                let userInfo_1 = JSON.stringify(res.data.user);
+                let charityOrganization_1 = JSON.stringify( res.data.charityOrganization);
+
+                setUserToken(res.data.token);
+                setUserInfo(res.data.user);
+                setCharityOrganization(res.data.charityOrganization);
+
+                await AsyncStorage.setItem('userToken', userToken_1);
+                await AsyncStorage.setItem('userInfo', userInfo_1);
+                await AsyncStorage.setItem('charityOrganization', charityOrganization_1);
+                // await isLoggedIn();
+
+                // saveMessageToken(userId).catch((error) => {
+                //     console.error('Error checking login status:', error);
+                // });
+
+                registerForPushNotificationsAsync(res.data.user.id).catch((error) => {
+                    console.error('Error checking login status:', error);
+                });
             } else {
                 console.log('Unexpected response structure:', res);
             }
-        }).catch(e => {
+            return res;
+        } catch (e) {
             console.log(`Login error` + e.message);
             errorCallback && errorCallback(`Đăng nhập thất bại: ${e.response.data}`);
-        })
-
-        setIsLoading(false);
+        } finally {
+            setIsLoading(false);
+        }
     }
-
-    // const getUserInformation = async () => {
-    //     try {
-    //         let token = await AsyncStorage.getItem('userToken');
-    //         const config = {
-    //             headers: {
-    //                 Authorization: `Bearer ${token}`,
-    //             },
-    //         };
-    //         const response = await axios.get(`${BASE_URL}/api/User/infor`, config);
-    //         let userInfo = response.data;
-    //         setUserInfo(userInfo);
-    //         console.log('userInfo', userInfo);
-    //         AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
-    //     } catch (error) {
-    //         console.error("Error fetching user information:", error);
-    //     }
-    // };
 
     const logout = () => {
         setIsLoading(true);

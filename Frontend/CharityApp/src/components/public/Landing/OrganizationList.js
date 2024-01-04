@@ -1,83 +1,61 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {LinearGradient} from "expo-linear-gradient";
-import {COLORS} from "../../../constants";
+import {COLORS, images} from "../../../constants";
 import {useNavigation} from '@react-navigation/native';
+import {getAllOrganization} from "../../../services/CharityOrganization/GetAllOrganization";
+import {getUserById} from "../../../services/User/{id}/GetUserById";
 
 const OrganizationList = () => {
-    const users = [
-        {
-            id: "1",
-            name: "Hội chữ thập đỏ Việt Nam",
-            image: {
-                uri: "https://static.thiennguyen.app/public/user/profile/2023/2/21/db3d0518-e681-4720-a582-73817b58e4c1.jpg",
-            },
-        },
-        {
-            id: "2",
-            name: "Quỹ Hoạt động Chữ Thập Đỏ",
-            image: {
-                uri: "https://static.thiennguyen.app/public/user/profile/2023/7/1/5edd036f-3dcb-4b8a-bd97-db67de73e2e8.jpg",
-            },
-        },
-        {
-            id: "3",
-            name: "Quỹ Tony Buổi sáng",
-            image: {
-                uri: "https://static.thiennguyen.app/public/user/profile/2023/10/2/5962958b-9b29-4a41-999c-3633f4eb44b9.jpg",
-            },
-        },
-        {
-            id: "4",
-            name: "Quỹ Hạnh Phúc Cho Mọi Người",
-            image: {
-                uri: "https://static.thiennguyen.app/public/user/profile/2023/2/24/649fb301-da9c-4d4b-be74-bca32ece39ae.jpg",
-            },
-        },
-        {
-            id: "5",
-            name: "Tree Bank",
-            image: {
-                uri: "https://static.thiennguyen.app/public/user/profile/2022/6/7/3388e3cc-85dc-4dbf-a3a0-67469111624c.jpg",
-            },
-        },
-        {
-            id: "6",
-            name: "Nhịp Cầu Nhân Ái VTV1",
-            image: {
-                uri: "https://static.thiennguyen.app/public/user/profile/2023/9/28/5ebeb7ab-72b1-4352-9c8c-909de18b7422.jpg",
-            },
-        },
-        {
-            id: "7",
-            name: "Hội Chữ Thập Đỏ Healthcare City",
-            image: {
-                uri: "https://static.thiennguyen.app/public/user/profile/2023/11/2/506be44e-ba77-4aa9-b7bd-03cce4562b81.jpg",
-            },
-        },
-    ];
+    const [organizationList, setOrganizationList] = useState([]);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const res = await getAllOrganization();
+                const updatedList = await Promise.all(
+                    res.data.map(async (item) => {
+                        try {
+                            const userResponse = await getUserById(item.user_Id);
+                            const { image, name } = userResponse.data;
+                            return { ...item, image, name };
+                        } catch (error) {
+                            console.error('Error fetching user data', error);
+                            return item;
+                        }
+                    })
+                );
+                setOrganizationList(updatedList);
+            } catch (error) {
+                console.error('Error fetching data', error);
+                setOrganizationList([]);
+            }
+        };
+
+        fetchData();
+    }, []);
 
     const navigation = useNavigation();
 
-    const Card = ({user}) => {
+    const Card = ({item}) => {
         return (
-            <TouchableOpacity key={user.id} style={{width: 74, padding: 5, marginRight: 10}}
-                              onPress={() => navigation.navigate("Profile")}>
+            <TouchableOpacity key={item.id} style={{width: 74, padding: 5, marginRight: 10}}
+                              onPress={() => navigation.navigate('Organization', { id: item.id, userId: item.user_Id })}
+            >
                 <LinearGradient
                     colors={['#bc2a8d', '#e95950', '#fccc63']}
                     style={{padding: 2, borderRadius: 50}}
                 >
-                    <Image source={user.image} style={styles.userImage}/>
+                    <Image  source={item.image ? { uri: item.image } : images.avatar_default} style={styles.userImage}/>
                 </LinearGradient>
                 <Text style={styles.userName} numberOfLines={1} ellipsizeMode="tail">
-                    {user.name}
+                    {item.name}
                 </Text>
             </TouchableOpacity>
         )
     }
 
     return (
-        <View style={{flex: 1, backgroundColor: COLORS.white, marginBottom: 1, paddingTop: 25, paddingBottom: 15}}>
+        <View style={{flex: 1, backgroundColor: COLORS.white, marginBottom: 1, paddingTop: 15, paddingBottom: 15}}>
             <ScrollView showsVerticalScrollIndicator={false}>
                 <View style={styles.sectionTitle}>
                     <Text style={{fontSize: 18, fontWeight: "500"}}>Hội thiện nguyện</Text>
@@ -90,8 +68,8 @@ const OrganizationList = () => {
                         contentContainerStyle={{paddingLeft: 20}}
                         horizontal
                         showsHorizontalScrollIndicator={false}
-                        data={users}
-                        renderItem={({item}) => <Card user={item}/>}
+                        data={organizationList}
+                        renderItem={({item}) => <Card item={item}/>}
                     />
                 </View>
             </ScrollView>

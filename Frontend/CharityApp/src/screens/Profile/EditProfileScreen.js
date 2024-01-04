@@ -13,7 +13,7 @@ import React, {useContext, useEffect, useState} from "react";
 import {SafeAreaView} from "react-native-safe-area-context";
 import * as ImagePicker from "expo-image-picker";
 import {COLORS, FONTS, images} from "../../constants";
-import {Ionicons, MaterialIcons} from "@expo/vector-icons";
+import {Ionicons, MaterialCommunityIcons, MaterialIcons} from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import {AuthContext} from "../../context/AuthContext";
 import FlashMessage, {hideMessage, showMessage} from "react-native-flash-message";
@@ -21,13 +21,20 @@ import {updateOrganizationById} from "../../services/CharityOrganization/{id}/Up
 import {getOrganizationById} from "../../services/CharityOrganization/{id}/GetOrganizationById";
 import firebase from "firebase/compat/app";
 import * as FileSystem from 'expo-file-system';
-import getUserProfileImage from "../../../firebase/getUserProfileImage";
+import getAvatar from "../../../firebase/getAvatar";
+import getBackground from "../../../firebase/getBackground";
+import image from "../../components/Profile/Image";
+import {updateUserById} from "../../services/User/{id}/UpdateUserById";
+import {getUserById} from "../../services/User/{id}/GetUserById";
 
 const EditProfileScreen = ({navigation}) => {
     const {userInfo, charityOrganization, userToken} = useContext(AuthContext);
-    const [selectedImage, setSelectedImage] = useState();
-    const [phone, setPhone] = useState(userInfo.phone);
-    const [address, setAddress] = useState(userInfo.address);
+    const [avatar, setAvatar] = useState();
+    const [background, setBackground] = useState();
+    const [selectedAvatar, setSelectedAvatar] = useState();
+    const [selectedBackground, setSelectedBackground] = useState();
+    const [phone, setPhone] = useState();
+    const [address, setAddress] = useState();
     const [fax, setFax] = useState();
     const [website, setWebsite] = useState();
     const [description, setDescription] = useState();
@@ -35,8 +42,9 @@ const EditProfileScreen = ({navigation}) => {
     const [date, setDate] = useState(new Date());
     const [isLoading, setIsLoading] = useState(false)
     const [showDatePicker, setShowDatePicker] = useState(false);
+    const [user, setUser] = useState(userInfo);
 
-    const handleImageSelection = async () => {
+    const handleAvatar = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             allowsEditing: true,
@@ -44,7 +52,21 @@ const EditProfileScreen = ({navigation}) => {
             quality: 1,
         });
         if (!result.canceled) {
-            setSelectedImage(result.assets[0].uri);
+            setAvatar(result.assets[0].uri);
+            setSelectedAvatar(result.assets[0].uri);
+        }
+    };
+
+    const handleBackground = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 4],
+            quality: 1,
+        });
+        if (!result.canceled) {
+            setBackground(result.assets[0].uri);
+            setSelectedBackground(result.assets[0].uri);
         }
     };
 
@@ -87,23 +109,52 @@ const EditProfileScreen = ({navigation}) => {
     }
 
     useEffect(() => {
-        const getProfileImage = async () => {
+        const getBackgroundImage = async () => {
             try {
-                const imageUrl = await getUserProfileImage(userInfo.id);
+                const imageUrl = await getBackground(userInfo.id);
                 if (imageUrl) {
-                    setSelectedImage(imageUrl);
+                    setBackground(imageUrl);
                 }
             } catch (error) {
                 console.error('Lỗi khi lấy ảnh từ Realtime Database', error);
             }
         };
+        getBackgroundImage();
+    }, [userInfo.id]);
 
+    useEffect(() => {
+        const getProfileImage = async () => {
+            try {
+                const imageUrl = await getAvatar(userInfo.id);
+                if (imageUrl) {
+                    setAvatar(imageUrl);
+                }
+            } catch (error) {
+                console.error('Lỗi khi lấy ảnh từ Realtime Database', error);
+            }
+        };
         getProfileImage();
     }, [userInfo.id]);
 
     useEffect(() => {
         const getData = async () => {
-            if(charityOrganization) {
+                try {
+                    const res = await getUserById(userInfo.id);
+                    if (res?.data) {
+                       setUser(res.data)
+                        setPhone(res.data.phone)
+                        setAddress(res.data.address)
+                    }
+                } catch (error) {
+                    console.error("Error fetching data", error);
+                }
+        };
+        getData();
+    }, []);
+
+    useEffect(() => {
+        const getData = async () => {
+            if (charityOrganization) {
                 try {
                     const res = await getOrganizationById(charityOrganization?.id);
                     if (res?.data) {
@@ -117,7 +168,6 @@ const EditProfileScreen = ({navigation}) => {
                 }
             }
         };
-
         getData();
     }, []);
 
@@ -150,7 +200,24 @@ const EditProfileScreen = ({navigation}) => {
 
                 await fetchData(newOrganization);
             }
-            await uploadImage();
+            let image_Url = user.image;
+            if(selectedAvatar) {
+                image_Url = await uploadAvatar();
+            }
+            if(selectedBackground) {
+                await uploadBackground();
+            }
+            const newUser = {
+                name: user.name,
+                userName: user.userName,
+                password: "12345678",
+                phone: phone,
+                email: user.email,
+                address: address,
+                image: image_Url
+            };
+            await fetchDataUser(newUser);
+
             setIsLoading(false);
         } else {
             setIsLoading(false);
@@ -158,50 +225,21 @@ const EditProfileScreen = ({navigation}) => {
     }
 
     // upload ảnh tới storage
-    const uploadImage = async () => {
+    const uploadAvatar = async () => {
         try {
-                const {uri} = await FileSystem.getInfoAsync(selectedImage);
+            const { uri: uri_a } = await FileSystem.getInfoAsync(selectedAvatar);
+            const blob_a = await fetch(uri_a).then(response => response.blob());
+            const name_a = selectedAvatar.substring(selectedAvatar.lastIndexOf('/') + 1);
+            const filename_a = name_a.replace(/\.[^/.]+$/, "");
+            const ref_a = firebase.storage().ref(`files/${filename_a}`);
+            await ref_a.put(blob_a);
+            const imageURL_a = await ref_a.getDownloadURL();
+            console.log(imageURL_a)
 
-                const blob = await new Promise((resolve, reject) => {
-                    const xhr = new XMLHttpRequest();
-                    xhr.onload = () => {
-                        resolve(xhr.response);
-                    };
-                    xhr.onerror = (e) => {
-                        reject(new TypeError('Network request failed'));
-                    };
-                    xhr.responseType = 'blob';
-                    xhr.open('GET', uri, true);
-                    xhr.send(null);
-                });
+            await saveImageUrlToDatabase(imageURL_a, "avatar");
 
-                const filename = selectedImage.substring(selectedImage.lastIndexOf('/') + 1);
-                const ref = firebase.storage().ref(`/files/${filename}`);
-                await ref.put(blob);
-
-                const imageURL = await ref.getDownloadURL();
-                if(imageURL){
-                    showMessage({
-                        message: "Gửi thành công",
-                        type: "success",
-                        duration: 3000,
-                        onPress: () => {
-                            hideMessage();
-                        },
-                    });
-                    await saveImageUrlToDatabase(imageURL);
-                } else {
-                    showMessage({
-                        message: "Đã xảy ra lỗi khi gửi yêu cầu",
-                        type: "danger",
-                        duration: 3000,
-                        onPress: () => {
-                            hideMessage();
-                        },
-                    });
-                }
+            return imageURL_a;
         } catch (e) {
-            console.log("cc")
             showMessage({
                 message: "Đã xảy ra lỗi khi gửi yêu cầu",
                 type: "danger",
@@ -211,15 +249,39 @@ const EditProfileScreen = ({navigation}) => {
                 },
             });
         }
-    }
+    };
+
+    // upload ảnh tới storage
+    const uploadBackground = async () => {
+        try {
+            const { uri: uri_b } = await FileSystem.getInfoAsync(selectedBackground);
+            const blob_b = await fetch(uri_b).then(response => response.blob());
+            const name_b = selectedBackground.substring(selectedBackground.lastIndexOf('/') + 1);
+            const filename_b = name_b.replace(/\.[^/.]+$/, "");
+            const ref_b = firebase.storage().ref(`files/${filename_b}`);
+            await ref_b.put(blob_b);
+            const imageURL_b = await ref_b.getDownloadURL();
+
+            await saveImageUrlToDatabase(imageURL_b, "background");
+        } catch (e) {
+            showMessage({
+                message: "Đã xảy ra lỗi khi gửi yêu cầu",
+                type: "danger",
+                duration: 3000,
+                onPress: () => {
+                    hideMessage();
+                },
+            });
+        }
+    };
 
     // lưu ảnh vào database
-    const saveImageUrlToDatabase = async (imageURL) => {
+    const saveImageUrlToDatabase = async (imageURL, key) => {
         try {
             const userId = userInfo.id;
-            const databaseRef = firebase.database().ref(`users/${userId}/image`);
+            const databaseRef = firebase.database().ref(`${userId}/${key}`);
 
-            await databaseRef.set(imageURL);
+            await databaseRef.push().set(imageURL);
         } catch (error) {
             showMessage({
                 message: "Đã xảy ra lỗi khi gửi yêu cầu",
@@ -232,12 +294,45 @@ const EditProfileScreen = ({navigation}) => {
         }
     };
 
+    // lưu thông tin user
+    const fetchDataUser = async (newUser) => {
+        try {
+            const res = await updateUserById(userInfo.id, newUser, userToken);
+            if (!res) {
+                showMessage({
+                    message: "Đã xảy ra lỗi khi gửi yêu cầu",
+                    type: "danger",
+                    duration: 3000,
+                    onPress: () => {
+                        hideMessage();
+                    },
+                });
+            }
+            showMessage({
+                message: "Cập nhật thành công",
+                type: "success",
+                duration: 3000,
+                onPress: () => {
+                    hideMessage();
+                },
+            });
+        } catch (error) {
+            showMessage({
+                message: "Đã xảy ra lỗi khi gửi yêu cầu",
+                type: "danger",
+                duration: 3000,
+                onPress: () => {
+                    hideMessage();
+                },
+            });
+        }
+    };
 
-    // lưu thông tin
+    // lưu thông tin tổ chức
     const fetchData = async (newOrganization) => {
         try {
             const res = await updateOrganizationById(charityOrganization?.id, newOrganization, userToken);
-            if(!res){
+            if (!res) {
                 showMessage({
                     message: "Đã xảy ra lỗi khi gửi yêu cầu",
                     type: "danger",
@@ -264,18 +359,17 @@ const EditProfileScreen = ({navigation}) => {
             style={{
                 flex: 1,
                 backgroundColor: COLORS.white,
-                paddingHorizontal: 20,
             }}
         >
             <View
                 style={{
                     flexDirection: "row",
                     alignItems: "center",
-                    marginVertical: 0,
+                    marginHorizontal: 20,
                     height: 60,
                 }}
             >
-                <FlashMessage position="top"/>
+                <FlashMessage position="top" style={{borderRadius: 12}}/>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
                     <Ionicons name="arrow-back" size={24} color={COLORS.black}/>
                 </TouchableOpacity>
@@ -294,24 +388,52 @@ const EditProfileScreen = ({navigation}) => {
                 showsHorizontalScrollIndicator={false}
                 showsVerticalScrollIndicator={false}
             >
+                <View style={{width: "100%"}}>
+                    <Image
+                        source={background ? {uri: background} : images.cover}
+                        resizeMode="cover"
+                        style={{
+                            height: 228,
+                            width: "100%",
+                        }}
+                    />
+                    <View
+                        style={{
+                            position: "absolute",
+                            bottom: 10,
+                            right: 15,
+                            zIndex: 9999,
+                        }}
+                    >
+                        <TouchableOpacity onPress={handleBackground}>
+                            <MaterialIcons
+                                name="photo-camera"
+                                size={32}
+                                color={COLORS.primary}
+                            />
+                        </TouchableOpacity>
+                    </View>
+                </View>
+
                 <View
                     style={{
-                        alignItems: "center",
+                        alignItems: "flex-start",
                         marginVertical: 20,
+                        marginHorizontal: 20
                     }}
                 >
-                    <TouchableOpacity onPress={handleImageSelection}>
+                    <View>
                         <Image
-                            source={selectedImage ? {uri: selectedImage} : images.avatar_default}
+                            source={avatar ? {uri: avatar} : images.avatar_default}
                             style={{
                                 height: 170,
                                 width: 170,
                                 borderRadius: 85,
                                 borderWidth: 2,
                                 borderColor: COLORS.primary,
+                                marginTop: -90,
                             }}
                         />
-
                         <View
                             style={{
                                 position: "absolute",
@@ -320,16 +442,37 @@ const EditProfileScreen = ({navigation}) => {
                                 zIndex: 9999,
                             }}
                         >
-                            <MaterialIcons
-                                name="photo-camera"
-                                size={32}
-                                color={COLORS.primary}
-                            />
+                            <TouchableOpacity onPress={handleAvatar}>
+                                <MaterialIcons
+                                    name="photo-camera"
+                                    size={32}
+                                    color={COLORS.primary}
+                                />
+                            </TouchableOpacity>
                         </View>
-                    </TouchableOpacity>
+                    </View>
                 </View>
 
-                <View style={{paddingVertical: 30}}>
+                <View style={{paddingVertical: 30, marginHorizontal: 20}}>
+                    <View
+                        style={{
+                            flexDirection: "column",
+                            marginBottom: 6,
+                        }}
+                    >
+                        <Text style={{...FONTS.h5}}>
+                            Chủ tài khoản <Text style={{color: "red"}}>*</Text>{" "}
+                        </Text>
+                        <View style={styles.containerTextInput}>
+                            <TextInput
+                                style={{fontSize: 16}}
+                                value={userInfo?.name}
+                                // onChangeText={(value) => setName(value)}
+                                editable={false}
+                            />
+                        </View>
+                    </View>
+
                     <View
                         style={{
                             flexDirection: "column",
@@ -342,7 +485,7 @@ const EditProfileScreen = ({navigation}) => {
                         <View style={styles.containerTextInput}>
                             <TextInput
                                 style={{fontSize: 16}}
-                                value={userInfo?.name}
+                                value={userInfo?.userName}
                                 // onChangeText={(value) => setName(value)}
                                 editable={false}
                             />
@@ -482,32 +625,34 @@ const EditProfileScreen = ({navigation}) => {
                     }
                 </View>
 
-                <TouchableOpacity
-                    style={{
-                        backgroundColor: COLORS.primary,
-                        height: 44,
-                        borderRadius: 6,
-                        marginTop: 10,
-                        marginBottom: 15,
-                        alignItems: "center",
-                        justifyContent: "center",
-                    }}
-                    activeOpacity={0.8}
-                    onPress={() => handleOnClickSave()}
-                >
-                    {!isLoading ? (
-                        <Text
-                            style={{
-                                ...FONTS.body3,
-                                color: COLORS.white,
-                            }}
-                        >
-                            Cập nhật
-                        </Text>
-                    ) : (
-                        <ActivityIndicator color={COLORS.white} size={30}/>
-                    )}
-                </TouchableOpacity>
+                <View style={{paddingHorizontal: 20}}>
+                    <TouchableOpacity
+                        style={{
+                            backgroundColor: COLORS.primary,
+                            height: 44,
+                            borderRadius: 6,
+                            marginTop: 10,
+                            marginBottom: 15,
+                            alignItems: "center",
+                            justifyContent: "center",
+                        }}
+                        activeOpacity={0.8}
+                        onPress={() => handleOnClickSave()}
+                    >
+                        {!isLoading ? (
+                            <Text
+                                style={{
+                                    ...FONTS.body3,
+                                    color: COLORS.white,
+                                }}
+                            >
+                                Cập nhật
+                            </Text>
+                        ) : (
+                            <ActivityIndicator color={COLORS.white} size={30}/>
+                        )}
+                    </TouchableOpacity>
+                </View>
 
                 {renderDatePicker()}
             </ScrollView>

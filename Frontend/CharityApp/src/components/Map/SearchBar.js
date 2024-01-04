@@ -30,7 +30,8 @@ export default function SearchBar({setSearchText}) {
                     <TextInput
                         placeholder="Search"
                         style={{ backgroundColor: COLORS.WHITE, width: "80%" }}
-                        onChangeText={(value) => setSearchInput(value)}
+                        value={searchInput}
+                        onChangeText={(value) => setSearchInput(searchInput)}
                         onSubmitEditing={() => setSearchText(searchInput)}
                     />
                 </View>

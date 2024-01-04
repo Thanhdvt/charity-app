@@ -1,11 +1,11 @@
 import * as request from "../../../utils/httpRequest";
 
-export const getOrganizationById = async (organizationId) => {
+export const getOrganizationById = async (id) => {
     try {
         const res = await request.get(
-            `/api/CharityOrganization/${organizationId}`,
+            `/api/CharityOrganization/${id}`,
         );
-        // console.log(res)
+        // console.log("organozation" + res)
         // console.log("getOrganizationById ", res);
         return res;
     } catch (error) {

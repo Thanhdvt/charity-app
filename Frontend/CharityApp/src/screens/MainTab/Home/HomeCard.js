@@ -1,5 +1,5 @@
-import React from "react";
-import {Image, ScrollView, StyleSheet, Text, TouchableOpacity} from "react-native";
+import React, {useContext, useEffect, useState} from "react";
+import {Image, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity} from "react-native";
 
 import {COLORS, images} from "../../../constants";
 import {createStackNavigator} from "@react-navigation/stack";
@@ -13,11 +13,21 @@ import Post from "../../../components/public/Landing/Post";
 import Button from "../../../components/common/Button";
 import ModalPop from "../../../components/Modal/PopModal";
 import {useFocusEffect} from "@react-navigation/native";
+import getAvatar from "../../../../firebase/getAvatar";
+import {AuthContext} from "../../../context/AuthContext";
 
 const HomeStack = createStackNavigator();
 
 const HomeContent = ({ navigation, visible, setVisible }) => {
   const theme = useTheme();
+    const [refreshing, setRefreshing] = useState(false);
+
+    const onRefresh = () => {
+        setRefreshing(true);
+        setTimeout(() => {
+            setRefreshing(false);
+        }, 2000);
+    };
 
     useFocusEffect(
         React.useCallback(() => {
@@ -28,9 +38,13 @@ const HomeContent = ({ navigation, visible, setVisible }) => {
     );
 
   return (
-      <ScrollView showsVerticalScrollIndicator={false} style={{marginBottom: 50}}>
+      <ScrollView showsVerticalScrollIndicator={false} style={{marginBottom: 50}}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
           <OrganizationList/>
-          <EventList setModalVisible={setVisible}/>
+          <EventList/>
           <Post/>
 
           <ModalPop visible={visible}>
@@ -76,8 +90,25 @@ const HomeContent = ({ navigation, visible, setVisible }) => {
 };
 
 const HomeScreen = ({ navigation }) => {
+    const {userInfo} = useContext(AuthContext)
   const { colors } = useTheme();
-  const [visible, setVisible] = React.useState(false);
+  const [visible, setVisible] = useState(false);
+  const [avatar, setAvatar] = useState()
+
+    useEffect(() => {
+        const fetchUserProfileImage = async () => {
+            try {
+                const imageUrl = await getAvatar(userInfo.id);
+                if (imageUrl) {
+                    setAvatar(imageUrl);
+                }
+            } catch (error) {
+                console.error('Lỗi khi lấy ảnh từ Realtime Database', error);
+            }
+        };
+
+        fetchUserProfileImage();
+    }, [userInfo.id]);
 
   return (
     <HomeStack.Navigator
@@ -116,7 +147,7 @@ const HomeScreen = ({ navigation }) => {
               />
               <TouchableOpacity style={{ paddingHorizontal: 10, marginTop: 0 }}>
                 <Image
-                  source={images.profile}
+                    source={ avatar ? {uri: avatar} : images.avatar_default }
                   resizeMode="contain"
                   style={{
                     width: 40,

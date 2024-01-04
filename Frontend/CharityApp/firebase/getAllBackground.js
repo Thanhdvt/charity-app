@@ -1,15 +1,15 @@
 import {firebase} from "../config";
 
-const getUserProfileImage = async (id) => {
+const getAllBackground = async (id) => {
     try {
         const snapshot = await firebase.database()
-            .ref(`users/${id}/image`)
+            .ref(`${id}/background/`)
             .once('value');
 
-        return snapshot.val() // trả về avatarUrl
+        return snapshot.val(); // return imageUrl
     } catch (error) {
         console.error('Lỗi khi lấy ảnh từ Realtime Database', error);
     }
 };
 
-export default getUserProfileImage;
+export default getAllBackground;

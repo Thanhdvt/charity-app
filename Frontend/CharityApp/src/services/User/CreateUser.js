@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const register = (name, email, phone, password) => {
-    axios.post(`http://10.0.2.2:153/api/User`, {
+    axios.post(`http://192.168.2.13:5000/api/User`, {
         name,
         userName: email,
         password,

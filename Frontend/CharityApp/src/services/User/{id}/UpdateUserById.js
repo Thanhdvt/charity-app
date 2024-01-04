@@ -1,12 +1,15 @@
 import * as request from "../../../utils/httpRequest";
+import {createAuthHeader} from "../../../utils/createAuthHeader";
 
-export const updateUserById = async (userId, data) => {
-    console.log(userId)
+export const updateUserById = async (id, data, token) => {
+    console.log(id)
     console.log(data)
     try {
+        const headers = createAuthHeader(token);
         const res = await request.put(
-            `/api/User/${userId}`,
+            `/api/User/${id}`,
             data,
+            {headers}
         );
         //console.log(res.data)
         // console.log("updateUser_1 ", res);
