@@ -1,8 +1,13 @@
 import {Image, ScrollView, StyleSheet, Text, TouchableOpacity, View,} from "react-native";
-import React from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {SafeAreaView} from "react-native-safe-area-context";
 import {COLORS} from "../../constants";
 import {Ionicons, MaterialIcons} from "@expo/vector-icons";
+import {AuthContext} from "../../context/AuthContext";
+import {getUserById} from "../../services/User/{id}/GetUserById";
+import {getAllForHelpRequestByUserId} from "../../services/ForHelpRequest/user/{userId}/GetAllForHelpRequestByUserId";
+import moment from "moment/moment";
+import {getOrganizationById} from "../../services/CharityOrganization/{id}/GetOrganizationById";
 
 const ForHelpRegisterScreen = ({navigation}) => {
     const eventList = [
@@ -14,17 +19,48 @@ const ForHelpRegisterScreen = ({navigation}) => {
         },
     ];
 
+    const {userInfo} = useContext(AuthContext);
+    const [forHelpRequestList, setForHelpRequestList] = useState([]);
 
+    useEffect(() => {
+        const getData = async () => {
+            try {
+                const res = await getAllForHelpRequestByUserId(userInfo.id);
+                if (res?.data) {
+
+                const updatedList = await Promise.all(
+                    res.data.map(async (item) => {
+                        try {
+                            const organization = await getOrganizationById(item.organization_Id);
+                            if (organization) {
+                                const userResponse = await getUserById(organization.data.user_Id)
+                                const { image, name } = userResponse.data;
+                                return { ...item, name, image };
+                            }
+                        } catch (error) {
+                            console.error('Error fetching user data', error);
+                            return item;
+                        }
+                    })
+                );
+                    setForHelpRequestList(updatedList)
+                }
+            } catch (error) {
+                console.error("Error fetching data", error);
+            }
+        };
+        getData();
+    }, []);
 
     const renderEventItem = ({ item }) => (
         <TouchableOpacity
             style={styles.eventItem}
-            onPress={() => navigation.navigate('ForHelpDetail', { eventId: item.id })}
+            onPress={() => navigation.navigate('ForHelpDetail', { forHelpRequestId: item.id, organizationName: item.name })}
         >
             <Image source={{ uri: item.image }} style={styles.eventImage} />
             <View style={styles.eventDetails}>
-                <Text style={styles.eventName}>{item.name}</Text>
-                <Text style={styles.eventStatus}>{item.status}</Text>
+                <Text style={styles.eventName}  numberOfLines={1} ellipsizeMode="tail">{item.description}</Text>
+                <Text style={styles.eventStatus}>{moment(item?.date).format("DD/MM/YYYY")}</Text>
             </View>
             <TouchableOpacity onPress={() => handleMoreOptions(item.id)}>
                 <MaterialIcons name="more-vert" size={24} color={COLORS.primary} />
@@ -67,7 +103,7 @@ const ForHelpRegisterScreen = ({navigation}) => {
                 showsVerticalScrollIndicator={false}
                 style={{marginHorizontal: 20}}
             >
-                {eventList.map((item) => (
+                {forHelpRequestList.map((item) => (
                     <View key={item.id}>
                         {renderEventItem({ item })}
                     </View>
@@ -121,7 +157,7 @@ const styles = StyleSheet.create({
     eventImage: {
         width: 60,
         height: 60,
-        borderRadius: 4,
+        borderRadius: 50,
     },
     eventDetails: {
         flex: 1,
@@ -130,9 +166,11 @@ const styles = StyleSheet.create({
     eventName: {
         fontSize: 16,
         fontWeight: 'bold',
+        textAlign: "justify"
     },
     eventStatus: {
         fontSize: 14,
         color: 'gray',
+        marginTop: 5
     },
 });

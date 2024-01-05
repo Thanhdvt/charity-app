@@ -16,6 +16,7 @@ const onboarding_2 = require("../../assets/images/onboarding_2.jpg");
 const profile = require("../../assets/images/profile.jpg");
 const landing_1 = require("../../assets/images/landing_1.jpg")
 const welcome = require("../../assets/images/welcome.jpg")
+const circle_gray = require("../../assets/images/circle_gray.jpg")
 
 export default {
     avatar_default,
@@ -35,5 +36,6 @@ export default {
     onboarding_2,
     profile,
     landing_1,
-    welcome
+    welcome,
+    circle_gray
 }

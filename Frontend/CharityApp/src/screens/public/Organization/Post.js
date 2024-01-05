@@ -271,7 +271,8 @@ const Post = ({organizationId, userOrganizationId}) => {
                                                 justifyContent: "space-between",
                                                 alignItems: "center",
                                                 paddingHorizontal: 12,
-                                                paddingVertical: 15,
+                                                paddingTop: 0,
+                                                paddingBottom: 8
                                             }}
                                         >
                                             <View style={{flexDirection: "row", alignItems: "center"}}>
@@ -317,7 +318,7 @@ const Post = ({organizationId, userOrganizationId}) => {
                                                 <Text
                                                     style={{
                                                         opacity: 0.5,
-                                                        paddingVertical: 8,
+                                                        paddingVertical: 5,
                                                         paddingBottom: 15,
                                                         fontSize: 14,
                                                         fontWeight: "500",
@@ -332,13 +333,14 @@ const Post = ({organizationId, userOrganizationId}) => {
                                                     filled
                                                     title="Tham gia"
                                                     style={{
-                                                        paddingVertical: 8,
+                                                        paddingVertical: 5,
                                                         paddingBottom: 8,
                                                         paddingHorizontal: 20,
                                                         borderWidth: 1,
                                                         borderRadius: 8
                                                     }}
-                                                    onPress={() => (userToken ? navigation.navigate("JoinRegister") : showNotice())}
+                                                    onPress={() => (userToken ? navigation.navigate("JoinRegister", { eventId: data.id, organizationId: data.organization_Id, organizationName: data.name}) : showNotice())}
+
                                                 />
                                             </View>
                                         </View>

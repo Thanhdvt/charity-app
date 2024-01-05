@@ -1,162 +1,78 @@
 import {Dimensions, FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View,} from "react-native";
 import {SafeAreaView} from "react-native-safe-area-context";
-import {COLORS, images} from "../../constants";
+import {COLORS} from "../../constants";
 import {Entypo, Ionicons, MaterialCommunityIcons, MaterialIcons,} from "@expo/vector-icons";
-import {useNavigation} from "@react-navigation/native";
 import {LinearGradient} from "expo-linear-gradient";
+import React, {useContext, useEffect, useState} from "react";
+import {AuthContext} from "../../context/AuthContext";
+import {getForHelpRequestById} from "../../services/ForHelpRequest/{id}/GetForHelpRequestById";
+import {Video} from "expo-av";
+import getForHelpRequestByUserId from "../../../firebase/GetForHelpRequestByUserId";
 
-const forHelpRequest = {
-    id: 1,
-    topic: "trẻ em",
-    name: "Nguyễn Duy Thành",
-    avatar: "https://example.com/avatar.jpg",
-    skills: [
-        { id: 1, name: "Quản lý dự án" },
-        { id: 2, name: "Giao tiếp hiệu quả" },
-        { id: 3, name: "Ngôn ngữ" },
-        { id: 4, name: "Thiết kế đồ họa" },
-        { id: 5, name: "Lập trình" },
-    ],
-    availability: "Buổi chiều thứ 5, thứ 7 và cả ngày chủ nhật",
-    content: "Hội Chữ thập đỏ Việt Nam là tổ chức xã hội nhân đạo của quần chúng do Chủ tịch Hồ Chí Minh sáng lập và là Chủ tịch danh dự đầu tiên.",
-    contact: {
-        email: "nguyenduythanh@example.com",
-        phone: "0123 456 789",
-    },
-    address: {
-        city: "Hà Nội",
-        district: "Hoàng Mai",
-        street: "123 Đường ABC",
-    },
-    images: [
-        {
-            id: "1",
-            name: "Hội chữ thập đỏ Việt Nam",
-            image: images.onboarding_1
-        },
-        {
-            id: "2",
-            name: "Quỹ Hoạt động Chữ Thập Đỏ",
-            image: images.onboarding
-        },
-        {
-            id: "3",
-            name: "Quỹ Tony Buổi sáng",
-            image: images.onboarding_0
-        },
-        {
-            id: "4",
-            name: "Quỹ Hạnh Phúc Cho Mọi Người",
-            image: images.onboarding_2
-        },
-        {
-            id: "5",
-            name: "Tree Bank",
-            image: images.onboarding_1
-        },
-        {
-            id: "6",
-            name: "Nhịp Cầu Nhân Ái VTV1",
-            image: images.onboarding
-        },
-    ]
-};
+const {height, width} = Dimensions.get("screen");
 
-const {height} = Dimensions.get("screen");
+const ForHelpDetailScreen = ({navigation, route}) => {
+    const forHelpRequestId = route.params.forHelpRequestId;
+    const organizationName = route.params.organizationName;
+    const {userInfo} = useContext(AuthContext);
+    const [forHelpRequest, setForHelpRequest] = useState();
+    const [files, setFiles] = useState([]);
 
-const ForHelpDetail = () => {
-    const navigation = useNavigation();
+    useEffect(() => {
+        const getData = async () => {
+            try {
+                const res = await getForHelpRequestById(forHelpRequestId);
+                setForHelpRequest(res.data)
+            } catch (error) {
+                console.error("Error fetching data", error);
+            }
+        };
+        getData();
+    }, []);
 
-    const Card = ({user}) => {
+    useEffect(() => {
+        const getData = async () => {
+            try {
+                const fileUrl = await getForHelpRequestByUserId(userInfo.id, forHelpRequestId);
+                if(fileUrl) {
+                    let combinedImageList = [...Object.values(fileUrl)];
+                    setFiles(combinedImageList)
+                }
+            } catch (error) {
+                console.error("Error fetching data", error);
+            }
+        };
+        getData();
+    }, []);
+
+    const isVideo = (media) => {
+        return media.toLowerCase().includes('.mp4') || media.toLowerCase().includes('youtube.com/watch');
+    };
+
+    const Card = ({media}) => {
         return (
-            <TouchableOpacity key={user.id} style={{width: 90, padding: 3, marginRight: 10}}
-                              onPress={() => {}}>
-                <LinearGradient
-                    colors={['#bc2a8d', '#e95950', '#fccc63']}
-                    style={{padding: 2, borderRadius: 6}}
-                >
-                    <Image source={user.image} style={styles.userImage}/>
-                </LinearGradient>
-            </TouchableOpacity>
-        )
-    }
+            <LinearGradient
+                colors={['#bc2a8d', '#e95950', '#fccc63']}
+                style={{marginRight: 10, borderRadius: 6}}
+                        >
+                {isVideo(media) ? (
+                    <View style={{padding: 3}}>
+                        <Video
+                            source={{uri: media}}
+                            style={styles.userImage}
+                            useNativeControls={true}
+                            resizeMode={"cover"}
+                        />
+                    </View>
+                ) : (
+                    <View  style={{padding: 3}}>
+                        <Image source={{uri: media}} style={styles.userImage}/>
+                    </View>
+                )}
+            </LinearGradient>
+        );
+    };
 
-    return (
-        <View style={styles.containerInfo}>
-            <View style={styles.section}>
-                <Text style={styles.sectionTitle}>
-                    <MaterialCommunityIcons
-                        name="card-account-details-outline"
-                        size={24}
-                        color="black"
-                    />{" "}
-                    Thông tin người gửi:
-                </Text>
-               <View style={{flexDirection: "row"}}>
-                   <View style={{paddingRight: 10}}>
-                       <Text style={{fontSize: 16, fontWeight: "500", marginBottom: 4}}>Tên:</Text>
-                       <Text style={{fontSize: 16, fontWeight: "500", marginBottom: 4}}>Địa chỉ:</Text>
-                       <Text style={{fontSize: 16, fontWeight: "500", marginBottom: 4}}>Email:</Text>
-                       <Text style={{fontSize: 16, fontWeight: "500", marginBottom: 4}}>SĐT: </Text>
-                   </View>
-                   <View>
-                       <Text style={styles.sectionText}>{forHelpRequest.name}</Text>
-                       <Text style={styles.sectionText}>{forHelpRequest.address.city}</Text>
-                       <Text style={styles.sectionText}>{forHelpRequest.contact.email}</Text>
-                       <Text style={styles.sectionText}>{forHelpRequest.contact.phone}</Text>
-                   </View>
-               </View>
-            </View>
-
-            <View style={styles.section}>
-                <Text style={styles.sectionTitle}>
-                    <MaterialCommunityIcons
-                        name="information-outline"
-                        size={24}
-                        color="black"
-                    />{" "}
-                    Nội dung:
-                </Text>
-                <Text style={styles.sectionText}>{forHelpRequest.content}</Text>
-            </View>
-
-            <View style={styles.section}>
-                <Text style={styles.sectionTitle}>
-                    <MaterialCommunityIcons
-                        name="image-outline"
-                        size={24}
-                        color="black"
-                    />{" "}
-                    Ảnh/Video:
-                </Text>
-                <View style={{height: 100}}>
-                    <FlatList
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        data={forHelpRequest.images}
-                        renderItem={({item}) => <Card user={item}/>}
-                    />
-                </View>
-            </View>
-
-            <View style={styles.socialMediaSection}>
-                <Text style={styles.sectionTitle}>
-                    <Entypo name="network" size={24} color="black" /> Mạng xã hội:
-                </Text>
-                <View style={{ flexDirection: "row" }}>
-                    <MaterialCommunityIcons name="facebook" size={24} color="#5c79ff" />
-                    <Text style={styles.socialMediaLink}>https://www.facebook.com</Text>
-                </View>
-                <View style={{ flexDirection: "row" }}>
-                    <MaterialCommunityIcons name="youtube" size={24} color="#ff0000" />
-                    <Text style={styles.socialMediaLink}>https://www.youtube.com</Text>
-                </View>
-            </View>
-        </View>
-    );
-};
-
-const ForHelpDetailScreen = ({ navigation }) => {
     return (
         <SafeAreaView
             style={{
@@ -175,19 +91,89 @@ const ForHelpDetailScreen = ({ navigation }) => {
                     }}
                 >
                     <TouchableOpacity onPress={() => navigation.goBack()}>
-                        <Ionicons name="arrow-back" size={24} color={COLORS.black} />
+                        <Ionicons name="arrow-back" size={24} color={COLORS.black}/>
                     </TouchableOpacity>
-                    <Text style={{fontSize: 16, fontWeight: "bold", marginLeft: 30}}>Yêu cầu trợ giúp</Text>
-                    <TouchableOpacity onPress={() => {}} style={{position: "absolute", right: 20}}>
-                        <MaterialIcons name="more-vert" size={24} color={COLORS.primary} />
+                    <TouchableOpacity onPress={() => {
+                    }} style={{position: "absolute", right: 20}}>
+                        <MaterialIcons name="more-vert" size={24} color={COLORS.primary}/>
                     </TouchableOpacity>
                 </View>
                 <View style={styles.screen}>
                     <View style={{flexDirection: "row", alignItems: "center"}}>
-                       <Text style={{fontSize: 24, fontWeight: "bold"}}> Chủ đề: </Text>
-                        <Text style={{fontSize: 24, fontWeight: "500"}}>{forHelpRequest.topic}</Text>
+                        <Text style={{fontSize: 24, fontWeight: "bold"}}> Chủ đề: </Text>
+                        <Text style={{fontSize: 24, fontWeight: "500"}}>Trẻ em</Text>
                     </View>
-                    <ForHelpDetail />
+                    <View style={styles.containerInfo}>
+                        <View style={styles.section}>
+                            <Text style={styles.sectionTitle}>
+                                <MaterialCommunityIcons
+                                    name="card-account-details-outline"
+                                    size={24}
+                                    color="black"
+                                />{" "}
+                                Thông tin người gửi
+                            </Text>
+                            <View style={{flexDirection: "row"}}>
+                                <View style={{paddingRight: 10}}>
+                                    <Text style={{fontSize: 16, fontWeight: "500", marginBottom: 4}}>Tên</Text>
+                                    <Text style={{fontSize: 16, fontWeight: "500", marginBottom: 4}}>Địa chỉ</Text>
+                                    <Text style={{fontSize: 16, fontWeight: "500", marginBottom: 4}}>Email</Text>
+                                    <Text style={{fontSize: 16, fontWeight: "500", marginBottom: 4}}>SĐT</Text>
+                                </View>
+                                <View>
+                                    <Text style={styles.sectionText}>: {userInfo.name}</Text>
+                                    <Text style={styles.sectionText}>: {userInfo.address}</Text>
+                                    <Text style={styles.sectionText}>: {userInfo.email}</Text>
+                                    <Text style={styles.sectionText}>: {userInfo.phone}</Text>
+                                </View>
+                            </View>
+                        </View>
+
+                        <View style={styles.section}>
+                            <Text style={styles.sectionTitle}>
+                                <MaterialCommunityIcons
+                                    name="information-outline"
+                                    size={24}
+                                    color="black"
+                                />{" "}
+                                Nội dung
+                            </Text>
+                            <Text style={styles.sectionText}>{forHelpRequest?.description}</Text>
+                        </View>
+
+                        <View style={styles.section}>
+                            <Text style={styles.sectionTitle}>
+                                <MaterialCommunityIcons
+                                    name="image-outline"
+                                    size={24}
+                                    color="black"
+                                />{" "}
+                                Ảnh/Video
+                            </Text>
+                            <View>
+                                <FlatList
+                                    horizontal
+                                    showsHorizontalScrollIndicator={false}
+                                    data={files}
+                                    renderItem={({item}) => <Card media={item}/>}
+                                />
+                            </View>
+                        </View>
+
+                        <View style={styles.socialMediaSection}>
+                            <Text style={styles.sectionTitle}>
+                                <Entypo name="network" size={24} color="black"/> Mạng xã hội:
+                            </Text>
+                            <View style={{flexDirection: "row"}}>
+                                <MaterialCommunityIcons name="facebook" size={24} color="#5c79ff"/>
+                                <Text style={styles.socialMediaLink}>https://www.facebook.com</Text>
+                            </View>
+                            <View style={{flexDirection: "row"}}>
+                                <MaterialCommunityIcons name="youtube" size={24} color="#ff0000"/>
+                                <Text style={styles.socialMediaLink}>https://www.youtube.com</Text>
+                            </View>
+                        </View>
+                    </View>
                 </View>
             </ScrollView>
         </SafeAreaView>
@@ -202,7 +188,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         backgroundColor: COLORS.white,
         paddingBottom: 20,
-        height: height-110
+        height: height - 110
     },
     imageContainer: {
         width: 155,
@@ -233,6 +219,7 @@ const styles = StyleSheet.create({
     containerInfo: {
         paddingVertical: 30,
         paddingHorizontal: 30,
+        width: width
     },
     section: {
         marginBottom: 16,
@@ -268,8 +255,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10
     },
     userImage: {
-        height: 80,
-        width: 80,
+        height: width/2,
+        width: width/2,
         borderRadius: 6,
         borderWidth: 4,
     },

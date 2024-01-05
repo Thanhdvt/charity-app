@@ -41,7 +41,7 @@ const EventTab = ({searchValue}) => {
     >
       <Image source={{ uri: event.image }} style={styles.eventImage} />
       <View style={styles.eventDetails}>
-        <Text style={styles.eventName}>{item.title}</Text>
+        <Text style={styles.eventName} numberOfLines={1} >{item.title}</Text>
         <Text style={styles.eventStatus}>{item.type === 0 ? "Đang diễn ra" : "Đã kết thúc" }</Text>
       </View>
       <TouchableOpacity onPress={() => handleMoreOptions(item.id)}>

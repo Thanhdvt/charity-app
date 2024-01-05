@@ -21,11 +21,12 @@ import {getOrganizationById} from "../../../services/CharityOrganization/{id}/Ge
 import {AuthContext} from "../../../context/AuthContext";
 import ModalPop from "../../Modal/PopModal";
 import {hideMessage, showMessage} from "react-native-flash-message";
+import SkeletonForEventList from "../../common/SkeletonForEventList";
 
 const {width} = Dimensions.get('screen');
 const EventList = () => {
 
-    const post=
+    const post =
         {
             postPersonName: "Hội chữ thập đỏ Việt Nam",
             postPersonImage: images.profile,
@@ -61,8 +62,8 @@ const EventList = () => {
                             const organization = await getOrganizationById(item.organization_Id);
                             if (organization) {
                                 const userResponse = await getUserById(organization.data.user_Id)
-                                const { image, name, email } = userResponse.data;
-                                return { ...item, image, name, email };
+                                const {image, name, email} = userResponse.data;
+                                return {...item, image, name, email};
                             }
                         } catch (error) {
                             console.error('Error fetching user data', error);
@@ -134,72 +135,100 @@ const EventList = () => {
         const event = eventList[index];
         // console.log(event)
         return (
-            <TouchableOpacity
-                activeOpacity={0.8}
-                onPress={() => navigation.navigate('EventDetail', { eventId: event.id, organizationId: event.organization_Id })}>
-                <View style={{width: width/1.4, backgroundColor: COLORS.grey, marginRight: 20, borderRadius: 16}}>
-                    <ImageBackground style={styles.cardImage} source={post.image}>
-                        <View style={{flexDirection: "row", alignItems: 'flex-start', alignSelf: "flex-end", padding: 10}}>
-                            <AntDesign name="heart" size={20} color={"red"} />
-                            <Text style={{marginLeft: 5, color: COLORS.white}}>{event?.like_Count}</Text>
-                        </View>
-                        <View
-                            style={{
-                                flex: 1,
-                                justifyContent: 'space-between',
-                                flexDirection: 'row',
-                                alignItems: 'flex-end',
+
+                <TouchableOpacity
+                    activeOpacity={0.8}
+                    onPress={() => navigation.navigate('EventDetail', {
+                        eventId: event.id,
+                        organizationId: event.organization_Id
+                    })}>
+                    <View style={{width: width / 1.4, backgroundColor: COLORS.grey, marginRight: 20, borderRadius: 16}}>
+                        <ImageBackground style={styles.cardImage} source={post.image}>
+                            <View style={{
+                                flexDirection: "row",
+                                alignItems: 'flex-start',
+                                alignSelf: "flex-end",
+                                padding: 10
                             }}>
-                            <View style={{flexDirection: 'row', justifyContent: "center", alignItems: "center", padding: 10}}>
-                                <Image source={ isLoading ? images.avatar_default : {uri: event?.image}} style={{
-                                    height: 40,
-                                    width: 40,
-                                    borderRadius: 50,
-                                    borderWidth: 4,
-                                }}/>
-                               <View>
-                                   <Text style={{marginLeft: 5, color: COLORS.white, fontWeight: "500", fontSize: 18}} numberOfLines={1} ellipsizeMode="tail">
-                                       {event?.name}
-                                   </Text>
-                                   <Text style={{marginLeft: 5, color: COLORS.white }}>
-                                       {event?.email}
-                                   </Text>
-                               </View>
+                                <AntDesign name="heart" size={20} color={"red"}/>
+                                <Text style={{marginLeft: 5, color: COLORS.white}}>{event?.like_Count}</Text>
                             </View>
+                            <View
+                                style={{
+                                    flex: 1,
+                                    justifyContent: 'space-between',
+                                    flexDirection: 'row',
+                                    alignItems: 'flex-end',
+                                }}>
+                                <View style={{
+                                    flexDirection: 'row',
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    padding: 10
+                                }}>
+                                    <Image source={isLoading ? images.avatar_default : {uri: event?.image}} style={{
+                                        height: 40,
+                                        width: 40,
+                                        borderRadius: 50,
+                                        borderWidth: 4,
+                                    }}/>
+                                    <View>
+                                        <Text style={{
+                                            marginLeft: 5,
+                                            color: COLORS.white,
+                                            fontWeight: "500",
+                                            fontSize: 18
+                                        }} numberOfLines={1} ellipsizeMode="tail">
+                                            {event?.name}
+                                        </Text>
+                                        <Text style={{marginLeft: 5, color: COLORS.white}}>
+                                            {event?.email}
+                                        </Text>
+                                    </View>
+                                </View>
+                            </View>
+                        </ImageBackground>
+                        <View style={{paddingVertical: 15, paddingHorizontal: 15}}>
+                            <Text style={{fontWeight: "bold", fontSize: 16, paddingBottom: 15, textAlign: "justify"}}
+                                  numberOfLines={1} ellipsizeMode="tail">
+                                {event?.title}
+                            </Text>
+                            <View style={{justifyContent: "space-between", paddingBottom: 15, paddingLeft: 15}}>
+                                <View style={{flexDirection: "row", alignItems: "center"}}>
+                                    <View style={styles.container}>
+                                        <Image style={styles.avatar} source={images.avatar_1}/>
+                                        <Image style={styles.avatar} source={images.avatar_2}/>
+                                        <Image style={styles.avatar} source={images.avatar_3}/>
+                                        <Image style={styles.avatar} source={images.avatar_4}/>
+                                    </View>
+                                    <Text>1280 người tham gia</Text>
+                                </View>
+                            </View>
+                            <Button
+                                title="Tham gia"
+                                style={{
+                                    paddingVertical: 8,
+                                    paddingBottom: 8,
+                                    borderWidth: 1,
+                                    borderRadius: 8
+                                }}
+                                onPress={() => (userToken ? navigation.navigate("JoinRegister", {
+                                    eventId: event.id,
+                                    organizationId: event.organization_Id,
+                                    organizationName: event.name
+                                }) : handleButtonClick)}
+                            />
                         </View>
-                    </ImageBackground>
-                    <View style={{paddingVertical: 15, paddingHorizontal: 15}}>
-                        <Text style={{fontWeight: "bold", fontSize: 16, paddingBottom: 15, textAlign: "justify"}} numberOfLines={1} ellipsizeMode="tail">
-                            {event?.title}
-                        </Text>
-                        <View style={{justifyContent: "space-between", paddingBottom: 15, paddingLeft: 15}}>
-                           <View style={{flexDirection: "row", alignItems: "center"}}>
-                               <View style={styles.container}>
-                                   <Image style={styles.avatar} source={images.avatar_1} />
-                                   <Image style={styles.avatar} source={images.avatar_2} />
-                                   <Image style={styles.avatar} source={images.avatar_3} />
-                                   <Image style={styles.avatar} source={images.avatar_4} />
-                               </View>
-                               <Text>1280 người tham gia</Text>
-                           </View>
-                        </View>
-                        <Button
-                            title="Tham gia"
-                            style={{
-                                paddingVertical: 8,
-                                paddingBottom: 8,
-                                borderWidth: 1,
-                                borderRadius: 8
-                            }}
-                            onPress={ () => (userToken ? navigation.navigate("JoinRegister") : handleButtonClick)}
-                        />
                     </View>
-                </View>
-            </TouchableOpacity>
+                </TouchableOpacity>
+
         );
     };
 
     return (
+        isLoading ? (
+            <SkeletonForEventList/>
+        ) : (
         <View style={{flex: 1, backgroundColor: COLORS.white, marginBottom: 5, paddingTop: 15, paddingBottom: 25}}>
             {showModal()}
             <ScrollView showsVerticalScrollIndicator={false}>
@@ -216,11 +245,12 @@ const EventList = () => {
                         showsHorizontalScrollIndicator={false}
                         data={eventList}
                         keyExtractor={(item, index) => index.toString()}
-                        renderItem={({ item, index }) => <Card index={index} />}
+                        renderItem={({item, index}) => <Card index={index}/>}
                     />
                 </View>
             </ScrollView>
         </View>
+        )
     );
 };
 

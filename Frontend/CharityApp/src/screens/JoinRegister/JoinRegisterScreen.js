@@ -1,27 +1,33 @@
 import {Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View,} from "react-native";
-import React, {useContext, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {SafeAreaView} from "react-native-safe-area-context";
 import * as ImagePicker from "expo-image-picker";
 import {COLORS, FONTS} from "../../constants";
 import {Ionicons, MaterialIcons} from "@expo/vector-icons";
-import {imagesDataURL} from "../../constants/data";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import {AuthContext} from "../../context/AuthContext";
+import {getUserById} from "../../services/User/{id}/GetUserById";
+import FlashMessage, {hideMessage, showMessage} from "react-native-flash-message";
+import {createJoinRequest} from "../../services/JoinRequest/CreateJoinRequest";
 
-const JoinRegisterScreen = ({ navigation }) => {
-    const [selectedImage, setSelectedImage] = useState(imagesDataURL[0]);
-    const [name, setName] = useState("Hội chữ thập đỏ Việt Nam");
-    const [phone, setPhone] = useState("02838391271");
-    const [email, setEmail] = useState("ctdpn@yahoo.com");
-    const [address, setAddress] = useState("Việt Nam");
+const JoinRegisterScreen = ({ navigation, route }) => {
+    let organizationId = route.params.organizationId;
+    let eventId = route.params.eventId;
+    let organizationName = route.params.organizationName;
+    const {userInfo, userToken} = useContext(AuthContext);
+    const [user, setUser] = useState();
+    const [selectedImage, setSelectedImage] = useState();
+    const [name, setName] = useState();
+    const [phone, setPhone] = useState();
+    const [email, setEmail] = useState();
+    const [address, setAddress] = useState();
     const [social, setSocial] = useState();
-    const [skill1, setSkill1] = useState();
-    const [skill2, setSkill2] = useState();
-    const [skill3, setSkill3] = useState();
+    const [skill1, setSkill1] = useState("");
     const [time, setTime] = useState();
-    const [description, setDescription] = useState(
-        "Hội Chữ thập đỏ Việt Nam là tổ chức xã hội nhân đạo của quần chúng do Chủ tịch Hồ Chí Minh sáng lập và là Chủ tịch danh dự đầu tiên."
-    );
+    const [description, setDescription] = useState("");
+    const [date, setDate] = useState(new Date());
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const [selectedStartDate, setSelectedStartDate] = useState();
 
     const handleImageSelection = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -35,12 +41,6 @@ const JoinRegisterScreen = ({ navigation }) => {
             setSelectedImage(result.assets[0].uri);
         }
     };
-
-    const {userInfo} = useContext(AuthContext);
-    const [date, setDate] = useState(new Date("1946-11-23"));
-    const [showDatePicker, setShowDatePicker] = useState(false);
-    const [selectedStartDate, setSelectedStartDate] = useState("23/11/1946");
-
     const showMode = () => {
         setShowDatePicker(true);
     };
@@ -80,6 +80,95 @@ const JoinRegisterScreen = ({ navigation }) => {
         );
     }
 
+    useEffect(() => {
+        const getData = async () => {
+            try {
+                const res = await getUserById(userInfo.id);
+                if (res?.data) {
+                    setUser(res.data)
+                    setPhone(res.data.phone)
+                    setAddress(res.data.address)
+                }
+            } catch (error) {
+                console.error("Error fetching data", error);
+            }
+        };
+        getData();
+    }, []);
+
+    const validate = () => {
+        if ( !skill1 || !time || !phone) {
+            showMessage({
+                message: "Nhập đầy đủ các trường bắt buộc",
+                type: "danger",
+                duration: 3000,
+                onPress: () => {
+                    hideMessage();
+                },
+            });
+            return false;
+        }
+        return true;
+    }
+
+    const clearForm = () => {
+        setPhone(null);
+        setAddress(null);
+        setSkill1(null);
+        setTime(null);
+        setDescription(null);
+    };
+
+    const handleOnClickSave = async () => {
+        if (validate()) {
+            const newJoinRequest = {
+                support_Time: "2021-09-06T10:45:20.548Z",
+                location: description,
+                skills: skill1,
+                organization_Id: organizationId
+            };
+            console.log(newJoinRequest)
+            await fetchData(newJoinRequest);
+        }
+    }
+
+    // lưu thông tin
+    const fetchData = async (newJoinRequest) => {
+        try {
+            const res = await createJoinRequest(newJoinRequest, userToken);
+            console.log(res)
+           if (res) {
+                showMessage({
+                    message: "Gửi thành công",
+                    type: "success",
+                    duration: 2000,
+                    onPress: () => {
+                        hideMessage();
+                    },
+                });
+                clearForm();
+            } else {
+                showMessage({
+                    message: "Đã xảy ra lỗi khi gửi yêu cầu",
+                    type: "danger",
+                    duration: 3000,
+                    onPress: () => {
+                        hideMessage();
+                    },
+                });
+            }
+        } catch (error) {
+            showMessage({
+                message: "Đã xảy ra lỗi khi gửi yêu cầu",
+                type: "danger",
+                duration: 3000,
+                onPress: () => {
+                    hideMessage();
+                },
+            });
+        }
+    }
+
     return (
         <SafeAreaView
             style={{
@@ -110,6 +199,7 @@ const JoinRegisterScreen = ({ navigation }) => {
                 </Text>
             </View>
 
+            <FlashMessage position="top" style={{marginHorizontal: 20, marginTop: 30, borderRadius: 8}}/>
             <ScrollView
                 showsHorizontalScrollIndicator={false}
                 showsVerticalScrollIndicator={false}
@@ -117,10 +207,9 @@ const JoinRegisterScreen = ({ navigation }) => {
                 <View
                     style={{
                         alignItems: "center",
-                        marginVertical: 22,
+                        marginVertical: 10,
                     }}
                 >
-                    <TouchableOpacity onPress={handleImageSelection}>
                         <Image
                             source={{ uri: userInfo.image }}
                             style={{
@@ -131,25 +220,9 @@ const JoinRegisterScreen = ({ navigation }) => {
                                 borderColor: COLORS.primary,
                             }}
                         />
-
-                        <View
-                            style={{
-                                position: "absolute",
-                                bottom: 0,
-                                right: 10,
-                                zIndex: 9999,
-                            }}
-                        >
-                            <MaterialIcons
-                                name="photo-camera"
-                                size={32}
-                                color={COLORS.primary}
-                            />
-                        </View>
-                    </TouchableOpacity>
                 </View>
 
-                <View style={{ paddingVertical: 30 }}>
+                <View style={{ paddingVertical: 20 }}>
                     <View
                         style={{
                             flexDirection: "column",
@@ -181,7 +254,7 @@ const JoinRegisterScreen = ({ navigation }) => {
                         <View style={styles.containerTextInput}>
                             <TextInput
                                 style={{ fontSize: 16 }}
-                                value={email}
+                                value={userInfo.email}
                                 // onChangeText={(value) => setEmail(value)}
                                 editable={false}
                             />
@@ -228,20 +301,20 @@ const JoinRegisterScreen = ({ navigation }) => {
                         </View>
                     </View>
 
-                    <View
-                        style={{
-                            flexDirection: "column",
-                            marginBottom: 6,
-                        }}
-                    >
-                        <Text style={{ ...FONTS.h5 }}>Ngày sinh</Text>
-                        <TouchableOpacity
-                            onPress={showMode}
-                            style={styles.containerTextInput}
-                        >
-                            <Text>{selectedStartDate}</Text>
-                        </TouchableOpacity>
-                    </View>
+                    {/*<View*/}
+                    {/*    style={{*/}
+                    {/*        flexDirection: "column",*/}
+                    {/*        marginBottom: 6,*/}
+                    {/*    }}*/}
+                    {/*>*/}
+                    {/*    <Text style={{ ...FONTS.h5 }}>Ngày sinh</Text>*/}
+                    {/*    <TouchableOpacity*/}
+                    {/*        onPress={showMode}*/}
+                    {/*        style={styles.containerTextInput}*/}
+                    {/*    >*/}
+                    {/*        <Text>{selectedStartDate}</Text>*/}
+                    {/*    </TouchableOpacity>*/}
+                    {/*</View>*/}
 
                     <View
                         style={{
@@ -249,51 +322,18 @@ const JoinRegisterScreen = ({ navigation }) => {
                             marginBottom: 6,
                         }}
                     >
-                        <Text style={{ ...FONTS.h5 }}>Mạng xã hội</Text>
-                        <View style={styles.containerTextInput}>
+                        <Text style={{ ...FONTS.h5 }}>Kỹ năng <Text style={{ color: "red" }}>*</Text></Text>
+                        <View style={[styles.containerTextInput, { height: 100 }]}>
                             <TextInput
                                 style={{ fontSize: 16 }}
-                                value={social}
-                                onChangeText={(value) => setSocial(value)}
-                                editable={true}
-                            />
-                        </View>
-                    </View>
-
-                    <View
-                        style={{
-                            flexDirection: "column",
-                            marginBottom: 6,
-                        }}
-                    >
-                        <Text style={{ ...FONTS.h5 }}>Kỹ năng</Text>
-                        <View style={styles.containerTextInput}>
-                            <TextInput
-                                style={{ fontSize: 16 }}
-                                placeholder={"Kỹ năng 1"}
+                                placeholder={"Nhập nội dung"}
+                                multiline
+                                numberOfLines={8}
                                 value={skill1}
                                 onChangeText={(value) => setSkill1(value)}
                                 editable={true}
                             />
                         </View>
-                        <View style={styles.containerTextInput}>
-                            <TextInput
-                                style={{ fontSize: 16 }}
-                                placeholder={"Kỹ năng 2"}
-                                value={skill2}
-                                onChangeText={(value) => setSkill2(value)}
-                                editable={true}
-                            />
-                        </View>
-                        <View style={styles.containerTextInput}>
-                            <TextInput
-                                style={{ fontSize: 16 }}
-                                placeholder={"Kỹ năng 3"}
-                                value={skill3}
-                                onChangeText={(value) => setSkill3(value)}
-                                editable={true}
-                            />
-                        </View>
                     </View>
 
                     <View
@@ -302,18 +342,36 @@ const JoinRegisterScreen = ({ navigation }) => {
                             marginBottom: 6,
                         }}
                     >
-                        <Text style={{ ...FONTS.h5 }}>Thời gian rảnh trong tuần</Text>
+                        <Text style={{ ...FONTS.h5 }}>Thời gian rảnh trong tuần <Text style={{ color: "red" }}>*</Text></Text>
                         <View style={[styles.containerTextInput, { height: 100 }]}>
                             <TextInput
                                 style={{ fontSize: 16 }}
                                 multiline
                                 numberOfLines={8}
+                                placeholder={"Nhập nội dung"}
                                 value={time}
                                 onChangeText={(value) => setTime(value)}
                                 editable={true}
                             />
                         </View>
                     </View>
+
+                    {/*<View*/}
+                    {/*    style={{*/}
+                    {/*        flexDirection: "column",*/}
+                    {/*        marginBottom: 6,*/}
+                    {/*    }}*/}
+                    {/*>*/}
+                    {/*    <Text style={{ ...FONTS.h5 }}>Mạng xã hội</Text>*/}
+                    {/*    <View style={styles.containerTextInput}>*/}
+                    {/*        <TextInput*/}
+                    {/*            style={{ fontSize: 16 }}*/}
+                    {/*            value={social}*/}
+                    {/*            onChangeText={(value) => setSocial(value)}*/}
+                    {/*            editable={true}*/}
+                    {/*        />*/}
+                    {/*    </View>*/}
+                    {/*</View>*/}
 
                     <View
                         style={{
@@ -325,6 +383,7 @@ const JoinRegisterScreen = ({ navigation }) => {
                         <View style={[styles.containerTextInput, { height: 200 }]}>
                             <TextInput
                                 style={{ fontSize: 16 }}
+                                placeholder={"Nhập nội dung"}
                                 multiline
                                 numberOfLines={8}
                                 value={description}
@@ -332,6 +391,20 @@ const JoinRegisterScreen = ({ navigation }) => {
                                 editable={true}
                             />
                         </View>
+                    </View>
+
+                    <View
+                        style={{
+                            marginTop: 16,
+                        }}
+                    >
+                       <View>
+                           <Text style={{...FONTS.h5, color: COLORS.secondary, textAlign: "justify",}}>
+                               Tôi mong muốn được tham gia vào tổ chức</Text>
+                           <Text style={{fontWeight: "bold", color: COLORS.primary, fontSize: 16}}>{organizationName}</Text>
+                       </View>
+                        <Text style={{...FONTS.h5, color: COLORS.secondary, textAlign: "justify",}}>
+                            Tôi xin cam kết tuân thủ và thực hiện đúng theo nội quy, quy định của tổ chức!</Text>
                     </View>
                 </View>
 
@@ -345,6 +418,7 @@ const JoinRegisterScreen = ({ navigation }) => {
                         alignItems: "center",
                         justifyContent: "center",
                     }}
+                    onPress={() => handleOnClickSave()}
                 >
                     <Text
                         style={{
@@ -374,6 +448,6 @@ const styles = StyleSheet.create({
         marginVertical: 4,
         marginBottom: 12,
         justifyContent: "center",
-        paddingLeft: 8,
+        paddingHorizontal: 8,
     },
 });

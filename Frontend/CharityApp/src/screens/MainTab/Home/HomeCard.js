@@ -15,6 +15,7 @@ import ModalPop from "../../../components/Modal/PopModal";
 import {useFocusEffect} from "@react-navigation/native";
 import getAvatar from "../../../../firebase/getAvatar";
 import {AuthContext} from "../../../context/AuthContext";
+import {Loading} from "../../../components/common/Loading";
 
 const HomeStack = createStackNavigator();
 

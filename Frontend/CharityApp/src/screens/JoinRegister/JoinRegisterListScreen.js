@@ -1,72 +1,60 @@
 import {Image, ScrollView, StyleSheet, Text, TouchableOpacity, View,} from "react-native";
-import React from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {SafeAreaView} from "react-native-safe-area-context";
 import {COLORS} from "../../constants";
 import {Ionicons, MaterialIcons} from "@expo/vector-icons";
+import {getAllForHelpRequestByUserId} from "../../services/ForHelpRequest/user/{userId}/GetAllForHelpRequestByUserId";
+import {getOrganizationById} from "../../services/CharityOrganization/{id}/GetOrganizationById";
+import {getUserById} from "../../services/User/{id}/GetUserById";
+import {getAllJoinRequestByUserId} from "../../services/JoinRequest/user/{userId}/GetAllJoinRequestByUserId";
+import {AuthContext} from "../../context/AuthContext";
 
 const JoinRegisterListScreen = ({navigation}) => {
-    const eventList = [
-        {
-            id: 1,
-            name: 'Chăm sóc sức khỏe cộng đồng',
-            image: 'https://redcross.org.vn/upload/18.jpg?v=1.0.2',
-            status: 'Đã kết thúc',
-        },
-        {
-            id: 2,
-            name: 'Diễn tập cứu hộ cứu nạn',
-            image: 'https://redcross.org.vn/upload/cham-soc-suc-khoe-2.jpg?v=1.0.2',
-            status: 'Đã kết thúc',
-        },
-        {
-            id: 3,
-            name: 'Hiến máu nhân đạo',
-            image: 'https://redcross.org.vn/upload/cham-soc-suc-khoe.jpg?v=1.0.2',
-            status: 'Đang diễn ra',
-        },
-        {
-            id: 4,
-            name: 'Mái ấm cho em',
-            image: 'https://redcross.org.vn/upload/phong-ngua-ung-pho-tham-hoa.jpg?v=1.0.2',
-            status: 'Đang diễn ra',
-        },
-        {
-            id: 5,
-            name: 'Chăm sóc sức khỏe cộng đồng',
-            image: 'https://redcross.org.vn/upload/18.jpg?v=1.0.2',
-            status: 'Đã kết thúc',
-        },
-        {
-            id: 6,
-            name: 'Diễn tập cứu hộ cứu nạn',
-            image: 'https://redcross.org.vn/upload/cham-soc-suc-khoe-2.jpg?v=1.0.2',
-            status: 'Đã kết thúc',
-        },
-        {
-            id: 7,
-            name: 'Hiến máu nhân đạo',
-            image: 'https://redcross.org.vn/upload/cham-soc-suc-khoe.jpg?v=1.0.2',
-            status: 'Đang diễn ra',
-        },
-        {
-            id: 8,
-            name: 'Mái ấm cho em',
-            image: 'https://redcross.org.vn/upload/phong-ngua-ung-pho-tham-hoa.jpg?v=1.0.2',
-            status: 'Đang diễn ra',
-        },
-    ];
+
+    const {userInfo} = useContext(AuthContext);
+    const [joinRequestList, setJoinRequestList] = useState([]);
+
+    useEffect(() => {
+        const getData = async () => {
+            try {
+                const res = await getAllJoinRequestByUserId(userInfo.id);
+                if (res?.data) {
+                    const updatedList = await Promise.all(
+                        res.data.map(async (item) => {
+                            try {
+                                const organization = await getOrganizationById(item.organization_Id);
+                                if (organization) {
+                                    const userResponse = await getUserById(organization.data.user_Id)
+                                    const { image, name } = userResponse.data;
+                                    return { ...item, name, image };
+                                }
+                            } catch (error) {
+                                console.error('Error fetching user data', error);
+                                return item;
+                            }
+                        })
+                    );
+                    setJoinRequestList(updatedList)
+                }
+            } catch (error) {
+                console.error("Error fetching data", error);
+            }
+        };
+        getData();
+    }, []);
+
 
     const renderEventItem = ({ item }) => (
         <TouchableOpacity
             style={styles.eventItem}
-            onPress={() => navigation.navigate('JoinRegisterDetail', { eventId: item.id })}
+            onPress={() => navigation.navigate('JoinRegisterDetail', { organizationName: item.name, joinRegisterId: item.id })}
         >
             <Image source={{ uri: item.image }} style={styles.eventImage} />
             <View style={styles.eventDetails}>
                 <Text style={styles.eventName}>{item.name}</Text>
-                <Text style={styles.eventStatus}>{item.status}</Text>
+                <Text style={styles.eventStatus}>{item.status === 1 ? "Đã duyệt" : "Đang chờ duyệt"}</Text>
             </View>
-            <TouchableOpacity onPress={() => handleMoreOptions(item.id)}>
+            <TouchableOpacity onPress={() => {}}>
                 <MaterialIcons name="more-vert" size={24} color={COLORS.primary} />
             </TouchableOpacity>
         </TouchableOpacity>
@@ -107,7 +95,7 @@ const JoinRegisterListScreen = ({navigation}) => {
                 showsVerticalScrollIndicator={false}
                 style={{marginHorizontal: 20}}
             >
-                {eventList.map((item) => (
+                {joinRequestList.map((item) => (
                     <View key={item.id}>
                         {renderEventItem({ item })}
                     </View>

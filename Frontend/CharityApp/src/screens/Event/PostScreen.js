@@ -10,6 +10,10 @@ import {AuthContext} from "../../context/AuthContext";
 import {createEvent} from "../../services/Event/CreateEvent";
 import FlashMessage, {hideMessage, showMessage} from "react-native-flash-message";
 import getAvatar from "../../../firebase/getAvatar";
+import * as FileSystem from "expo-file-system";
+import firebase from "firebase/compat";
+import {createForHelpRequest} from "../../services/ForHelpRequest/CreateForHelpRequest";
+import {sendPushNotification} from "../../../firebase/sendPushNotification";
 
 const {height} = Dimensions.get('screen');
 
@@ -39,21 +43,6 @@ const PostScreen = () => {
     const [avatar, setAvatar] = useState();
     const [selectedFiles, setSelectedFiles] = useState([]);
 
-    useEffect(() => {
-        const fetchUserProfileImage = async () => {
-            try {
-                const imageUrl = await getAvatar(userInfo.id);
-
-                if (imageUrl) {
-                    setAvatar(imageUrl);
-                }
-            } catch (error) {
-                console.error('Lỗi khi lấy ảnh từ Realtime Database', error);
-            }
-        };
-        fetchUserProfileImage();
-    }, [userInfo.id]);
-
     const pickFiles = async () => {
         try {
             const result = await ImagePicker.launchImageLibraryAsync({
@@ -78,8 +67,34 @@ const PostScreen = () => {
         setSelectedFiles(newFiles);
     };
 
+    // const  expoPushToken = "ExponentPushToken[xhyOSsIm-6Pp5UBGnJg_dS]"
+    const  expoPushToken = "ExponentPushToken[7mhEAvLS-b5MhVKE-U_bWt]"
+
+    const message = {
+        to: expoPushToken,
+        sound: 'default',
+        title: 'Original Title',
+        body: 'And here is the body!',
+        data: { someData: 'goes here' },
+    };
+
+    useEffect(() => {
+        const fetchUserProfileImage = async () => {
+            try {
+                const imageUrl = await getAvatar(userInfo.id);
+
+                if (imageUrl) {
+                    setAvatar(imageUrl);
+                }
+            } catch (error) {
+                console.error('Lỗi khi lấy ảnh từ Realtime Database', error);
+            }
+        };
+        fetchUserProfileImage();
+    }, [userInfo.id]);
+
     const validate = () => {
-        if( !selectedImages.length || !content) {
+        if( !selectedFiles.length || !content) {
             showMessage({
                 message: "Nhập đầy đủ các trường bắt buộc",
                 type: "danger",
@@ -94,7 +109,7 @@ const PostScreen = () => {
     }
 
     const clearForm = () => {
-        setSelectedImages([]);
+        setSelectedFiles([]);
         setContent("")
     };
 
@@ -112,30 +127,71 @@ const PostScreen = () => {
                 type: 0
             };
 
-            try {
-                const res = await createEvent(newPost);
-                console.log(res.status)
-                if(res) {
-                    showMessage({
-                        message: "Gửi thành công",
-                        type: "success",
-                        duration: 2000,
-                        onPress: () => {
-                            hideMessage();
-                        },
-                    });
-                    clearForm();
-                } else {
-                    showMessage({
-                        message: "Đã xảy ra lỗi khi gửi yêu cầu",
-                        type: "danger",
-                        duration: 3000,
-                        onPress: () => {
-                            hideMessage();
-                        },
-                    });
-                }
-            } catch (error) {
+            let eventId = await fetchData(newPost);
+            await uploadImage(eventId);
+            await sendPushNotification(message);
+        }
+    }
+
+    // upload ảnh tới storage
+    const uploadImage = async (forHelpRequestId) => {
+        try {
+            selectedFiles.map(async (selectedFile) => {
+                console.log('ok');
+                const {uri} = await FileSystem.getInfoAsync(selectedFile);
+
+                const blob = await new Promise((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.onload = () => {
+                        resolve(xhr.response);
+                    };
+                    xhr.onerror = (e) => {
+                        reject(new TypeError('Network request failed'));
+                    };
+                    xhr.responseType = 'blob';
+                    xhr.open('GET', uri, true);
+                    xhr.send(null);
+                });
+
+                const filename = selectedFile.substring(selectedFile.lastIndexOf('/') + 1);
+                const ref = firebase.storage().ref(`files/${filename}`);
+                await ref.put(blob);
+
+                const imageURL = await ref.getDownloadURL();
+                await saveImageUrlToDatabase(imageURL, forHelpRequestId);
+            })
+        } catch (e) {
+            console.log("err" + e);
+        }
+    }
+
+    // lưu ảnh vào database
+    const saveImageUrlToDatabase = async (imageURL, eventId) => {
+        try {
+            const databaseRef = firebase.database().ref(`${userInfo.id}/event/${eventId}`);
+            await databaseRef.push().set(imageURL);
+        } catch (error) {
+            console.error("Error saving image URL to database", error);
+        }
+    };
+
+    // lưu thông tin
+    const fetchData = async (newForHelpRequest) => {
+        try {
+            const res = await createEvent(newForHelpRequest);
+            const forHelpRequestId = res.data
+            if (res) {
+                showMessage({
+                    message: "Gửi thành công",
+                    type: "success",
+                    duration: 2000,
+                    onPress: () => {
+                        hideMessage();
+                    },
+                });
+                clearForm();
+                return forHelpRequestId;
+            } else {
                 showMessage({
                     message: "Đã xảy ra lỗi khi gửi yêu cầu",
                     type: "danger",
@@ -145,6 +201,15 @@ const PostScreen = () => {
                     },
                 });
             }
+        } catch (error) {
+            showMessage({
+                message: "Đã xảy ra lỗi khi gửi yêu cầu",
+                type: "danger",
+                duration: 3000,
+                onPress: () => {
+                    hideMessage();
+                },
+            });
         }
     }
 
@@ -186,7 +251,7 @@ const PostScreen = () => {
                     height: 60,
                 }}
             >
-                <FlashMessage position="top" />
+                <FlashMessage position="top" style={{borderRadius: 8, marginTop: 10}}/>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
                     <Ionicons name="arrow-back" size={24} color={COLORS.black}/>
                 </TouchableOpacity>

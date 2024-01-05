@@ -24,14 +24,14 @@ export const AuthProvider = ({children}) => {
                 let userInfo_1 = JSON.stringify(res.data.user);
                 let charityOrganization_1 = JSON.stringify( res.data.charityOrganization);
 
-                setUserToken(res.data.token);
-                setUserInfo(res.data.user);
-                setCharityOrganization(res.data.charityOrganization);
+                // setUserToken(res.data.token);
+                // setUserInfo(res.data.user);
+                // setCharityOrganization(res.data.charityOrganization);
 
                 await AsyncStorage.setItem('userToken', userToken_1);
                 await AsyncStorage.setItem('userInfo', userInfo_1);
                 await AsyncStorage.setItem('charityOrganization', charityOrganization_1);
-                // await isLoggedIn();
+                await isLoggedIn();
 
                 // saveMessageToken(userId).catch((error) => {
                 //     console.error('Error checking login status:', error);

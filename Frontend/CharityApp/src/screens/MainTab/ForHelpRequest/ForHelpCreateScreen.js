@@ -57,6 +57,12 @@ const ForHelpCreate = ({navigation}) => {
         }
     };
 
+    const removeFile = (index) => {
+        const newFiles = [...selectedFiles];
+        newFiles.splice(index, 1);
+        setSelectedFiles(newFiles);
+    };
+
     // const  expoPushToken = "ExponentPushToken[xhyOSsIm-6Pp5UBGnJg_dS]"
     const  expoPushToken = "ExponentPushToken[7mhEAvLS-b5MhVKE-U_bWt]"
 
@@ -66,12 +72,6 @@ const ForHelpCreate = ({navigation}) => {
         title: 'Original Title',
         body: 'And here is the body!',
         data: { someData: 'goes here' },
-    };
-
-    const removeFile = (index) => {
-        const newFiles = [...selectedFiles];
-        newFiles.splice(index, 1);
-        setSelectedFiles(newFiles);
     };
 
     useEffect(() => {
@@ -186,7 +186,7 @@ const ForHelpCreate = ({navigation}) => {
     const fetchData = async (newForHelpRequest) => {
         try {
             const res = await createForHelpRequest(newForHelpRequest);
-            const random = Math.floor(Math.random() * 1000000000) + 1; // cần fix lại sau, hiện đang coi là id yêu cầu trợ giúp
+            const forHelpRequestId = res.data
             if (res) {
                 showMessage({
                     message: "Gửi thành công",
@@ -197,7 +197,7 @@ const ForHelpCreate = ({navigation}) => {
                     },
                 });
                 clearForm();
-                return random;
+                return forHelpRequestId;
             } else {
                 showMessage({
                     message: "Đã xảy ra lỗi khi gửi yêu cầu",
@@ -228,7 +228,7 @@ const ForHelpCreate = ({navigation}) => {
                 paddingHorizontal: 20,
             }}
         >
-            <FlashMessage position="top" style={{marginHorizontal: 20}}/>
+            <FlashMessage position="top" style={{marginHorizontal: 20, borderRadius: 8}}/>
             <ScrollView
                 showsHorizontalScrollIndicator={false}
                 showsVerticalScrollIndicator={false}

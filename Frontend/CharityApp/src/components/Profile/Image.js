@@ -52,7 +52,7 @@ const Images = () => {
     };
 
     return (
-        <View style={{ flex: 1, backgroundColor: COLORS.white, marginBottom: 5, paddingTop: 25, paddingBottom: 15 }}>
+        <View style={{ flex: 1, backgroundColor: COLORS.white, marginBottom: 5, paddingTop: 12, paddingBottom: 15 }}>
             <ScrollView showsVerticalScrollIndicator={false}>
                 <View style={styles.sectionTitle}>
                     <Text style={{ fontSize: 18, fontWeight: "500" }}>Ảnh/Video</Text>
