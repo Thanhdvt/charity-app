@@ -1,26 +1,28 @@
 import {Image, Linking, Pressable, Text, TextInput, TouchableOpacity, View, StyleSheet} from 'react-native'
 import React, {useState} from 'react'
 import {SafeAreaView} from "react-native-safe-area-context";
-import {COLORS, icons} from '../../../constants';
-import {AntDesign, EvilIcons, Ionicons} from "@expo/vector-icons";
+import {COLORS, FONTS, icons} from '../../../constants';
+import {AntDesign, EvilIcons, Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
 import Checkbox from "expo-checkbox"
 import Button from '../../../components/common/Button';
 import {register} from "../../../services/User/CreateUser";
 import CustomModal from "../../../components/Modal/MessageModal";
 import Feather from "react-native-vector-icons/Feather";
+import MaterialCommunityIcon from "react-native-paper/src/components/MaterialCommunityIcon";
 
 const SignupScreen = ({ navigation }) => {
     const [modalVisible, setModalVisible] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
     const [isPasswordShown, setIsPasswordShown] = useState(false);
     const [name, setName] = useState('');
+    const [account, setAccount] = useState('')
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
-    const validate = (name, email, phone, password, confirmPassword) => {
-        if (!name || !email || !phone || !password || !confirmPassword) {
+    const validate = (name, account, email, phone, password, confirmPassword) => {
+        if (!name || !account || !email || !phone || !password || !confirmPassword) {
             return { success: false, message: "Vui lòng nhập đầy đủ thông tin" };
         }
         if (password !== confirmPassword) {
@@ -33,14 +35,14 @@ const SignupScreen = ({ navigation }) => {
     };
 
     const handleRegisterPress = () => {
-        const validation = validate(name, email, phone, password, confirmPassword);
+        const validation = validate(name, account, email, phone, password, confirmPassword);
 
         if (!validation.success) {
             setModalMessage(validation.message);
             setModalVisible(true);
             return;
         }
-        register(name, email, phone, password);
+        register(name, account, email, phone, password);
         navigation.navigate('Login');
     };
 
@@ -57,7 +59,7 @@ const SignupScreen = ({ navigation }) => {
         <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
             <View style={{ flex: 1, marginHorizontal: 22, justifyContent: "center", marginVertical: 10 }}>
                 <CustomModal isVisible={modalVisible} onClose={closeModal} message={modalMessage} />
-                <View style={{ marginBottom: 50 }}>
+                <View style={{ marginBottom: 30 }}>
                     <Text style={{
                         fontSize: 22,
                         fontWeight: 'bold',
@@ -85,6 +87,22 @@ const SignupScreen = ({ navigation }) => {
                             }}
                             value={name}
                             onChangeText={text => setName(text)}
+                        />
+                    </View>
+                </View>
+
+                <View style={{ marginBottom: 12, marginVertical: 10 }}>
+                    <View style={styles.containerText}>
+                        <Ionicons name="person-circle-outline" size={30} color='#A9A9A9' />
+                        <TextInput
+                            placeholder='Nhập tên đăng nhập'
+                            placeholderTextColor={COLORS.sliver}
+                            style={{
+                                width: "100%",
+                                paddingLeft: 10
+                            }}
+                            value={account}
+                            onChangeText={text => setAccount(text)}
                         />
                     </View>
                 </View>
@@ -217,15 +235,31 @@ const SignupScreen = ({ navigation }) => {
                     </View>
                 </View>
 
-                <Button
-                    title="Đăng ký"
-                    filled
-                    style={{
-                        marginTop: 20,
-                        marginBottom: 4,
-                    }}
-                    onPress = {() => handleRegisterPress()}
-                />
+                <View>
+                    <TouchableOpacity
+                        style={{
+                            backgroundColor: COLORS.primary,
+                            height: 44,
+                            borderRadius: 10,
+                            marginTop: 10,
+                            marginBottom: 15,
+                            alignItems: "center",
+                            justifyContent: "center",
+                        }}
+                        activeOpacity={0.8}
+                        onPress={() => handleRegisterPress()}
+                    >
+
+                        <Text
+                            style={{
+                                ...FONTS.body3,
+                                color: COLORS.white,
+                            }}
+                        >
+                            Đăng ký
+                        </Text>
+                    </TouchableOpacity>
+                </View>
 
                 <View>
                     <View style={{

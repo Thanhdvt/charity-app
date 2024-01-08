@@ -46,7 +46,7 @@ export const AuthProvider = ({children}) => {
             return res;
         } catch (e) {
             console.log(`Login error` + e.message);
-            errorCallback && errorCallback(`Đăng nhập thất bại: ${e.response.data}`);
+            errorCallback && errorCallback(`${e.response.data}. Vui lòng kiểm tra lại.`);
         } finally {
             setIsLoading(false);
         }

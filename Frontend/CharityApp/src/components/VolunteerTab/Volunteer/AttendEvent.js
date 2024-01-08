@@ -1,48 +1,44 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {MaterialIcons} from "@expo/vector-icons";
 import {COLORS} from "../../../constants";
 import {useNavigation} from "@react-navigation/native";
+import {getAllEvent} from "../../../services/Event/GetAllEvent";
 
-const AttendEvent = () => {
-  const eventList = [
-    {
-      id: 1,
-      name: 'Chăm sóc sức khỏe cộng đồng',
-      image: 'https://redcross.org.vn/upload/18.jpg?v=1.0.2',
-      status: 'Đã kết thúc',
-    },
-    {
-      id: 2,
-      name: 'Diễn tập cứu hộ cứu nạn',
-      image: 'https://redcross.org.vn/upload/cham-soc-suc-khoe-2.jpg?v=1.0.2',
-      status: 'Đã kết thúc',
-    },
-    {
-        id: 3,
-        name: 'Hiến máu nhân đạo',
-        image: 'https://redcross.org.vn/upload/cham-soc-suc-khoe.jpg?v=1.0.2',
-        status: 'Đang diễn ra',
-      },
-      {
-        id: 4,
-        name: 'Mái ấm cho em',
-        image: 'https://redcross.org.vn/upload/phong-ngua-ung-pho-tham-hoa.jpg?v=1.0.2',
-        status: 'Đang diễn ra',
-      },
-  ];
+const AttendEvent = ({volunteerId, userId}) => {
+  const event = {
+    id: 1,
+    name: 'Chăm sóc sức khỏe cộng đồng',
+    image: 'https://redcross.org.vn/upload/18.jpg?v=1.0.2',
+    status: 'Đã kết thúc',
+  };
 
   const navigation = useNavigation();
+  const [eventList, setEventList] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await getAllEvent();
+        setEventList(res.data);
+      } catch (error) {
+        console.error('Error fetching data', error);
+        setEventList([]);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const renderEventItem = ({ item }) => (
     <TouchableOpacity
       style={styles.eventItem}
-      onPress={() => navigation.navigate('EventDetail', { eventId: item.id })}
+      onPress={() => navigation.navigate('EventDetail',  { eventId: item.id, organizationId: item.organization_Id })}
     >
-      <Image source={{ uri: item.image }} style={styles.eventImage} />
+      <Image source={{ uri: event.image }} style={styles.eventImage} />
       <View style={styles.eventDetails}>
-        <Text style={styles.eventName}>{item.name}</Text>
-        <Text style={styles.eventStatus}>{item.status}</Text>
+        <Text style={styles.eventName}>{item.title}</Text>
+        <Text style={styles.eventStatus}>{item.type === 0 ? "Đang diễn ra" : "Đã kết thúc" }</Text>
       </View>
       <TouchableOpacity onPress={() => handleMoreOptions(item.id)}>
         <MaterialIcons name="more-vert" size={24} color={COLORS.primary} />

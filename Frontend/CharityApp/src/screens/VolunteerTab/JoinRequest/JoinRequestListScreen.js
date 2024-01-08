@@ -1,91 +1,127 @@
-import React, {useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {Dimensions, FlatList, Image, StyleSheet, Text, TouchableOpacity, View,} from "react-native";
 import {COLORS} from "../../../constants";
+import {getVolunteerByOrganizationId} from "../../../services/Volunteer/organization/GetVolunteerByOrganizationId";
+import {getUserById} from "../../../services/User/{id}/GetUserById";
+import {
+  getJoinRequestByOrganizationId
+} from "../../../services/JoinRequest/organization/GetJoinRequestByOrganizationId";
+import {AuthContext} from "../../../context/AuthContext";
+import {createVolunteer} from "../../../services/Volunteer/CreateVolunteer";
+import {getJoinRequestById} from "../../../services/JoinRequest/{id}/GetJoinRequestById";
+import {createApprove} from "../../../services/JoinRequest/approve/{id}";
+import {useFocusEffect} from "@react-navigation/native";
 
 const {width} = Dimensions.get('screen');
 
 const JoinRequestListScreen = ({ navigation }) => {
-  const [requestData, setRequestData] = useState([
-    {
-      id: "1",
-      name: "Phan Nhật Minh",
-      image: {
-        uri: "https://toigingiuvedep.vn/wp-content/uploads/2021/05/anh-avatar-nam-buon-1.jpg",
-      },
-    },
-    {
-      id: "2",
-      name: "Nguyễn Thị Phương Thảo",
-      image: {
-        uri: "https://www.vietnamfineart.com.vn/wp-content/uploads/2023/03/1675684301_441_1001-anh-avatar-dep-cho-con-gai-ngau-buon-chat-1.jpg",
-      },
-    },
-    {
-      id: "3",
-      name: "Lý Nhã Nam Phong",
-      image: {
-        uri: "https://toigingiuvedep.vn/wp-content/uploads/2021/05/avatar-nam-ca-tinh.jpg",
-      },
-    },
-    {
-      id: "4",
-      name: "Vũ Như Diệp Linh",
-      image: {
-        uri: "https://www.vietnamfineart.com.vn/wp-content/uploads/2023/03/avatar-anime-cho-nu-dep-2.jpg",
-      },
-    },
-    {
-      id: "5",
-      name: "Đỗ Khắc Cường",
-      image: {
-        uri: "https://kynguyenlamdep.com/wp-content/uploads/2022/08/anime-trai-dep-cuoi-de-thuong.jpg",
-      },
-    },
-    {
-      id: "6",
-      name: "Trịnh Kim Khả Ngân",
-      image: {
-        uri: "https://i.pinimg.com/736x/c9/67/79/c9677971022e91c54f984b4f9d896e3d.jpg",
-      },
-    },
-    {
-      id: "7",
-      name: "Khổng Minh Tuệ",
-      image: {
-        uri: "https://taytou.com/wp-content/uploads/2022/06/Anh-Avatar-cute-Nam-NGAU-my-nam-ao-hoodie-deo-khau-trang-trang.jpg",
-      },
-    },
-    {
-      id: "8",
-      name: "Trương Thị Mỹ Lan",
-      image: {
-        uri: "https://i.pinimg.com/1200x/6f/1e/65/6f1e652d717da2b043b7202cf274676d.jpg",
-      },
-    },
-  ]);
+  // const [requestData, setRequestData] = useState([
+  //   {
+  //     id: "1",
+  //     name: "Phan Nhật Minh",
+  //     image: {
+  //       uri: "https://toigingiuvedep.vn/wp-content/uploads/2021/05/anh-avatar-nam-buon-1.jpg",
+  //     },
+  //   },
+  // ]);
+  const {charityOrganization, userToken} = useContext(AuthContext);
+  const [requestData, setRequestData] = useState([]);
 
-  const handleConfirm = (id) => {
-    const updatedData = requestData.filter((item) => item.id !== id);
-    setRequestData(updatedData);
-  };
+    useFocusEffect(
+        React.useCallback(() => {
+            const fetchData = async () => {
+                try {
+                    const res = await getJoinRequestByOrganizationId(charityOrganization.id);
+                    const updatedList = await Promise.all(
+                        res.data.map(async (item) => {
+                            try {
+                                const userResponse = await getUserById(item.user_Id);
+                                const { image, name } = userResponse.data;
+                                return { ...item, image, name };
+                            } catch (error) {
+                                console.error('Error fetching user data', error);
+                                return item;
+                            }
+                        })
+                    );
+                    setRequestData(updatedList);
+                } catch (error) {
+                    console.error('Error fetching join request data', error);
+                    setRequestData([]);
+                }
+            };
 
-  const handleDelete = (id) => {
-    const updatedData = requestData.filter((item) => item.id !== id);
-    setRequestData(updatedData);
-  };
+            fetchData();
+        }, [charityOrganization.id]) // Ensure to include any dependencies in the dependency array
+    );
 
-  const handleRequestPress = (id) => {
-    console.log(`Request with ID ${id} is pressed.`);
-    navigation.navigate("JoinRequestScreen");
+  const addVolunteer = async (id) => {
+      await createApprove(id);
+  }
+
+    const handleConfirm = (id) => {
+        const updatedData = requestData.filter((item) => item.id !== id);
+        setRequestData(updatedData);
+        addVolunteer(id);
+    };
+
+    const handleDelete = (id) => {
+        const updatedData = requestData.filter((item) => item.id !== id);
+        setRequestData(updatedData);
+    };
+
+    const handleRequestPress = (userId, id) => {
+        console.log(`Request with ID ${id} is pressed.`);
+        navigation.navigate("JoinRequestScreen", {userId: userId, id: id});
+    };
+
+  const RequestItem = ({ userId, id, name, image, onPress, onConfirm, onDelete }) => {
+    return (
+        <TouchableOpacity onPress={() => onPress(userId, id)}>
+          <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                paddingHorizontal: 20,
+                paddingVertical: 8,
+              }}
+          >
+            <Image
+                source={{uri: image}}
+                style={{ width: 60, height: 60, borderRadius: 30, marginRight: 12 }}
+            />
+            <View>
+              <View style={{ paddingBottom: 8 }}>
+                <Text style={{ flex: 1, fontSize: 16, fontWeight: "500" }}>
+                  {name}
+                </Text>
+              </View>
+              <View style={{ flexDirection: "row", }}>
+                <TouchableOpacity
+                    style={styles.confirmButton}
+                    onPress={() => onConfirm(id)}
+                >
+                  <Text style={styles.buttonText}>Xác nhận</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={styles.deleteButton}
+                    onPress={() => onDelete(id)}
+                >
+                  <Text style={styles.buttonText}>Xóa</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </TouchableOpacity>
+    );
   };
 
   return (
-    <>
+    <View style={{paddingBottom: 47}}>
       <View
         style={{
-          paddingHorizontal: 20,
-          paddingBottom: 5,
-          paddingTop: 20,
+          paddingHorizontal: 15,
+          paddingTop: 10,
           flexDirection: "row",
           justifyContent: "space-between",
         }}
@@ -101,6 +137,7 @@ const JoinRequestListScreen = ({ navigation }) => {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <RequestItem
+              userId={item.user_Id}
             id={item.id}
             name={item.name}
             image={item.image}
@@ -110,51 +147,9 @@ const JoinRequestListScreen = ({ navigation }) => {
           />
         )}
       />
-    </>
+    </View>
   );
 };
-
-const RequestItem = ({ id, name, image, onPress, onConfirm, onDelete }) => {
-  return (
-    <TouchableOpacity onPress={() => onPress(id)}>
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          paddingHorizontal: 20,
-          paddingVertical: 8,
-        }}
-      >
-        <Image
-          source={image}
-          style={{ width: 60, height: 60, borderRadius: 30, marginRight: 12 }}
-        />
-        <View>
-          <View style={{ paddingBottom: 8 }}>
-            <Text style={{ flex: 1, fontSize: 16, fontWeight: "500" }}>
-              {name}
-            </Text>
-          </View>
-          <View style={{ flexDirection: "row", }}>
-            <TouchableOpacity
-              style={styles.confirmButton}
-              onPress={() => onConfirm(id)}
-            >
-              <Text style={styles.buttonText}>Xác nhận</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.deleteButton}
-              onPress={() => onDelete(id)}
-            >
-              <Text style={styles.buttonText}>Xóa</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
-};
-
 export default JoinRequestListScreen;
 
 const styles = StyleSheet.create({

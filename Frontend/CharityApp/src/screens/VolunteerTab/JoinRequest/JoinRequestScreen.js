@@ -1,34 +1,15 @@
-import {Image, ScrollView, StyleSheet, Text, TouchableOpacity, View,} from "react-native";
+import {Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View,} from "react-native";
 import {SafeAreaView} from "react-native-safe-area-context";
 import {COLORS, images} from "../../../constants";
 import {Entypo, Ionicons, MaterialCommunityIcons, MaterialIcons,} from "@expo/vector-icons";
+import React, {useEffect, useState} from "react";
+import {getVolunteerById} from "../../../services/Volunteer/{id}/GetVolunteerById";
+import {getJoinRequestById} from "../../../services/JoinRequest/{id}/GetJoinRequestById";
+import {getUserById} from "../../../services/User/{id}/GetUserById";
 
-const joinRequest = {
-  id: 1,
-  name: "Nguyễn Thị Anh",
-  avatar: "https://example.com/avatar.jpg",
-  skills: [
-    { id: 1, name: "Quản lý dự án" },
-    { id: 2, name: "Giao tiếp hiệu quả" },
-    { id: 3, name: "Ngôn ngữ" },
-    { id: 4, name: "Thiết kế đồ họa" },
-    { id: 5, name: "Lập trình" },
-  ],
-  availability: "Buổi chiều thứ 5, thứ 7 và cả ngày chủ nhật",
-  additionalInfo:
-    "Tôi đã tham gia nhiều dự án tình nguyện về hiến máu nhân đạo và phát triển cộng đồng.",
-  contact: {
-    email: "nguyenduythanh@example.com",
-    phone: "0123 456 789",
-  },
-  address: {
-    city: "Hà Nội",
-    district: "Hoàng Mai",
-    street: "123 Đường ABC",
-  },
-};
+const {width} = Dimensions.get("screen")
 
-const DetailInfo = () => {
+const DetailInfo = ({joinRequest, user}) => {
   return (
     <View style={styles.containerInfo}>
       <View style={styles.section}>
@@ -40,12 +21,13 @@ const DetailInfo = () => {
           />{" "}
           Kỹ Năng:
         </Text>
-        {joinRequest.skills.map((skill) => (
-          <View key={skill.id} style={styles.skillItemContainer}>
-            <MaterialIcons name="check" size={16} color={COLORS.primary} />
-            <Text style={styles.skillItem}>{skill.name}</Text>
-          </View>
-        ))}
+        {/*{joinRequest.skills.map((skill) => (*/}
+        {/*  <View key={skill.id} style={styles.skillItemContainer}>*/}
+        {/*    <MaterialIcons name="check" size={16} color={COLORS.primary} />*/}
+        {/*    <Text style={styles.skillItem}>{skill.name}</Text>*/}
+        {/*  </View>*/}
+        {/*))}*/}
+        <Text style={styles.skillItem}>{joinRequest.skills}</Text>
       </View>
 
       <View style={styles.section}>
@@ -57,7 +39,7 @@ const DetailInfo = () => {
           />{" "}
           Thời Gian Hỗ Trợ:
         </Text>
-        <Text style={styles.sectionText}>{joinRequest.availability}</Text>
+        <Text style={styles.sectionText}>{joinRequest.support_Time}</Text>
       </View>
 
       <View style={styles.section}>
@@ -69,7 +51,7 @@ const DetailInfo = () => {
           />{" "}
           Thông Tin Bổ Sung:
         </Text>
-        <Text style={styles.sectionText}>{joinRequest.additionalInfo}</Text>
+        <Text style={styles.sectionText}>{joinRequest.location}</Text>
       </View>
 
       <View style={styles.section}>
@@ -81,8 +63,8 @@ const DetailInfo = () => {
           />{" "}
           Liên Hệ:
         </Text>
-        <Text style={styles.sectionText}>{joinRequest.contact.email}</Text>
-        <Text style={styles.sectionText}>{joinRequest.contact.phone}</Text>
+        <Text style={styles.sectionText}>{user.email}</Text>
+        <Text style={styles.sectionText}>{user.phone}</Text>
       </View>
 
       <View style={styles.socialMediaSection}>
@@ -102,7 +84,40 @@ const DetailInfo = () => {
   );
 };
 
-const JoinRequestScreen = ({ navigation }) => {
+const JoinRequestScreen = ({ navigation, route }) => {
+  let userId = route.params.userId;
+  let joinRequestId = route.params.id;
+  const [joinRequest, setJoinRequest] = useState({});
+  const [user, setUser] = useState({});
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await getJoinRequestById(joinRequestId);
+        setJoinRequest(res.data);
+      } catch (error) {
+        console.error('Error fetching data', error);
+        setJoinRequest({});
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await getUserById(userId);
+        setUser(res.data);
+      } catch (error) {
+        console.error('Error fetching data', error);
+        setUser({});
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <SafeAreaView
       style={{
@@ -124,22 +139,26 @@ const JoinRequestScreen = ({ navigation }) => {
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Ionicons name="arrow-back" size={24} color={COLORS.black} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleMoreOptions(item.id)}>
+          <TouchableOpacity onPress={() => {}}>
             <MaterialIcons name="more-vert" size={24} color={COLORS.primary} />
           </TouchableOpacity>
         </View>
         <View style={styles.screen}>
-          <View style={styles.imageContainer}>
-            <Image
-              source={images.avatar_1}
-              style={styles.image}
-              resizeMode="cover"
-            />
-          </View>
+          {
+            user?.image && (
+                  <View style={styles.imageContainer}>
+                    <Image
+                        source={{uri: user?.image}}
+                        style={styles.image}
+                        resizeMode="cover"
+                    />
+                  </View>
+              )
+          }
           <View>
-            <Text style={styles.hearderText}>Nguyễn Duy Thành</Text>
+            <Text style={styles.hearderText}>{user.name}</Text>
           </View>
-          <DetailInfo />
+          <DetailInfo joinRequest={joinRequest} user={user}/>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -183,7 +202,8 @@ const styles = StyleSheet.create({
   },
   containerInfo: {
     paddingVertical: 16,
-    paddingHorizontal: 30,
+    paddingHorizontal: 40,
+    width: width,
   },
   section: {
     marginBottom: 16,

@@ -18,6 +18,7 @@ const VolunteerTabScreen = ({ navigation }) => {
       style={{
         flex: 1,
         backgroundColor: COLORS.white,
+        marginBottom: 50,
       }}
     >
       <StatusBar style="dark" backgroundColor="white" />
@@ -27,33 +28,33 @@ const VolunteerTabScreen = ({ navigation }) => {
           alignItems: "center",
           justifyContent: 'space-between',
           paddingHorizontal: 20,
-          height: 60,
+          height: 50,
           backgroundColor: COLORS.primary
         }}
       >
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color={COLORS.white} />
         </TouchableOpacity>
-        <View style={{flexDirection: "row", backgroundColor: COLORS.white, paddingVertical: 3, paddingHorizontal: 15, borderRadius: 24,}}>
-            <View style={{justifyContent: "center", alignContent: "center", paddingHorizontal: 10, width: width/1.7}}>
-                <TextInput
-                    style={{fontWeight: "400", fontSize: 16}}
-                    placeholder="Tìm kiếm"
-                />
-            </View>
-            <Icon
-                name="ios-search"
-                size={24}
-                color={COLORS.secondary}
-            />
-        </View>
+        {/*<View style={{flexDirection: "row", backgroundColor: COLORS.white, paddingVertical: 3, paddingHorizontal: 15, borderRadius: 24,}}>*/}
+        {/*    <View style={{justifyContent: "center", alignContent: "center", paddingHorizontal: 10, width: width/1.7}}>*/}
+        {/*        <TextInput*/}
+        {/*            style={{fontWeight: "400", fontSize: 16}}*/}
+        {/*            placeholder="Tìm kiếm"*/}
+        {/*        />*/}
+        {/*    </View>*/}
+        {/*    <Icon*/}
+        {/*        name="ios-search"*/}
+        {/*        size={24}*/}
+        {/*        color={COLORS.secondary}*/}
+        {/*    />*/}
+        {/*</View>*/}
       </View>
       <Tab.Navigator
         initialRouteName="Volunteer"
         screenOptions={{
           tabBarActiveTintColor: COLORS.black,
-          tabBarLabelStyle: { fontSize: 14, fontWeight: "bold", textTransform: "none", },
-          tabBarStyle: { backgroundColor: COLORS.white,  },
+          tabBarLabelStyle: { fontSize: 16, fontWeight: "bold", textTransform: "none"},
+          tabBarStyle: { backgroundColor: COLORS.white, height: 40 },
           tabBarIndicatorStyle: { backgroundColor: COLORS.primary},
           tabBarAndroidRipple: { borderless: false },
           tabBarPressColor: COLORS.secondaryGray,

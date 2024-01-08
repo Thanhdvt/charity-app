@@ -119,7 +119,7 @@ const MenuContent = ({ navigation }) => {
       },
       {
         icon: "chart-box-outline",
-        text: "Thống kê phân tích",
+        text: "Báo cáo & Thống kê",
         action: navigateToStatistic
       },
 
@@ -161,9 +161,13 @@ const MenuContent = ({ navigation }) => {
 
   const supportItems = [
     {
-      icon: "cog-outline",
-      text: "Cài đặt chung",
+      icon: "alpha-a-box-outline",
+      text: "Ngôn ngữ",
       action: navigateToGenericSetup,
+    },
+    {
+      icon: "information-outline",
+      text: "Chính sách và điều khoản",
     },
     {
       icon: "logout",
@@ -206,7 +210,7 @@ const MenuContent = ({ navigation }) => {
     menuSections = [
       { title: "Hồ sơ", items: accountItems },
       { title: "Hoạt động", items: actionsItems },
-      { title: "Tùy chọn", items: OptionsItems },
+      // { title: "Tùy chọn", items: OptionsItems },
       { title: "Khác", items: supportItems },
     ];
   }
@@ -214,7 +218,7 @@ const MenuContent = ({ navigation }) => {
     menuSections = [
       { title: "Hồ sơ", items: accountItems },
       { title: "Hoạt động", items: actionsItems },
-      { title: "Tùy chọn", items: OptionsItems },
+      // { title: "Tùy chọn", items: OptionsItems },
       { title: "Khác", items: supportItems },
     ];
   }
@@ -222,7 +226,7 @@ const MenuContent = ({ navigation }) => {
     menuSections = [
       { title: "Hồ sơ", items: accountItems },
       { title: "Hoạt động", items: actionsItems },
-      { title: "Tùy chọn", items: OptionsItems },
+      // { title: "Tùy chọn", items: OptionsItems },
       { title: "Khác", items: supportItems },
     ];
   }
@@ -303,7 +307,7 @@ const MenuScreen = () => {
                   style={{ paddingHorizontal: 20, marginTop: 5 }}
                 >
                   <Image
-                    source={images.profile}
+                    source={userInfo?.image ? {uri: userInfo?.image} : images.avatar_default}
                     resizeMode="contain"
                     style={{
                       width: 40,

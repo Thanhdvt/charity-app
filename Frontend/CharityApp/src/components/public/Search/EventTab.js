@@ -1,9 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import {Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {MaterialIcons} from "@expo/vector-icons";
-import {COLORS} from "../../../constants";
+import {COLORS, images} from "../../../constants";
 import {useNavigation} from "@react-navigation/native";
 import {getAllEvent} from "../../../services/Event/GetAllEvent";
+import {getOrganizationById} from "../../../services/CharityOrganization/{id}/GetOrganizationById";
+import {getUserById} from "../../../services/User/{id}/GetUserById";
+import getAllFileByEventId from "../../../../firebase/GetAllFileByEventId";
+import getBackgroundByEventId from "../../../../firebase/getBackgroundByEventId";
 
 const EventTab = ({searchValue}) => {
   const event = {
@@ -20,7 +24,21 @@ const EventTab = ({searchValue}) => {
     const fetchData = async () => {
       try {
         const res = await getAllEvent();
-        setEventList(res.data);
+        const updatedList = await Promise.all(
+            res.data.map(async (item) => {
+              try {
+                const organization = await getOrganizationById(item.organization_Id);
+                if (organization) {
+                  const background = await getBackgroundByEventId(organization.data.user_Id, item.id);
+                  return { ...item, background };
+                }
+              } catch (error) {
+                console.error('Error fetching user data', error);
+                return item;
+              }
+            })
+        );
+        setEventList(updatedList);
       } catch (error) {
         console.error('Error fetching data', error);
         setEventList([]);
@@ -39,7 +57,7 @@ const EventTab = ({searchValue}) => {
       style={styles.eventItem}
       onPress={() => navigation.navigate('EventDetail', { eventId: item.id, organizationId: item.organization_Id })}
     >
-      <Image source={{ uri: event.image }} style={styles.eventImage} />
+      <Image source={item?.background ? { uri: item?.background } : images.onboarding_2} style={styles.eventImage} />
       <View style={styles.eventDetails}>
         <Text style={styles.eventName} numberOfLines={1} >{item.title}</Text>
         <Text style={styles.eventStatus}>{item.type === 0 ? "Đang diễn ra" : "Đã kết thúc" }</Text>

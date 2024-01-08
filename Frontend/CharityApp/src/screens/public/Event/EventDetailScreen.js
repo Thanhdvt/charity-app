@@ -13,6 +13,7 @@ import {Loading} from "../../../components/common/Loading";
 import moment from "moment";
 import {AuthContext} from "../../../context/AuthContext";
 import FlashMessage, {hideMessage, showMessage} from "react-native-flash-message";
+import getBackgroundByEventId from "../../../../firebase/getBackgroundByEventId";
 
 const EventDetailScreen = ({ navigation, route}) => {
     const data = {
@@ -95,9 +96,10 @@ const EventDetailScreen = ({ navigation, route}) => {
                 const res_1 = await getOrganizationById(organizationId);
                 if(res_1) {
                     const userResponse = await getUserById(res_1.data.user_Id);
+                    const background = await getBackgroundByEventId(res_1.data.user_Id, res.data.id);
+                    setEvent({ ...res.data, background });
                     setOrganizationUser(userResponse.data);
                 }
-                setEvent(res.data);
             } catch (error) {
                 console.error('Error fetching data', error);
                 setEvent(null);
@@ -142,7 +144,7 @@ const EventDetailScreen = ({ navigation, route}) => {
                             />
                         </TouchableOpacity>
                         <Image
-                            source={data.postImage}
+                            source={event?.background ? {uri: event?.background} : images.onboarding_2}
                             resizeMode='cover'
                             style={{
                                 width: SIZES.width,

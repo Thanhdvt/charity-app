@@ -1,9 +1,9 @@
 import axios from "axios";
 
-export const register = (name, email, phone, password) => {
+export const register = (name, userName, email, phone, password) => {
     axios.post(`http://192.168.2.13:5000/api/User`, {
         name,
-        userName: email,
+        userName,
         password,
         phone,
         email,

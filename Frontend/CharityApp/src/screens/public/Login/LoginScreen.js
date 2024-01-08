@@ -1,7 +1,7 @@
-import {Image, Pressable, Text, TextInput, TouchableOpacity, View} from 'react-native'
+import {ActivityIndicator, Image, Pressable, Text, TextInput, TouchableOpacity, View} from 'react-native'
 import React, {useContext, useState} from 'react'
 import {SafeAreaView} from "react-native-safe-area-context";
-import {COLORS, icons, images} from '../../../constants';
+import {COLORS, FONTS, icons, images} from '../../../constants';
 import {AntDesign, EvilIcons, Ionicons} from "@expo/vector-icons";
 import Button from '../../../components/common/Button';
 import {AuthContext} from "../../../context/AuthContext";
@@ -11,7 +11,7 @@ const Login = ({ navigation }) => {
     const [modalVisible, setModalVisible] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
     const [isPasswordShown, setIsPasswordShown] = useState(false);
-    const [isChecked, setIsChecked] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const {login} = useContext(AuthContext);
@@ -28,19 +28,19 @@ const Login = ({ navigation }) => {
         setModalVisible(true);
     };
 
+    const closeModal = () => {
+        setModalVisible(false);
+    };
+
     const handleLoginPress = () => {
         const validation = validate(email, password);
 
         if (!validation.success) {
             setModalMessage(validation.message);
             setModalVisible(true);
-            return;
         }
         login(email, password, handleLoginError);
-    };
 
-    const closeModal = () => {
-        setModalVisible(false);
     };
 
     return (
@@ -82,11 +82,10 @@ const Login = ({ navigation }) => {
                         marginVertical: 10,
                         flexDirection: "row"
                     }}>
-                        <AntDesign name={"mail"} size={26} color={COLORS.sliver}/>
+                        <AntDesign name={"user"} size={26} color={COLORS.sliver}/>
                         <TextInput
-                            placeholder='Nhập địa chỉ email'
+                            placeholder='Nhập tên đăng nhập'
                             placeholderTextColor={COLORS.sliver}
-                            keyboardType='email-address'
                             style={{
                                 width: "100%",
                                 paddingLeft: 12
@@ -158,15 +157,31 @@ const Login = ({ navigation }) => {
                     <Text style={{color: COLORS.primary, fontWeight: "bold"}}>Quên mật khẩu ?</Text>
                 </View>
 
-                <Button
-                    title="Đăng nhập"
-                    filled
-                    style={{
-                        marginTop: 20,
-                        marginBottom: 4,
-                    }}
-                    onPress = {() => handleLoginPress()}
-                />
+                <View>
+                    <TouchableOpacity
+                        style={{
+                            backgroundColor: COLORS.primary,
+                            height: 44,
+                            borderRadius: 10,
+                            marginTop: 10,
+                            marginBottom: 15,
+                            alignItems: "center",
+                            justifyContent: "center",
+                        }}
+                        activeOpacity={0.8}
+                        onPress={() => handleLoginPress()}
+                    >
+
+                            <Text
+                                style={{
+                                    ...FONTS.body3,
+                                    color: COLORS.white,
+                                }}
+                            >
+                                Đăng nhập
+                            </Text>
+                    </TouchableOpacity>
+                </View>
 
                 <View>
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 20 }}>

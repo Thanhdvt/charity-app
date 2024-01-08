@@ -46,18 +46,18 @@ const MainTabScreen = () => {
                         ),
                     }}
                 />
-                <Tab.Screen
-                    name="Map"
-                    component={MapScreen}
-                    options={{
-                        tabBarLabel: "Bản đồ",
-                        tabBarLabelStyle: {fontSize: 12, fontWeight: "400"},
-                        tabBarColor: "#d02860",
-                        tabBarIcon: ({color}) => (
-                            <Icon name="ios-map" color={color} size={24}/>
-                        ),
-                    }}
-                />
+                {/*<Tab.Screen*/}
+                {/*    name="Map"*/}
+                {/*    component={MapScreen}*/}
+                {/*    options={{*/}
+                {/*        tabBarLabel: "Bản đồ",*/}
+                {/*        tabBarLabelStyle: {fontSize: 12, fontWeight: "400"},*/}
+                {/*        tabBarColor: "#d02860",*/}
+                {/*        tabBarIcon: ({color}) => (*/}
+                {/*            <Icon name="ios-map" color={color} size={24}/>*/}
+                {/*        ),*/}
+                {/*    }}*/}
+                {/*/>*/}
                 {
                     (userInfo.role === 1) && (
                         <Tab.Screen
@@ -88,18 +88,18 @@ const MainTabScreen = () => {
                         />
                     )
                 }
-                <Tab.Screen
-                    name="Notifications"
-                    component={NotificationScreen}
-                    options={{
-                        tabBarLabel: "Thông báo",
-                        tabBarLabelStyle: {fontSize: 12, fontWeight: "400"},
-                        tabBarColor: "#1f65ff",
-                        tabBarIcon: ({color}) => (
-                            <Icon name="ios-notifications" color={color} size={24}/>
-                        ),
-                    }}
-                />
+                {/*<Tab.Screen*/}
+                {/*    name="Notifications"*/}
+                {/*    component={NotificationScreen}*/}
+                {/*    options={{*/}
+                {/*        tabBarLabel: "Thông báo",*/}
+                {/*        tabBarLabelStyle: {fontSize: 12, fontWeight: "400"},*/}
+                {/*        tabBarColor: "#1f65ff",*/}
+                {/*        tabBarIcon: ({color}) => (*/}
+                {/*            <Icon name="ios-notifications" color={color} size={24}/>*/}
+                {/*        ),*/}
+                {/*    }}*/}
+                {/*/>*/}
                 <Tab.Screen
                     name="Menu"
                     component={MenuScreen}

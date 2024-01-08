@@ -16,6 +16,7 @@ const Button = (props) => {
                 ...props.style
             }}
             onPress={props.onPress}
+            activeOpacity={0.8}
         >
             <Text style={{ fontSize: 16, fontWeight: "bold", ... { color: textColor } }}>{props.title}</Text>
         </TouchableOpacity>

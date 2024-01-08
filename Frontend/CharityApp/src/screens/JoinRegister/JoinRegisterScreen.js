@@ -9,6 +9,8 @@ import {AuthContext} from "../../context/AuthContext";
 import {getUserById} from "../../services/User/{id}/GetUserById";
 import FlashMessage, {hideMessage, showMessage} from "react-native-flash-message";
 import {createJoinRequest} from "../../services/JoinRequest/CreateJoinRequest";
+import {getJoinRequestById} from "../../services/JoinRequest/{id}/GetJoinRequestById";
+import {createVolunteer} from "../../services/Volunteer/CreateVolunteer";
 
 const JoinRegisterScreen = ({ navigation, route }) => {
     let organizationId = route.params.organizationId;
@@ -106,37 +108,45 @@ const JoinRegisterScreen = ({ navigation, route }) => {
                     hideMessage();
                 },
             });
+            console.log("ok")
             return false;
         }
         return true;
     }
 
     const clearForm = () => {
-        setPhone(null);
-        setAddress(null);
-        setSkill1(null);
-        setTime(null);
-        setDescription(null);
+        setPhone(userInfo.phone);
+        setAddress(userInfo.address);
+        setSkill1("");
+        setTime("");
+        setDescription("");
     };
 
     const handleOnClickSave = async () => {
         if (validate()) {
             const newJoinRequest = {
-                support_Time: "2021-09-06T10:45:20.548Z",
+                support_Time: time,
                 location: description,
                 skills: skill1,
                 organization_Id: organizationId
             };
+            const newVolunteer = {
+                support_Time: "2023-12-06T10:45:20.548Z",
+                location: description,
+                skills: skill1
+            }
             console.log(newJoinRequest)
-            await fetchData(newJoinRequest);
+            await fetchData(newJoinRequest, newVolunteer);
         }
     }
 
     // lưu thông tin
-    const fetchData = async (newJoinRequest) => {
+    const fetchData = async (newJoinRequest, newVolunteer) => {
         try {
             const res = await createJoinRequest(newJoinRequest, userToken);
-            console.log(res)
+            const res_1 = await createVolunteer(userToken, newVolunteer);
+            console.log(res);
+            console.log(res_1);
            if (res) {
                 showMessage({
                     message: "Gửi thành công",

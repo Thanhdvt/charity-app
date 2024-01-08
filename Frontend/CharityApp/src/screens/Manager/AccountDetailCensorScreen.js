@@ -5,6 +5,9 @@ import {Entypo, Ionicons, MaterialCommunityIcons, MaterialIcons,} from "@expo/ve
 import {useNavigation} from "@react-navigation/native";
 import {LinearGradient} from "expo-linear-gradient";
 import Button from "../../components/common/Button";
+import {useEffect, useState} from "react";
+import {getAllUser} from "../../services/User/GetAllUser";
+import {getUserById} from "../../services/User/{id}/GetUserById";
 
 const forHelpRequest = {
     id: 1,
@@ -65,7 +68,7 @@ const forHelpRequest = {
 
 const {height} = Dimensions.get("screen");
 
-const ForHelpDetail = () => {
+const UserDetail = ({user}) => {
     const navigation = useNavigation();
 
     const Card = ({user}) => {
@@ -91,20 +94,20 @@ const ForHelpDetail = () => {
                         size={24}
                         color="black"
                     />{" "}
-                    Thông tin người gửi:
+                    Thông tin tài khoản:
                 </Text>
                 <View style={{flexDirection: "row"}}>
                     <View style={{paddingRight: 10}}>
-                        <Text style={{fontSize: 16, fontWeight: "500", marginBottom: 4}}>Tên:</Text>
-                        <Text style={{fontSize: 16, fontWeight: "500", marginBottom: 4}}>Địa chỉ:</Text>
-                        <Text style={{fontSize: 16, fontWeight: "500", marginBottom: 4}}>Email:</Text>
-                        <Text style={{fontSize: 16, fontWeight: "500", marginBottom: 4}}>SĐT: </Text>
+                        <Text style={{fontSize: 16, fontWeight: "500", marginBottom: 4}}>Tên</Text>
+                        <Text style={{fontSize: 16, fontWeight: "500", marginBottom: 4}}>Địa chỉ</Text>
+                        <Text style={{fontSize: 16, fontWeight: "500", marginBottom: 4}}>Email</Text>
+                        <Text style={{fontSize: 16, fontWeight: "500", marginBottom: 4}}>SĐT</Text>
                     </View>
                     <View>
-                        <Text style={styles.sectionText}>{forHelpRequest.name}</Text>
-                        <Text style={styles.sectionText}>{forHelpRequest.address.city}</Text>
-                        <Text style={styles.sectionText}>{forHelpRequest.contact.email}</Text>
-                        <Text style={styles.sectionText}>{forHelpRequest.contact.phone}</Text>
+                        <Text style={styles.sectionText}>: {user.name}</Text>
+                        <Text style={styles.sectionText}>: {user.address}</Text>
+                        <Text style={styles.sectionText}>: {user.email}</Text>
+                        <Text style={styles.sectionText}>: {user.phone}</Text>
                     </View>
                 </View>
             </View>
@@ -157,7 +160,22 @@ const ForHelpDetail = () => {
     );
 };
 
-const AccountDetailCensorScreen = ({ navigation }) => {
+const AccountDetailCensorScreen = ({ navigation, route }) => {
+    let userId = route.params.userId
+    const [user, setUser] = useState({});
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const res = await getUserById(userId);
+                setUser(res.data);
+            } catch (e) {
+                console.log(e)
+            }
+        }
+        fetchData();
+    }, []);
+
     return (
         <SafeAreaView
             style={{
@@ -170,7 +188,7 @@ const AccountDetailCensorScreen = ({ navigation }) => {
                     style={{
                         flexDirection: "row",
                         alignItems: "center",
-                        height: 60,
+                        height: 50,
                         backgroundColor: COLORS.white,
                         paddingHorizontal: 20,
                     }}
@@ -186,21 +204,21 @@ const AccountDetailCensorScreen = ({ navigation }) => {
                 <View
                     style={{
                         alignItems: "center",
-                        marginVertical: 22,
+                        marginVertical: 5,
                     }}
                 >
                     <View style={styles.imageContainer}>
                         <Image
-                            source={{uri: forHelpRequest.avatar}}
+                            source={user?.image ? {uri: user?.image} : images.avatar_default}
                             style={styles.image}
                             resizeMode="cover"
                         />
                     </View>
                     <View>
-                        <Text style={styles.hearderText}>Nguyễn Duy Thành</Text>
+                        <Text style={styles.hearderText}>{user.name}</Text>
                     </View>
                 </View>
-                <ForHelpDetail/>
+                <UserDetail user={user}/>
             </ScrollView>
 
             <View style={{
@@ -277,7 +295,7 @@ const styles = StyleSheet.create({
         marginVertical: 5,
     },
     containerInfo: {
-        paddingVertical: 30,
+        paddingVertical: 20,
         paddingHorizontal: 30,
     },
     section: {

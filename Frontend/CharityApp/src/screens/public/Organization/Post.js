@@ -14,7 +14,7 @@ import Button from "../../../components/common/Button";
 import {SwiperFlatList} from "react-native-swiper-flatlist";
 import FlashMessage, {hideMessage, showMessage} from "react-native-flash-message";
 import {Video} from "expo-av";
-import {StatusBar} from "expo-status-bar";
+import getAllFileByEventId from "../../../../firebase/GetAllFileByEventId";
 
 const {width, height} = Dimensions.get('window');
 
@@ -54,10 +54,11 @@ const Post = ({organizationId, userOrganizationId}) => {
     const [userInfo, setUserInfo] = useState();
     const [charityOrganization, setCharityOrganization] = useState();
     const [visible, setVisible] = useState(false);
+    const [files, setFiles] = useState([]);
 
 
-    const navigateToCommentScreen = () => {
-        navigation.navigate("Comment");
+    const navigateToCommentScreen = (id) => {
+        navigation.navigate("Comment", {eventId: id});
     };
 
     const toggleDescription = () => {
@@ -125,7 +126,19 @@ const Post = ({organizationId, userOrganizationId}) => {
         const fetchData = async () => {
             try {
                 const res = await getEventByOrganizationId(organizationId);
-                setEventList(res?.data);
+                const updatedList = await Promise.all(
+                    res.data.map(async (item) => {
+                        try {
+                            const urlFiles = await getAllFileByEventId(userOrganizationId, item.id);
+                            const files = [...Object.values(urlFiles)].filter(item => item);
+                            return { ...item, files };
+                        } catch (error) {
+                            console.error('Error fetching user data', error);
+                            return item;
+                        }
+                    })
+                );
+                setEventList(updatedList);
             } catch (error) {
                 console.error("Error fetching data", error);
                 setEventList([]);
@@ -154,10 +167,6 @@ const Post = ({organizationId, userOrganizationId}) => {
     const video = useRef(null);
     const [posterStatus, setPosterStatus] = useState(true);
 
-    const isVideo = (media) => {
-        return media.toLowerCase().includes('.mp4') || media.toLowerCase().includes('youtube.com/watch');
-    };
-
     const CustomPosterComponent = ({ style, source }) => {
         return (
             <View style={[style, styles.customPosterContainer]}>
@@ -166,18 +175,23 @@ const Post = ({organizationId, userOrganizationId}) => {
         );
     };
 
+    const isVideo = (media) => {
+        return media.toLowerCase().includes('.mp4') || media.toLowerCase().includes('youtube.com/watch');
+    };
+
     const Card = ({media}) => {
         return (
             <View>
                 {isVideo(media) ? (
                     <>
                             <Video
-                                ref={video}
+                                // ref={video}
                                 source={{uri: media}}
-                               // posterSource={{uri: 'https://firebasestorage.googleapis.com/v0/b/charity-app-9a8ed.appspot.com/o/files%2Fb554b375-e8e3-41a4-b953-005788be9957?alt=media&token=4f34e019-fe3c-4d8e-bc0f-c96ef2de4b62'}}
-                                style={{width: width, height: height / 3}}
-                                //PosterComponent={CustomPosterComponent}
                                 useNativeControls={true}
+                                style={{width: width, height: height / 3}}
+                                resizeMode={"cover"}
+                               // posterSource={{uri: 'https://firebasestorage.googleapis.com/v0/b/charity-app-9a8ed.appspot.com/o/files%2Fb554b375-e8e3-41a4-b953-005788be9957?alt=media&token=4f34e019-fe3c-4d8e-bc0f-c96ef2de4b62'}}
+                                //PosterComponent={CustomPosterComponent}
                                // usePoster={true}
                                 // shouldPlay={isPlaying}
                             />
@@ -233,8 +247,8 @@ const Post = ({organizationId, userOrganizationId}) => {
                                                 </View>
                                             </View>
                                         </View>
-                                        <View style={{paddingHorizontal: 20, paddingVertical: 10}}>
-                                            {data.content.length > 100 && (
+                                        <View style={{paddingHorizontal: 20, paddingBottom: 15}}>
+                                            {data.content.length > 100 ? (
                                                 <TouchableOpacity onPress={toggleDescription}>
                                                     <Text style={{
                                                         color: COLORS.sliver,
@@ -252,13 +266,22 @@ const Post = ({organizationId, userOrganizationId}) => {
                                                         {showFullContent ? '   Thu gọn' : '   Xem thêm'}
                                                     </Text>
                                                 </TouchableOpacity>
-                                            )}
+                                            ): (
+                                                <Text
+                                                style={{
+                                                fontSize: 14,
+                                                color: COLORS.secondary,
+                                            }}
+                                        >
+                                            {data?.content}
+                                        </Text>
+                                        )}
                                         </View>
                                         <View style={{flex: 1}}>
                                             <SwiperFlatList
                                                 index={0}
                                                 showPagination
-                                                data={imageList}
+                                                data={data?.files}
                                                 renderItem={({item}) => <Card media={item}/>}
                                                 paginationStyleItem={{width: 8, height: 8}}
                                                 paginationDefaultColor={COLORS.secondaryGray}
@@ -288,7 +311,7 @@ const Post = ({organizationId, userOrganizationId}) => {
                                                         }}
                                                     />
                                                 </TouchableOpacity>
-                                                <TouchableOpacity onPress={navigateToCommentScreen}>
+                                                <TouchableOpacity onPress={() => navigateToCommentScreen(data.id)}>
                                                     <Ionicons
                                                         name="md-chatbubble-ellipses-outline"
                                                         style={{fontSize: 28, paddingRight: 25}}
@@ -323,7 +346,7 @@ const Post = ({organizationId, userOrganizationId}) => {
                                                         fontSize: 14,
                                                         fontWeight: "500",
                                                     }}
-                                                    onPress={navigateToCommentScreen}
+                                                    onPress={() => navigateToCommentScreen(data.id)}
                                                 >
                                                     View all comments
                                                 </Text>

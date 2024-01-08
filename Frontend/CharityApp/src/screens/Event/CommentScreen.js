@@ -1,49 +1,61 @@
-import React, {useContext, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {FlatList, Image, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View,} from "react-native";
 import {Ionicons,} from "@expo/vector-icons";
 import {COLORS, images} from "../../../src/constants";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import {useNavigation} from "@react-navigation/native";
 import {AuthContext} from "../../context/AuthContext";
+import {getCommentByEventId} from "../../services/Comment/event/GetCommentByEventId";
+import {getOrganizationById} from "../../services/CharityOrganization/{id}/GetOrganizationById";
+import {getUserById} from "../../services/User/{id}/GetUserById";
+import {createComment} from "../../services/Comment/CreateComment";
 
-const CommentScreen = () => {
-  const {userToken} = useContext(AuthContext);
+const CommentScreen = ({route}) => {
+  const {userToken, userInfo} = useContext(AuthContext);
+  const eventId = route.params.eventId;
+  console.log(eventId)
   const navigation = useNavigation();
   const navigateGoBack = () => {
     navigation.goBack();
   };
 
-  const [comments, setComments] = useState([
-    {
+  const comment = {
       id: 1,
       text: "Bài đăng ý nghĩa!",
       user: { name: "Thành", avatar: images.avatar_1 },
-      likes: 8,
+      likes: 0,
       isLiked: false,
       createdAt: new Date("2023-11-23T24:00:00"),
-    },
-    {
-      id: 2,
-      text: "Cảm ơn bạn!",
-      user: {
-        name: "Hội chữ thập đỏ Việt Nam",
-        avatar: images.profile,
-      },
-      likes: 7,
-      isLiked: false,
-      createdAt: new Date("2023-11-23T12:00:00"),
-    },
-    {
-      id: 3,
-      text: "Mong điều tốt đẹp với mọi người.",
-      user: { name: "Thành", avatar: images.avatar_1 },
-      likes: 5,
-      isLiked: false,
-      createdAt: new Date("2023-11-22T12:30:00"),
-    },
-  ]);
+  }
+
+  const [comments, setComments] = useState([]);
 
   const [newComment, setNewComment] = useState("");
+
+  useEffect(() => {
+    console.log(new Date())
+    const fetchData = async () => {
+      try {
+        const res = await getCommentByEventId(eventId);
+        const updatedList = await Promise.all(
+            res.data.map(async (item) => {
+              try {
+                const userResponse = await getUserById(item.user_Id)
+                const { image, name, email } = userResponse.data;
+                return { ...item, image, name, email };
+              } catch (error) {
+                console.error('Error fetching user data', error);
+                return item;
+              }
+            })
+        );
+        setComments(updatedList);
+      } catch (e) {
+        console.log(e);
+      }
+    }
+    fetchData();
+  }, []);
 
   const addComment = () => {
     if (newComment) {
@@ -52,34 +64,41 @@ const CommentScreen = () => {
         {
           id: comments.length + 1,
           text: newComment,
-          user: {
-            name: "Hội chữ thập đỏ Việt Nam",
-            avatar: images.profile
-          },
+          name: userInfo.name,
+          image: userInfo.image,
           likes: 0,
           isLiked: false,
-          createdAt: new Date(),
+          time: new Date(),
         },
       ]);
       setNewComment("");
     }
+    addNewComment()
   };
 
-  const toggleLike = (commentId) => {
-    setComments((prevComments) =>
-      prevComments.map((comment) =>
-        comment.id === commentId
-          ? {
-              ...comment,
-              isLiked: !comment.isLiked,
-              likes: comment.isLiked ? comment.likes - 1 : comment.likes + 1,
-            }
-          : comment
-      )
-    );
+  const addNewComment = async () => {
+    try {
+      const comment = {
+        event_Id: eventId,
+        text: newComment,
+        video: "<string>",
+        time: new Date(),
+        status: 2,
+        picture: "<string>",
+      }
+      const res = await createComment(userToken, comment);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  const toggleLike = () => {
+
   };
 
-  const calculateElapsedTime = (createdAt) => {
+
+  const calculateElapsedTime = (time) => {
+    const createdAt = new Date(time);
     const currentTime = new Date();
     const timeDifference = currentTime - createdAt;
 
@@ -116,17 +135,17 @@ const CommentScreen = () => {
                   <View style={styles.commentContainer}>
                     <View>
                       <View style={styles.userInfo}>
-                        <Image source={item.user.avatar} style={styles.avatar} />
-                        <Text style={styles.userName}>{item.user.name}</Text>
+                        <Image source={item.image ? {uri: item.image} : images.avatar_default} style={styles.avatar} />
+                        <Text style={styles.userName}>{item.name}</Text>
                       </View>
                       <Text style={styles.commentText}>{item.text}</Text>
                       <View style={{ flexDirection: "row", alignItems: "center" }}>
                         <View style={{ width: "60%", overflow: "hidden" }}>
-                          <Text>{calculateElapsedTime(item.createdAt)}</Text>
+                          <Text>{calculateElapsedTime(item?.time)}</Text>
                         </View>
                         <View style={{ width: "40%", overflow: "hidden" }}>
                           <Text style={{ fontWeight: "500" }}>
-                            {item.likes} lượt thích
+                            {comment.likes} lượt thích
                           </Text>
                         </View>
                       </View>
@@ -134,11 +153,11 @@ const CommentScreen = () => {
                     {
                         userToken && (
                             <View style={styles.likeContainer}>
-                              <TouchableOpacity onPress={() => toggleLike(item.id)}>
+                              <TouchableOpacity onPress={() => toggleLike()}>
                                 <FontAwesome
-                                    name={item.isLiked ? "heart" : "heart-o"}
+                                    name={comment?.isLiked ? "heart" : "heart-o"}
                                     size={24}
-                                    color={item.isLiked ? "red" : "#000"}
+                                    color={comment?.isLiked ? "red" : "#000"}
                                 />
                               </TouchableOpacity>
                             </View>

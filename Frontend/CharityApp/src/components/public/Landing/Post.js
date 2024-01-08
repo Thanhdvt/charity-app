@@ -1,10 +1,20 @@
 import React, {useContext, useEffect, useState} from "react";
-import {ActivityIndicator, FlatList, Image, Share, StyleSheet, Text, TouchableOpacity, View,} from "react-native";
+import {
+  ActivityIndicator,
+  Dimensions,
+  FlatList,
+  Image,
+  Share,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import Feather from "react-native-vector-icons/Feather";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import {Ionicons,} from "@expo/vector-icons";
 import {COLORS, images} from "../../../constants";
-import {useNavigation} from "@react-navigation/native";
+import {useFocusEffect, useNavigation} from "@react-navigation/native";
 import Button from "../../common/Button";
 import {AuthContext} from "../../../context/AuthContext";
 import {getAllEvent} from "../../../services/Event/GetAllEvent";
@@ -12,6 +22,12 @@ import {getOrganizationById} from "../../../services/CharityOrganization/{id}/Ge
 import {getUserById} from "../../../services/User/{id}/GetUserById";
 import Skeleton from "../../common/Skeleton";
 import ModalPop from "../../Modal/PopModal";
+import getBackgroundByEventId from "../../../../firebase/getBackgroundByEventId";
+import getAllFileByEventId from "../../../../firebase/GetAllFileByEventId";
+import {Video} from "expo-av";
+import {SwiperFlatList} from "react-native-swiper-flatlist";
+
+const {width, height} = Dimensions.get("screen");
 
 const Post = ({setModalVisible, showNotice}) => {
   const postInfo = [
@@ -40,8 +56,8 @@ const Post = ({setModalVisible, showNotice}) => {
   const toggleDescription = (index) => {
     setExpandedPostIndex((prevIndex) => (prevIndex === index ? null : index));
   };
-  const navigateToCommentScreen = () => {
-    navigation.navigate("Comment");
+  const navigateToCommentScreen = (id) => {
+    navigation.navigate("Comment", {eventId: id});
   };
 
   const handleEventPress = () => {
@@ -94,6 +110,35 @@ const Post = ({setModalVisible, showNotice}) => {
     }
   };
 
+  const isVideo = (media) => {
+    return media.toLowerCase().includes('.mp4') || media.toLowerCase().includes('youtube.com/watch');
+  };
+
+  const Card = ({media}) => {
+    return (
+        <View>
+          {isVideo(media) ? (
+              <>
+                <Video
+                    // ref={video}
+                    source={{uri: media}}
+                    useNativeControls={true}
+                    style={{width: width, height: height / 3}}
+                    resizeMode={"cover"}
+                    // posterSource={{uri: 'https://firebasestorage.googleapis.com/v0/b/charity-app-9a8ed.appspot.com/o/files%2Fb554b375-e8e3-41a4-b953-005788be9957?alt=media&token=4f34e019-fe3c-4d8e-bc0f-c96ef2de4b62'}}
+                    //PosterComponent={CustomPosterComponent}
+                    // usePoster={true}
+                    // shouldPlay={isPlaying}
+                />
+              </>
+          ) : (
+              <View style={{paddingBottom: 40}}>
+                <Image source={{uri: media}} style={{width: width, height: height / 3}}/>
+              </View>
+          )}
+        </View>
+    );
+  };
 
   const showModal = () => {
     return (
@@ -143,36 +188,40 @@ const Post = ({setModalVisible, showNotice}) => {
     )
   }
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await getAllEvent();
-        const updatedList = await Promise.all(
-            res.data.map(async (item) => {
-              try {
-                const organization = await getOrganizationById(item.organization_Id);
-                if (organization) {
-                  const userResponse = await getUserById(organization.data.user_Id)
-                  const { image, name, email } = userResponse.data;
-                  return { ...item, image, name, email };
-                }
-              } catch (error) {
-                console.error('Error fetching user data', error);
-                return item;
-              }
-            })
-        );
-        setEventList(updatedList);
-      } catch (error) {
-        console.error('Error fetching data', error);
-        setEventList([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  useFocusEffect(
+      React.useCallback(() => {
+        const fetchData = async () => {
+          try {
+            const res = await getAllEvent();
+            const updatedList = await Promise.all(
+                res.data.map(async (item) => {
+                  try {
+                    const organization = await getOrganizationById(item.organization_Id);
+                    if (organization) {
+                      const userResponse = await getUserById(organization.data.user_Id)
+                      const urlFiles = await getAllFileByEventId(organization.data.user_Id, item.id);
+                      const files = [...Object.values(urlFiles)].filter(item => item);
+                      const { image, name, email } = userResponse.data;
+                      return { ...item, image, name, email, files };
+                    }
+                  } catch (error) {
+                    console.error('Error fetching user data', error);
+                    return item;
+                  }
+                })
+            );
+            setEventList(updatedList);
+          } catch (error) {
+            console.error('Error fetching data', error);
+            setEventList([]);
+          } finally {
+            setIsLoading(false);
+          }
+        };
 
-    fetchData();
-  }, [page])
+        fetchData();
+      }, [page])
+  );
 
   return (
       isLoading ? (
@@ -246,16 +295,15 @@ const Post = ({setModalVisible, showNotice}) => {
                             </Text>
                         )}
                       </View>
-                      <View
-                          style={{
-                            position: "relative",
-                            justifyContent: "center",
-                            alignItems: "center",
-                          }}
-                      >
-                        <Image
-                            source={images.onboarding}
-                            style={{ width: "100%", height: 400 }}
+                      <View style={{flex: 1}}>
+                        <SwiperFlatList
+                            index={0}
+                            showPagination
+                            data={event?.files}
+                            renderItem={({item}) => <Card media={item}/>}
+                            paginationStyleItem={{width: 8, height: 8}}
+                            paginationDefaultColor={COLORS.secondaryGray}
+                            paginationActiveColor={COLORS.primary}
                         />
                       </View>
                       <View
@@ -264,7 +312,8 @@ const Post = ({setModalVisible, showNotice}) => {
                             justifyContent: "space-between",
                             alignItems: "center",
                             paddingHorizontal: 12,
-                            paddingVertical: 15,
+                            paddingBottom: 15,
+                            paddingTop: 0
                           }}
                       >
                         <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -278,7 +327,7 @@ const Post = ({setModalVisible, showNotice}) => {
                                 }}
                             />
                           </TouchableOpacity>
-                          <TouchableOpacity onPress={navigateToCommentScreen}>
+                          <TouchableOpacity onPress={() => navigateToCommentScreen(event.id)}>
                             <Ionicons
                                 name="md-chatbubble-ellipses-outline"
                                 style={{ fontSize: 28, paddingRight: 25 }}
@@ -309,7 +358,7 @@ const Post = ({setModalVisible, showNotice}) => {
                                 fontSize: 14,
                                 fontWeight: "500",
                               }}
-                              onPress={navigateToCommentScreen}
+                              onPress={() => navigateToCommentScreen(event.id)}
                           >
                             View all comments
                           </Text>

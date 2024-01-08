@@ -11,17 +11,16 @@ import {
     View
 } from 'react-native';
 import {COLORS, images} from '../../../constants';
-import {useNavigation} from "@react-navigation/native";
+import {useFocusEffect, useNavigation} from "@react-navigation/native";
 import Button from "../../common/Button";
 import {AntDesign} from "@expo/vector-icons";
 import {getAllEvent} from "../../../services/Event/GetAllEvent";
-import {getAllOrganization} from "../../../services/CharityOrganization/GetAllOrganization";
 import {getUserById} from "../../../services/User/{id}/GetUserById";
 import {getOrganizationById} from "../../../services/CharityOrganization/{id}/GetOrganizationById";
 import {AuthContext} from "../../../context/AuthContext";
 import ModalPop from "../../Modal/PopModal";
-import {hideMessage, showMessage} from "react-native-flash-message";
 import SkeletonForEventList from "../../common/SkeletonForEventList";
+import getBackgroundByEventId from "../../../../firebase/getBackgroundByEventId";
 
 const {width} = Dimensions.get('screen');
 const EventList = () => {
@@ -52,35 +51,40 @@ const EventList = () => {
         navigation.navigate("Login");
     }
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const res = await getAllEvent();
-                const updatedList = await Promise.all(
-                    res.data.map(async (item) => {
-                        try {
-                            const organization = await getOrganizationById(item.organization_Id);
-                            if (organization) {
-                                const userResponse = await getUserById(organization.data.user_Id)
-                                const {image, name, email} = userResponse.data;
-                                return {...item, image, name, email};
+    useFocusEffect(
+        React.useCallback(() => {
+            const fetchData = async () => {
+                try {
+                    const res = await getAllEvent();
+                    const updatedList = await Promise.all(
+                        res.data.map(async (item) => {
+                            try {
+                                const organization = await getOrganizationById(item.organization_Id);
+                                if (organization) {
+                                    const userResponse = await getUserById(organization.data.user_Id);
+                                    const background = await getBackgroundByEventId(organization.data.user_Id, item.id);
+                                    const { image, name, email } = userResponse.data;
+                                    return { ...item, image, name, email, background };
+                                }
+
+                            } catch (error) {
+                                console.error('Error fetching user data', error);
+                                return item;
                             }
-                        } catch (error) {
-                            console.error('Error fetching user data', error);
-                            return item;
-                        }
-                    })
-                );
-                setEventList(updatedList);
-            } catch (error) {
-                console.error('Error fetching data', error);
-                setEventList([]);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        fetchData();
-    }, []);
+                        })
+                    );
+                    setEventList(updatedList);
+                } catch (error) {
+                    console.error('Error fetching data', error);
+                    setEventList([]);
+                } finally {
+                    setIsLoading(false);
+                }
+            };
+            fetchData();
+
+        }, [])
+    );
 
     const showModal = () => {
         return (
@@ -143,7 +147,7 @@ const EventList = () => {
                         organizationId: event.organization_Id
                     })}>
                     <View style={{width: width / 1.4, backgroundColor: COLORS.grey, marginRight: 20, borderRadius: 16}}>
-                        <ImageBackground style={styles.cardImage} source={post.image}>
+                        <ImageBackground style={styles.cardImage} source={event?.background ? {uri: event?.background} : images.onboarding_2}>
                             <View style={{
                                 flexDirection: "row",
                                 alignItems: 'flex-start',
@@ -221,7 +225,6 @@ const EventList = () => {
                         </View>
                     </View>
                 </TouchableOpacity>
-
         );
     };
 
