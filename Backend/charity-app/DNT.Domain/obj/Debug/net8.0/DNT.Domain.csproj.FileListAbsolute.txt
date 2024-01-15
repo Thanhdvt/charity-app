@@ -1,0 +1,13 @@
+C:\Users\dell\Documents\DNT\DNT.Domain\bin\Debug\net8.0\DNT.Domain.deps.json
+C:\Users\dell\Documents\DNT\DNT.Domain\bin\Debug\net8.0\DNT.Domain.dll
+C:\Users\dell\Documents\DNT\DNT.Domain\bin\Debug\net8.0\DNT.Domain.pdb
+C:\Users\dell\Documents\DNT\DNT.Domain\obj\Debug\net8.0\DNT.Domain.csproj.AssemblyReference.cache
+C:\Users\dell\Documents\DNT\DNT.Domain\obj\Debug\net8.0\DNT.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\dell\Documents\DNT\DNT.Domain\obj\Debug\net8.0\DNT.Domain.AssemblyInfoInputs.cache
+C:\Users\dell\Documents\DNT\DNT.Domain\obj\Debug\net8.0\DNT.Domain.AssemblyInfo.cs
+C:\Users\dell\Documents\DNT\DNT.Domain\obj\Debug\net8.0\DNT.Domain.csproj.CoreCompileInputs.cache
+C:\Users\dell\Documents\DNT\DNT.Domain\obj\Debug\net8.0\DNT.Domain.sourcelink.json
+C:\Users\dell\Documents\DNT\DNT.Domain\obj\Debug\net8.0\DNT.Domain.dll
+C:\Users\dell\Documents\DNT\DNT.Domain\obj\Debug\net8.0\refint\DNT.Domain.dll
+C:\Users\dell\Documents\DNT\DNT.Domain\obj\Debug\net8.0\DNT.Domain.pdb
+C:\Users\dell\Documents\DNT\DNT.Domain\obj\Debug\net8.0\ref\DNT.Domain.dll

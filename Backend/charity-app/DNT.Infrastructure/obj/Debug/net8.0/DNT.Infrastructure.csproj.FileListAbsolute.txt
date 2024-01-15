@@ -1,0 +1,16 @@
+C:\Users\dell\Documents\DNT\DNT.Infrastructure\bin\Debug\net8.0\DNT.Infrastructure.deps.json
+C:\Users\dell\Documents\DNT\DNT.Infrastructure\bin\Debug\net8.0\DNT.Infrastructure.dll
+C:\Users\dell\Documents\DNT\DNT.Infrastructure\bin\Debug\net8.0\DNT.Infrastructure.pdb
+C:\Users\dell\Documents\DNT\DNT.Infrastructure\bin\Debug\net8.0\DNT.Domain.dll
+C:\Users\dell\Documents\DNT\DNT.Infrastructure\bin\Debug\net8.0\DNT.Domain.pdb
+C:\Users\dell\Documents\DNT\DNT.Infrastructure\obj\Debug\net8.0\DNT.Infrastructure.csproj.AssemblyReference.cache
+C:\Users\dell\Documents\DNT\DNT.Infrastructure\obj\Debug\net8.0\DNT.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\dell\Documents\DNT\DNT.Infrastructure\obj\Debug\net8.0\DNT.Infrastructure.AssemblyInfoInputs.cache
+C:\Users\dell\Documents\DNT\DNT.Infrastructure\obj\Debug\net8.0\DNT.Infrastructure.AssemblyInfo.cs
+C:\Users\dell\Documents\DNT\DNT.Infrastructure\obj\Debug\net8.0\DNT.Infrastructure.csproj.CoreCompileInputs.cache
+C:\Users\dell\Documents\DNT\DNT.Infrastructure\obj\Debug\net8.0\DNT.Infrastructure.sourcelink.json
+C:\Users\dell\Documents\DNT\DNT.Infrastructure\obj\Debug\net8.0\DNT.Infrastructure.csproj.CopyComplete
+C:\Users\dell\Documents\DNT\DNT.Infrastructure\obj\Debug\net8.0\DNT.Infrastructure.dll
+C:\Users\dell\Documents\DNT\DNT.Infrastructure\obj\Debug\net8.0\refint\DNT.Infrastructure.dll
+C:\Users\dell\Documents\DNT\DNT.Infrastructure\obj\Debug\net8.0\DNT.Infrastructure.pdb
+C:\Users\dell\Documents\DNT\DNT.Infrastructure\obj\Debug\net8.0\ref\DNT.Infrastructure.dll
