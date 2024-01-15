@@ -6,10 +6,12 @@ import {MaterialCommunityIcons} from "@expo/vector-icons";
 import {Caption, Title, useTheme,} from "react-native-paper";
 import {createStackNavigator} from "@react-navigation/stack";
 import {AuthContext} from "../../../context/AuthContext";
+import {useTranslation} from "react-i18next";
 
 const MenuStack = createStackNavigator();
 
 const MenuContent = ({ navigation }) => {
+  const {t} = useTranslation();
   const {userInfo} = useContext(AuthContext)
   const {logout} = useContext(AuthContext);
   const navigateToProfile = () => {
@@ -198,7 +200,7 @@ const MenuContent = ({ navigation }) => {
             fontSize: 15,
           }}
         >
-          {text}{" "}
+          {t(text)}{" "}
         </Text>
       </TouchableOpacity>
     </View>
@@ -249,7 +251,7 @@ const MenuContent = ({ navigation }) => {
             }}
           >
             <Text style={{ ...FONTS.h5, marginVertical: 5, color: "#A9A9A9" }}>
-              {section.title}
+              {t(section.title)}
             </Text>
             <View style={{ backgroundColor: "white", borderRadius: 18 }}>
               {section.items.map((item, itemIndex) => (

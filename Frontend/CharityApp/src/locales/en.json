@@ -1,4 +1,26 @@
 {
+  "Trang chủ": "Home",
+  "Hồ sơ": "Profile",
+  "Trang tổng quan": "Dashboard",
+  "Chỉnh sửa thông tin": "Edit profile",
+  "Cài đặt tài khoản": "Setting account",
+  "Hoạt động": "Activity",
+  "Hội nhóm": "Organizaion",
+  "Bảng tin sự kiện": "Event summary",
+  "Báo cáo & Thống kê": "Statistical report",
+  "Khác": "Other",
   "Ngôn ngữ": "Language",
-  "welcome": "Welcome to my app"
+  "Chính sách và điều khoản": "Policy and terms",
+  "Đăng xuất": "Sign out",
+  "Người theo dõi": "Followers",
+  "Lượt yêu thích": "Like",
+  "Lượt ủng hộ": "Visit",
+  "Số lượng người tham gia":  "Numbers of visiters",
+  "Bài viết hôm nay":  "Post for today",
+  "Ảnh/video": "Image/Video",
+  "Xem tất cả": "View all",
+  "Xem tất cả bình luận": "View all comments",
+  "Không có bài viết": "No more events",
+  "Đăng ký tham gia": "Regist Event",
+  "Yêu cầu trợ giúp": "Help Request"
 }

@@ -128,7 +128,7 @@ const ForHelpCreate = ({navigation}) => {
         if (validate()) {
             const newForHelpRequest = {
                 description: description,
-                date: "2023-12-06T10:45:20.548Z",
+                date: "2023-01-014T10:45:20.548Z",
                 status: 1,
                 user_id: userInfo.id,
                 organization_Id: organization_Id

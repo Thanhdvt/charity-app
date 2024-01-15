@@ -20,7 +20,7 @@ const GenericSetupScreen = () => {
     const [visible, setVisible] = useState(false);
     const {t} = useTranslation();
     const navigation = useNavigation();
-    const [language, setLanguage] = useState("en");
+    const [language, setLanguage] = useState("vi");
 
     const changeLng = lng => {
         i18next.changeLanguage(lng);
@@ -47,7 +47,7 @@ const GenericSetupScreen = () => {
                         marginLeft: 30,
                     }}
                 >
-                    Ngôn ngữ
+                    {t('Ngôn ngữ')}
                 </Text>
             </View>
             <TouchableOpacity style={styles.button} onPress={() => setVisible(true)}>

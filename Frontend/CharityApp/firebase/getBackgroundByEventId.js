@@ -8,22 +8,24 @@ const getBackgroundByEventId = async (userId, eventId) => {
 
         // Check if there's any data
         if (snapshot.exists()) {
-            const keys = Object.keys(snapshot.val());
-            const lastChildKey = keys[keys.length - 1];
-            const lastChildValue = snapshot.val()[lastChildKey];
-            // console.log('Last child key:', lastChildKey);
-            console.log('Last child value:', lastChildValue);
+            const values = Object.values(snapshot.val());
 
-            if(lastChildValue.toLowerCase().includes('.jpeg')){
-                return lastChildValue;  // Return imageUrl
+            // Find the first image URL (if any)
+            const imageUrl = values.find(value => value.toLowerCase().includes('.jpeg'));
+
+            if (imageUrl) {
+                return imageUrl;  // Return the first image URL
+            } else {
+                console.log('No JPEG image found in the data.');
+                return null;
             }
-            return null;
         } else {
             console.log('No data under the specified path.');
             return null;
         }
     } catch (error) {
         console.error('Lỗi khi lấy ảnh từ Realtime Database', error);
+        return null;
     }
 };
 

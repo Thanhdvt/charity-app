@@ -201,7 +201,7 @@ const Post = () => {
                       >
                         <View style={{ flexDirection: "row", alignItems: "center" }}>
                           <Image
-                              source={postInfo[0].postPersonImage}
+                              source={data?.image ? {uri: data?.image} : images.avatar_default}
                               style={{ width: 40, height: 40, borderRadius: 100 }}
                           />
                           <View style={{ paddingLeft: 5 }}>

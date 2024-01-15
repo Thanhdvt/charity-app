@@ -8,11 +8,13 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import {AuthContext} from "../../context/AuthContext";
 import getAvatar from "../../../firebase/getAvatar";
 import FlashMessage, {hideMessage, showMessage} from "react-native-flash-message";
+import getBackground from "../../../firebase/getBackground";
 
 const IntroInfo = () => {
     const {userInfo, charityOrganization} = useContext(AuthContext);
     const navigation = useNavigation();
     const [selectedImage, setSelectedImage] = useState();
+    const [background, setBackgroud] = useState();
 
     const navigateGoBack = () => {
         navigation.goBack();
@@ -22,8 +24,12 @@ const IntroInfo = () => {
         const fetchUserProfileImage = async () => {
             try {
                 const imageUrl = await getAvatar(userInfo.id);
+                const background = await getBackground(userInfo.id);
                 if (imageUrl) {
                     setSelectedImage(imageUrl);
+                }
+                if(background) {
+                        setBackgroud(background);
                 }
             } catch (error) {
                 console.error('Lỗi khi lấy ảnh từ Realtime Database', error);
@@ -55,7 +61,7 @@ const IntroInfo = () => {
             <FlashMessage position="top" style={{marginHorizontal: 20, borderRadius: 12}}/>
             <View style={{width: "100%"}}>
                 <Image
-                    source={images.cover}
+                    source={background ? {uri: background} : images.cover}
                     resizeMode="cover"
                     style={{
                         height: 228,
@@ -265,95 +271,99 @@ const IntroInfo = () => {
                     </TouchableOpacity>
                 </View>
 
-                <View
-                    style={{
-                        paddingVertical: 8,
-                        flexDirection: "row",
-                    }}
-                >
-                    <View
-                        style={{
-                            flexDirection: "column",
-                            alignItems: "center",
-                            paddingHorizontal: SIZES.padding,
-                            borderRightWidth: 1,
-                            borderColor: COLORS.secondaryGray,
-                        }}
-                    >
-                        <Text
+                {
+                    userInfo.role === 1 && (
+                        <View
                             style={{
-                                ...FONTS.h3,
-                                color: COLORS.black,
+                                paddingVertical: 8,
+                                flexDirection: "row",
                             }}
                         >
-                            7,2 K
-                        </Text>
-                        <Text
-                            style={{
-                                ...FONTS.body4,
-                                color: COLORS.secondary,
-                                paddingVertical: 5,
-                            }}
-                        >
-                            Người theo dõi
-                        </Text>
-                    </View>
+                            <View
+                                style={{
+                                    flexDirection: "column",
+                                    alignItems: "center",
+                                    paddingHorizontal: SIZES.padding,
+                                    borderRightWidth: 1,
+                                    borderColor: COLORS.secondaryGray,
+                                }}
+                            >
+                                <Text
+                                    style={{
+                                        ...FONTS.h3,
+                                        color: COLORS.black,
+                                    }}
+                                >
+                                    7,2 K
+                                </Text>
+                                <Text
+                                    style={{
+                                        ...FONTS.body4,
+                                        color: COLORS.secondary,
+                                        paddingVertical: 5,
+                                    }}
+                                >
+                                    Người theo dõi
+                                </Text>
+                            </View>
 
-                    <View
-                        style={{
-                            flexDirection: "column",
-                            alignItems: "center",
-                            paddingHorizontal: SIZES.padding,
-                            borderRightWidth: 1,
-                            borderColor: COLORS.secondaryGray,
-                        }}
-                    >
-                        <Text
-                            style={{
-                                ...FONTS.h3,
-                                color: COLORS.black,
-                                marginHorizontal: 10,
-                            }}
-                        >
-                            6,7 K
-                        </Text>
-                        <Text
-                            style={{
-                                ...FONTS.body4,
-                                color: COLORS.secondary,
-                                paddingVertical: 5,
-                            }}
-                        >
-                            Lượt yêu thích
-                        </Text>
-                    </View>
+                            <View
+                                style={{
+                                    flexDirection: "column",
+                                    alignItems: "center",
+                                    paddingHorizontal: SIZES.padding,
+                                    borderRightWidth: 1,
+                                    borderColor: COLORS.secondaryGray,
+                                }}
+                            >
+                                <Text
+                                    style={{
+                                        ...FONTS.h3,
+                                        color: COLORS.black,
+                                        marginHorizontal: 10,
+                                    }}
+                                >
+                                    6,7 K
+                                </Text>
+                                <Text
+                                    style={{
+                                        ...FONTS.body4,
+                                        color: COLORS.secondary,
+                                        paddingVertical: 5,
+                                    }}
+                                >
+                                    Lượt yêu thích
+                                </Text>
+                            </View>
 
-                    <View
-                        style={{
-                            flexDirection: "column",
-                            alignItems: "center",
-                            paddingHorizontal: SIZES.padding,
-                        }}
-                    >
-                        <Text
-                            style={{
-                                ...FONTS.h3,
-                                color: COLORS.black,
-                            }}
-                        >
-                            26,8 K
-                        </Text>
-                        <Text
-                            style={{
-                                ...FONTS.body4,
-                                color: COLORS.secondary,
-                                paddingVertical: 5,
-                            }}
-                        >
-                            Lượt ủng hộ
-                        </Text>
-                    </View>
-                </View>
+                            <View
+                                style={{
+                                    flexDirection: "column",
+                                    alignItems: "center",
+                                    paddingHorizontal: SIZES.padding,
+                                }}
+                            >
+                                <Text
+                                    style={{
+                                        ...FONTS.h3,
+                                        color: COLORS.black,
+                                    }}
+                                >
+                                    26,8 K
+                                </Text>
+                                <Text
+                                    style={{
+                                        ...FONTS.body4,
+                                        color: COLORS.secondary,
+                                        paddingVertical: 5,
+                                    }}
+                                >
+                                    Lượt ủng hộ
+                                </Text>
+                            </View>
+                        </View>
+                    )
+                }
             </View>
         </View>
     );

@@ -5,14 +5,14 @@ import 'firebase/compat/storage';
 import 'firebase/compat/database';
 
 const firebaseConfig = {
-    apiKey: "AIzaSyDW1X5WGzKRR-L2WRXnaOTe80jRsRU_uJY",
-    authDomain: "charity-app-9a8ed.firebaseapp.com",
-    projectId: "charity-app-9a8ed",
-    storageBucket: "charity-app-9a8ed.appspot.com",
-    messagingSenderId: "403380094991",
-    appId: "1:403380094991:web:1972fd69bc63006a5f3b7a",
-    measurementId: "G-56PBH83EGZ",
-    databaseURL: 'https://charity-app-9a8ed-default-rtdb.asia-southeast1.firebasedatabase.app/'
+    apiKey: "AIzaSyDMchEmbrBR69MGGOswDK_YqbqOENHsUtg",
+    authDomain: "charity-70c6d.firebaseapp.com",
+    databaseURL: "https://charity-70c6d-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "charity-70c6d",
+    storageBucket: "charity-70c6d.appspot.com",
+    messagingSenderId: "582471099265",
+    appId: "1:582471099265:web:6b1b3cb36b51b8eab2be80",
+    measurementId: "G-HZ9XK0H432"
 };
 
 if (!firebaseConfig.length) {

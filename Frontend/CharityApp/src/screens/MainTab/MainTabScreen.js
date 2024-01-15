@@ -10,6 +10,7 @@ import {MaterialCommunityIcons} from "@expo/vector-icons";
 import NotificationScreen from "./Notification/NotificationScreen";
 import {AuthContext} from "../../context/AuthContext";
 import VolunteerTabScreen from "../VolunteerTab/VolunteerTabScreen";
+import {useTranslation} from "react-i18next";
 
 const Tab = createBottomTabNavigator();
 
@@ -29,6 +30,7 @@ const screenOptions = {
     tabBarActiveTintColor: "#FF6347",
 };
 const MainTabScreen = () => {
+    const {t} = useTranslation();
     const {userInfo} = useContext(AuthContext);
 
     return (
@@ -39,7 +41,7 @@ const MainTabScreen = () => {
                     name="Home"
                     component={HomeScreen}
                     options={{
-                        tabBarLabel: "Trang chủ",
+                        tabBarLabel: t("Trang chủ"),
                         tabBarLabelStyle: {fontSize: 12, fontWeight: "400"},
                         tabBarIcon: ({color}) => (
                             <Icon name="ios-home" color={color} size={24}/>
@@ -64,7 +66,7 @@ const MainTabScreen = () => {
                             name="VolunteerTab"
                             component={VolunteerTabScreen}
                             options={{
-                                tabBarLabel: 'Hội nhóm',
+                                tabBarLabel: t('Hội nhóm'),
                                 tabBarColor: '#694fad',
                                 tabBarIcon: ({color}) => (
                                     <MaterialCommunityIcons name="account-group" color={color} size={28}/>
@@ -79,7 +81,7 @@ const MainTabScreen = () => {
                             name="ForHelpCreate"
                             component={ForHelpCreateScreen}
                             options={{
-                                tabBarLabel: 'Trợ giúp',
+                                tabBarLabel: t('Trợ giúp'),
                                 tabBarColor: '#694fad',
                                 tabBarIcon: ({color}) => (
                                     <MaterialCommunityIcons name="hand-heart" color={color} size={24}/>
@@ -104,7 +106,7 @@ const MainTabScreen = () => {
                     name="Menu"
                     component={MenuScreen}
                     options={{
-                        tabBarLabel: "Khám phá",
+                        tabBarLabel: t("Khám phá"),
                         tabBarLabelStyle: {fontSize: 12, fontWeight: "400"},
                         tabBarColor: "#694fad",
                         tabBarIcon: ({color}) => (
